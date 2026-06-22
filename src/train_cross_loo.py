@@ -64,10 +64,21 @@ RESULTS_DIR = ROOT / "results"
 # --------------------------------------------------------------------------- #
 # shared, transferable feature basis (fit on TRAINING slices only)
 # --------------------------------------------------------------------------- #
-def fit_shared_basis(train_slices, dim, seed):
+def fit_shared_basis(train_slices, dim, seed, feature_mode="global"):
     """Fit ONE TruncatedSVD basis on the lognorm expression of the training
-    slices stacked together, plus the standardization stats. Returns a closure
-    that projects any slice (with the same gene set) into this fixed basis."""
+    slices stacked together. Returns a closure that projects any slice (with the
+    same gene set) into this fixed basis.
+
+    feature_mode controls how the 50-dim SVD embedding is standardized — the
+    knob that decides whether a held-out DONOR's features land in-distribution:
+      "global"   — standardize by the TRAINING slices' pooled mean/std. A held-out
+                   donor with a batch shift then projects OFF-distribution (this is
+                   the diagnosed failure mode of the single-donor LOO run).
+      "perslice" — standardize EACH slice by ITS OWN mean/std over spots. Every
+                   slice's feature cloud is re-centered to zero-mean/unit-var
+                   regardless of donor, a cheap, memory-safe batch correction in
+                   embedding space that keeps an unseen donor in-distribution.
+    """
     mats = [_lognorm(a) for a in train_slices]
     stacked = svstack(mats) if issparse(mats[0]) else np.vstack(mats)
     svd = TruncatedSVD(n_components=dim, random_state=seed).fit(stacked)
@@ -76,7 +87,10 @@ def fit_shared_basis(train_slices, dim, seed):
 
     def project(adata):
         Z = svd.transform(_lognorm(adata)).astype(np.float32)
-        return ((Z - mu) / sd).astype(np.float32)
+        if feature_mode == "perslice":
+            m, s = Z.mean(0), Z.std(0) + 1e-6          # this slice's own stats
+            return ((Z - m) / s).astype(np.float32)
+        return ((Z - mu) / sd).astype(np.float32)      # pooled training stats
 
     return project
 
@@ -166,6 +180,11 @@ def main() -> None:
     p.add_argument("--attn-dim", type=int, default=64)
     p.add_argument("--knn", type=int, default=6)
     p.add_argument("--pca-dim", type=int, default=50)
+    p.add_argument("--feature-mode", choices=["global", "perslice"],
+                   default="global",
+                   help="SVD-embedding standardization: 'global' (training pooled "
+                        "stats) or 'perslice' (per-slice, batch-robust for unseen "
+                        "donors)")
     p.add_argument("--epochs", type=int, default=100)
     p.add_argument("--steps-per-epoch", type=int, default=12)
     p.add_argument("--lr", type=float, default=1e-3)
@@ -193,7 +212,8 @@ def main() -> None:
                    ad.read_h5ad(DATA_DIR / f"DLPFC_{test_smp}.h5ad")]
     assert_same_genes(train_slices + test_slices)
 
-    project = fit_shared_basis(train_slices, args.pca_dim, args.seed)
+    project = fit_shared_basis(train_slices, args.pca_dim, args.seed,
+                               feature_mode=args.feature_mode)
 
     pairs = [build_pair(ref, smp, project, args.knn) for ref, smp in train_pairs]
     test = build_pair(test_ref, test_smp, project, args.knn)
@@ -205,7 +225,8 @@ def main() -> None:
     print("ARCA leave-one-out CROSS-SAMPLE generalization — design summary")
     print("=" * 70)
     print(f"  feature basis : shared TruncatedSVD dim={args.pca_dim}, "
-          f"fit on {len(train_slices)} TRAINING slices only")
+          f"fit on {len(train_slices)} TRAINING slices only "
+          f"(standardize={args.feature_mode})")
     for pr in pairs:
         print(f"  train pair    : {pr['ref']}/{pr['smp']}  "
               f"(A {pr['A'].n_obs} spots, bridge {100*pr['have'].mean():.1f}%, "
