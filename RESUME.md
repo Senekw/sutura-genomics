@@ -1,6 +1,85 @@
 # ARCA — resume checkpoint
 
 ================================================================================
+## UPDATE 2026-06-22 (later) — 3-DONOR LEAVE-ONE-OUT — STILL NEGATIVE, deeper
+================================================================================
+
+Ran the full 3-donor leave-one-out to try to FIX the single-donor transfer
+failure (section below). Trained the shared encoder on TWO donors and evaluated
+on the held-out third, across all 3 folds, under two feature-standardization
+modes. **Multi-donor training did NOT fix generalization, and neither did the
+batch-correction variant.** But it changed the failure mechanism in an
+informative way. ARCA still loses to PASTE2 on every unseen donor.
+
+### Setup
+- Downloaded subj3 pair 151673/151674 (so all 3 donors on disk now).
+- One pair per donor: S1=151507/08, S2=151669/70, S3=151673/74.
+- 3 folds (leave-out S1 / S2 / S3), each trains on the OTHER two donors' pairs;
+  100 epochs x 24 steps (~1200 steps/pair, matches the single-pair supervision).
+- Two feature modes (`--feature-mode`, src/train_cross_loo.py):
+  * `global`   = standardize SVD embedding by TRAINING-pooled stats (control).
+  * `perslice` = standardize each slice by its OWN stats (cheap batch correction,
+    re-centers every slice incl. the unseen donor to zero-mean/unit-var).
+- PASTE2 baselines on all 3 held-out pairs (subj3 sweep added this run).
+- Orchestrated by run_loo_3donor.ps1 (ran as detached scheduled task ARCA_LOO3);
+  finished 2026-06-22 16:05 UTC, 0 failures.
+
+### Result — registration error MEDIAN (px), tear regime, sev0->8
+| held-out | ARCA in-sample | ARCA held-out (global) | ARCA held-out (perslice) | PASTE2 held-out |
+|----------|----------------|------------------------|--------------------------|-----------------|
+|   S1     |   121 -> 148   |      1254 -> 1421       |       1082 -> 1242        |    658 -> 838   |
+|   S2     |   110 -> 130   |      1164 -> 1289       |       1182 -> 1198        |    526 -> 691   |
+|   S3     |    82 ->  98   |      1397 -> 1557       |       1259 -> 1380        |    407 -> 551   |
+(figure: results/arca_loo3_summary.png — one panel per held-out donor)
+
+### Verdict (three clean conclusions)
+1. **In-sample is excellent, held-out is not.** Trained on 2 donors, ARCA stays
+   SUB-PITCH on its training donors (82-148 px) but lands ~8-11 spot pitches out
+   on the unseen donor (1080-1557 px) in EVERY fold. Adding a second training
+   donor did NOT buy donor-invariance.
+2. **Per-slice batch correction helps only marginally.** perslice beats global on
+   2 of 3 folds (S1 -180px, S3 -140px) and is ~flat-but-equal on S2 — a real but
+   small (~10-15%) gain that does not close the ~1000px gap.
+3. **ARCA loses to PASTE2 on every unseen donor.** PASTE2 (unsupervised, no
+   train/test gap) is 407-838 px held-out; ARCA is 2-3x worse on all 3 donors.
+   ARCA's earlier "win" was entirely contingent on training on the test tissue.
+
+### Mechanism CHANGED vs single-donor (diagnosed, fold S1, sev0)
+- Single-donor run: attention near-UNIFORM (eff. support 2367/3661 A-spots) ->
+  predictions blur to the tissue centroid -> ~1500px.
+- 3-donor run: attention is now SHARP (eff. support 301 global / 404 perslice of
+  4226) but matches held-out B spots to the WRONG A-locations -> still ~1250px.
+  => Multi-donor training fixed the COLLAPSE (encoder is now discriminative) but
+  the learned correspondences are CONFIDENT-BUT-WRONG on unseen tissue. The gap
+  is in cross-donor correspondence alignment, not feature non-discrimination.
+
+### What this means for next steps (the real fix is harder than batch-norming)
+The problem is the learned matching does not transfer, even with discriminative
+features. Promising directions, in rough priority:
+(a) explicit correspondence supervision that is donor-invariant — e.g. a
+    contrastive / InfoNCE loss tying B-spot embeddings to their array-bridge A
+    partner, so the SIMILARITY GEOMETRY (not just per-spot features) transfers;
+(b) stronger expression integration BEFORE the encoder (Harmony/Scanorama across
+    all training donors, projected onto the held-out donor) rather than the
+    lightweight perslice z-score;
+(c) more donors (the dataset has 12 slices / 6 pairs; we used 3 pairs) so the
+    encoder sees more cross-donor variation;
+(d) geometry-aware matching (optimal-transport head on embeddings, i.e. graft
+    PASTE2's strength onto ARCA) since pure soft-attention mismatches across
+    donors.
+Honest read: ARCA as a learned registrar is NOT yet competitive with PASTE2
+out-of-sample. The in-sample win is real but does not generalize; (a) is the
+most direct test of whether the architecture can be salvaged.
+
+### Artifacts (results/)
+- arca_loo3_<mode>_test<S1|S2|S3>_{test,train}_curve.csv  (12 curves) + .pt (6).
+- arca_loo3_summary.png — 3-panel figure (in-sample / global / perslice / PASTE2).
+- sweep_deformation_cross_tear_subj3.csv — PASTE2 baseline on subj3 (new).
+- loo3_run.log, loo3_DONE.txt — orchestration log + completion marker.
+- Code: src/train_cross_loo.py (added --feature-mode), src/overlay_loo3.py (NEW),
+  run_loo_3donor.ps1 (NEW orchestration).
+
+================================================================================
 ## UPDATE 2026-06-22 — LEAVE-ONE-OUT GENERALIZATION TEST (caveat #2) — NEGATIVE
 ================================================================================
 
