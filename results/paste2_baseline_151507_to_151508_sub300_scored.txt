@@ -1,0 +1,4 @@
+tag=151507_to_151508_sub300 s=1.0
+paste2_accuracy=0.6267 (188/300)
+random_floor=0.1803 +/- 0.0225 (50 trials)
+masked_a_na=0 masked_partner_na=0

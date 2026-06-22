@@ -1,0 +1,6 @@
+PASTE2 baseline 151507->151508
+s=0.99 alpha=0.1 dissimilarity=pca subsample=0
+runtime_s=210.5
+paste2_accuracy=0.6526 (2754/4220)
+random_floor=0.1866 +/- 0.0062 (50 trials)
+masked_a_na=5 masked_partner_na=1

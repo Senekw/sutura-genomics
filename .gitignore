@@ -1,0 +1,16 @@
+# Python env
+.venv/
+__pycache__/
+*.pyc
+
+# Large raw data — regenerable via src/prepare_data.py and src/warp_slice.py
+data/
+*.h5ad
+
+# Large transport matrices — regenerable via the sweep scripts (exceed GitHub's
+# 100 MB limit at full-spot resolution). Results CSVs, PNG figures, .pt
+# checkpoints, and .npz metadata ARE tracked (they are the deliverables).
+*.npy
+
+# Notebook checkpoints
+.ipynb_checkpoints/
