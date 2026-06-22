@@ -132,19 +132,32 @@ class ARCACrossNet(nn.Module):
             nn.Linear(2 * hidden + 2, hidden), nn.ReLU(),
             nn.Linear(hidden, 2))
 
-    def forward(self, ga, gb, a_coords_norm):
+    def forward(self, ga, gb, a_coords_norm, return_match=False):
         """ga/gb: dicts with x, edge_index, edge_attr. a_coords_norm: (n_A,2) pitch units.
-        Returns predicted A-frame coords for every B spot, in pitch units."""
+        Returns predicted A-frame coords for every B spot, in pitch units.
+
+        If return_match=True, also returns a dict of cross-slice match logits over
+        every (B spot, A spot) pair for the contrastive correspondence loss — both
+        the raw scaled attention logits (q.k*scale, the distribution actually used
+        for the coarse prediction) and the L2-normalized cosine similarity (for the
+        canonical temperature-scaled InfoNCE read-out). Inference path (return_match
+        False) is byte-for-byte unchanged."""
         z_a = self.encoder(ga["x"], ga["edge_index"], ga["edge_attr"])   # (n_A,H)
         z_b = self.encoder(gb["x"], gb["edge_index"], gb["edge_attr"])   # (n_B,H)
 
-        scores = (self.q(z_b) @ self.k(z_a).T) * self.scale              # (n_B,n_A)
+        qb, ka = self.q(z_b), self.k(z_a)                                # (n_B,d),(n_A,d)
+        scores = (qb @ ka.T) * self.scale                                # (n_B,n_A)
         attn = torch.softmax(scores, dim=1)
         coarse = attn @ a_coords_norm                                    # (n_B,2) soft corr.
         attended_za = attn @ self.v(z_a)                                 # (n_B,H)
 
         residual = self.head(torch.cat([z_b, attended_za, coarse], dim=-1))
-        return coarse + residual                                         # (n_B,2) pitch units
+        pred = coarse + residual                                         # (n_B,2) pitch units
+        if not return_match:
+            return pred
+        qn = torch.nn.functional.normalize(qb, dim=1)
+        kn = torch.nn.functional.normalize(ka, dim=1)
+        return pred, {"attn_logits": scores, "cos_sim": qn @ kn.T}
 
 
 # --------------------------------------------------------------------------- #
