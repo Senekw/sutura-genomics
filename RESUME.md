@@ -1,6 +1,59 @@
 # ARCA — resume checkpoint
 
 ================================================================================
+## UPDATE 2026-06-22 — LEAVE-ONE-OUT GENERALIZATION TEST (caveat #2) — NEGATIVE
+================================================================================
+
+Ran the cross-sample generalization test that caveat #2 (below) demanded. The
+result is a clean NEGATIVE: **ARCA's in-sample win does NOT transfer to an unseen
+donor as currently built.** This is the honest answer, mechanistically diagnosed.
+
+### Setup (`src/train_cross_loo.py`, NEW)
+- Train on subject 1 pair 151507/151508; evaluate on the HELD-OUT subject 2 pair
+  151669/151670 (downloaded this session, 96.1% array-bridge coverage, pitch 137).
+- Two changes made cross-tissue eval valid: (1) TRANSFERABLE FEATURES — one
+  TruncatedSVD basis fit on the TRAINING slices ONLY, then .transform applied to
+  every slice (the held-out donor never touches the basis fit OR the weights);
+  (2) the model is already pair-agnostic at inference (coarse = attn @ A_coords in
+  whatever A frame is passed). Same loss/metric/eval grid as the headline.
+
+### Result — registration error MEDIAN (px), tear regime
+| severity | ARCA in-sample (subj1) | ARCA HELD-OUT (subj2) |
+|----------|------------------------|-----------------------|
+|    0     |          95            |        1508           |
+|    8     |         118            |        1594           |
+- In-sample REPRODUCES the original head-to-head (95->118px vs original 99->118),
+  so the refactor is sound — the gap is real transfer failure, not a bug.
+- Held-out median is ~1500px ≈ **11 spot pitches**, and FLAT across severity
+  (1508->1594). The warp is irrelevant because correspondence is already lost.
+
+### Mechanism (diagnosed, not guessed)
+Cross-donor batch effect -> subj2 expression projects off-distribution in the
+subj1-fit SVD basis -> the subj1-trained encoder produces NON-discriminative
+embeddings on subj2 -> cross-attention collapses toward UNIFORM (median effective
+support 2367 of 3661 A-spots) -> barycentric averaging shrinks predictions toward
+the tissue centroid (pred std ~1134/1532 vs A's true ~2261/2209) -> ~1500px flat
+error. The failure is in FEATURE/REPRESENTATION TRANSFER, not the deformation head.
+
+### Honest framing (do not over-claim the negative either)
+1. Single-donor training is the HARDEST possible generalization ask: the encoder
+   never saw cross-donor variation, so it could not learn donor-invariance. The
+   3-donor leave-one-out (not run) would be a fairer test (encoder trains on 2).
+2. The deformation model is fine; it is being fed embeddings it cannot use.
+
+### Next steps to actually achieve generalization
+(a) batch-correct expression across donors (Harmony / Scanorama) BEFORE the SVD;
+(b) train the encoder on MULTIPLE donors so it sees cross-donor variation;
+(c) add a contrastive correspondence loss to sharpen cross-slice attention.
+
+### Artifacts (results/)
+- `arca_loo_test_curve.csv`  — held-out subj2 curve (the generalization result).
+- `arca_loo_train_curve.csv` — in-sample subj1 curve (reproduces the headline).
+- `arca_loo.pt`              — checkpoint (state_dict + args + per-pair pitch).
+- `arca_loo_generalization.png` — 2-panel figure (gap; head-to-head on unseen
+  tissue vs PASTE2 run on the same held-out pair: sweep_deformation_cross_tear_loo).
+
+================================================================================
 ## UPDATE 2026-06-20 (late) — ARCA GRAPH MODEL TRAINED + HEAD-TO-HEAD DONE
 ================================================================================
 
