@@ -79,3 +79,23 @@ Open [http://localhost:3000](http://localhost:3000).
 - Landing page: `src/app/page.tsx`
 - Demo / contact form: `src/app/demo/page.tsx`
 - Deploys via Netlify (`netlify.toml`).
+
+## Demo form backend (Supabase)
+
+The demo form writes leads to a Supabase `demo_requests` table via a client-side
+insert (the site is a static export, so there's no server). The anon key is
+public; Row Level Security restricts it to inserts only — see
+`supabase/schema.sql`.
+
+One-time setup:
+
+1. Create a project at [supabase.com](https://supabase.com) (sign in as
+   rushilmaniar2010@gmail.com).
+2. SQL Editor → paste `supabase/schema.sql` → Run.
+3. Project Settings → API → copy the **Project URL** and **anon public key**.
+4. Set both as env vars — locally in `.env.local` (see `.env.local.example`) and
+   in Netlify (Site settings → Environment variables):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Redeploy. Until these are set, the form degrades gracefully (acknowledges the
+   submission without storing). View leads in the Supabase Table editor.

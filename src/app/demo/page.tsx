@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import PrivacyPolicyModal from "@/components/ui/privacy-policy-modal";
 import { Logo } from "@/components/logo";
+import { supabase } from "@/lib/supabase";
 
 interface FormState {
   fullName: string;
@@ -38,6 +39,8 @@ export default function DemoPage() {
   });
   const [errors, setErrors] = useState<Errors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const set =
     (key: keyof FormState) =>
@@ -62,9 +65,39 @@ export default function DemoPage() {
     return Object.keys(next).length === 0;
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) setSubmitted(true);
+    if (!validate()) return;
+    setSubmitError(null);
+    setSubmitting(true);
+
+    // If Supabase isn't configured yet (env vars unset), fall back to the prior
+    // behavior so the live site never breaks — just acknowledge the submission.
+    if (!supabase) {
+      setSubmitting(false);
+      setSubmitted(true);
+      return;
+    }
+
+    const { error } = await supabase.from("demo_requests").insert({
+      full_name: v.fullName.trim(),
+      email: v.email.trim(),
+      company: v.company.trim(),
+      role: v.role.trim() || null,
+      company_size: v.size,
+      looking_for: v.looking.trim(),
+      source: v.source.trim() || null,
+    });
+
+    setSubmitting(false);
+    if (error) {
+      console.error("demo_requests insert failed:", error);
+      setSubmitError(
+        "Something went wrong saving your request. Please email us directly at rushilmaniar2010@gmail.com."
+      );
+      return;
+    }
+    setSubmitted(true);
   };
 
   return (
@@ -210,10 +243,17 @@ export default function DemoPage() {
               <Button
                 type="submit"
                 size="lg"
+                disabled={submitting}
                 className="mt-1 h-12 w-full rounded-full text-[15px]"
               >
-                Submit
+                {submitting ? "Submitting…" : "Submit"}
               </Button>
+
+              {submitError && (
+                <p className="text-center text-[13px] font-light text-destructive">
+                  {submitError}
+                </p>
+              )}
 
               <p className="text-center text-[12px] font-light leading-relaxed text-muted-foreground">
                 By submitting, you agree to our{" "}
