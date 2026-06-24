@@ -1,0 +1,291 @@
+@import "tailwindcss";
+
+/* Sutura Genomics — light theme (cuebench.dev style) */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 6%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 6%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 6%;
+
+  --primary: 240 8% 8%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 240 5% 96%;
+  --secondary-foreground: 240 8% 12%;
+
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
+
+  --accent: 240 5% 95%;
+  --accent-foreground: 240 8% 12%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 240 6% 90%;
+  --input: 240 6% 88%;
+  --ring: 256 85% 57%;
+
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+/* ───────────── Cuebench-faithful landing — exact port of cuebench.dev ─────────────
+   Values lifted 1:1 from cuebench.dev's stylesheet (ink #111, muted #8a8a8a,
+   hair rgba(17,17,17,.10), 13px/28px pill, 74px divider, rise 0.8s stagger). */
+:root {
+  --cb-ink: #111111;
+  --cb-muted: #8a8a8a;
+  --cb-hair: rgba(17, 17, 17, 0.1);
+  --cb-yc: #fb651e;
+}
+
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 72px 28px;
+  text-align: center;
+  background: #ffffff;
+  color: var(--cb-ink);
+  font-weight: 300;
+  letter-spacing: normal; /* neutralize global -0.01em so per-element spacing matches cuebench */
+}
+
+.landing .fade {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.landing .d1 { animation-delay: 0.05s; }
+.landing .d2 { animation-delay: 0.18s; }
+.landing .d3 { animation-delay: 0.32s; }
+.landing .d4 { animation-delay: 0.46s; }
+
+/* Sutura ships a square emblem (not a wide wordmark), so the logo is a lockup:
+   emblem + "Sutura Genomics" wordmark, sized to read as the page's focal mark. */
+.landing .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+.landing .brand .mark {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  display: block;
+}
+.landing .brand .word {
+  font-size: 47px;
+  font-weight: 300;
+  letter-spacing: 0.015em;
+  color: var(--cb-ink);
+}
+
+.landing .tagline {
+  margin: 24px 0 0;
+  max-width: 32rem;
+  min-height: 1.7em; /* one line — matches cuebench's tight tagline→button rhythm */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  color: var(--cb-muted);
+}
+.landing .tagline .caret {
+  color: var(--cb-ink);
+}
+
+.landing .btn {
+  margin-top: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--cb-ink);
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  padding: 13px 28px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.landing .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(17, 17, 17, 0.18);
+}
+.landing .btn:active {
+  transform: translateY(0);
+}
+.landing .btn .arrow {
+  transition: transform 0.22s ease;
+}
+.landing .btn:hover .arrow {
+  transform: translateX(3px);
+}
+
+.landing .divider {
+  width: 40px;
+  height: 1px;
+  background: var(--cb-hair);
+  margin: 74px 0 0;
+}
+
+.landing .team {
+  margin: 40px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.landing .member {
+  line-height: 1.45;
+}
+.landing .member a {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--cb-ink);
+  text-decoration: none;
+  position: relative;
+}
+.landing .member a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--cb-ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s ease;
+}
+.landing .member a:hover::after {
+  transform: scaleX(1);
+}
+.landing .member .role {
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--cb-muted);
+  letter-spacing: 0.02em;
+}
+
+.landing .foot {
+  margin-top: 64px;
+  font-size: 12px;
+  color: var(--cb-muted);
+  letter-spacing: 0.03em;
+}
+.landing .foot a,
+.landing .foot button {
+  color: var(--cb-muted);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--cb-hair);
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+.landing .foot a:hover,
+.landing .foot button:hover {
+  color: var(--cb-ink);
+}
+
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: 2px solid var(--cb-yc);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+  .landing .divider { margin-top: 56px; }
+  .landing .foot { margin-top: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing .fade {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .landing .btn,
+  .landing .btn .arrow,
+  .landing .member a::after {
+    transition: none;
+  }
+  .landing .tagline .caret {
+    animation: none;
+  }
+}
