@@ -45,6 +45,7 @@ foreach ($f in $folds) {
         foreach ($ro in $s.ros) {
             $out = "arca_ctr_{0}_l{1}_test{2}" -f $ro, $s.tag, $f.tag
             $n++
+            if (Test-Path "results\$out.pt") { Log "RUN $n/15  skip (exists) $out"; continue }
             Log "RUN $n/15  fold=test$($f.tag)  readout=$ro  lambda=$($s.lam)  out=$out"
             & $py src\train_cross_contrastive.py --train `
                 --train-pairs $f.train --test-pair $f.test `
