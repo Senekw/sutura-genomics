@@ -1,0 +1,5 @@
+PASTE2 baseline 151507->151508
+s=1.0 alpha=0.1 dissimilarity=glmpca subsample=300
+runtime_s=196.1
+accuracy=0.6267 (188/300)
+accuracy_aligned_only=0.6267 (n=300)
