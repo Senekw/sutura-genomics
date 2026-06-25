@@ -136,8 +136,8 @@ export default function DemoPage() {
         <ArrowLeft className="h-4 w-4" /> Back
       </Link>
 
-      <div className="mt-6 grid w-full max-w-4xl gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
-        {/* Left: intro + plain-language description (no em dashes) */}
+      <div className="mt-6 grid w-full max-w-4xl gap-10 lg:grid-cols-2 lg:items-start lg:gap-16">
+        {/* Left: intro + what the demo will show (no em dashes) */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <Logo size={40} withWordmark={false} className="mb-4" />
           <h1 className="text-xl font-light tracking-tight text-foreground">
@@ -148,11 +148,12 @@ export default function DemoPage() {
             be in touch.
           </p>
           <p className="mt-4 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
-            Sutura aligns spatial transcriptomics tissue sections so the same
-            cells line up from one slice to the next. Where optimal transport
-            methods slip on torn or distorted tissue, our graph deep learning
-            model learns the registration directly and stays accurate through the
-            tears and folds that real samples actually have.
+            In the demo we walk through Sutura on real spatial transcriptomics
+            slides. You will see it align serial tissue sections, keep cells
+            matched across tears and folds, and hold accuracy where optimal
+            transport pipelines drift. We compare it side by side with the
+            alignment tools you use today and tailor the walkthrough to your own
+            sample types.
           </p>
         </div>
 
