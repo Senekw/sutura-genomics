@@ -27,6 +27,10 @@ type Errors = Partial<Record<keyof FormState, string>>;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const sizes = ["1–10", "11–50", "51–200", "201–1,000", "1,000+"];
 
+// Web3Forms emails each submission to the address the key is registered to.
+// Public by design (client-side); abuse is limited by Web3Forms' spam filtering.
+const WEB3FORMS_ACCESS_KEY = "31af204b-f37d-41d6-815f-e720fd494926";
+
 export default function DemoPage() {
   const [v, setV] = useState<FormState>({
     fullName: "",
@@ -71,14 +75,7 @@ export default function DemoPage() {
     setSubmitError(null);
     setSubmitting(true);
 
-    // If Supabase isn't configured yet (env vars unset), fall back to the prior
-    // behavior so the live site never breaks — just acknowledge the submission.
-    if (!supabase) {
-      setSubmitting(false);
-      setSubmitted(true);
-      return;
-    }
-
+    // 1) Save the lead to Supabase (the source of truth).
     const { error } = await supabase.from("demo_requests").insert({
       full_name: v.fullName.trim(),
       email: v.email.trim(),
@@ -89,14 +86,42 @@ export default function DemoPage() {
       source: v.source.trim() || null,
     });
 
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       console.error("demo_requests insert failed:", error);
       setSubmitError(
         "Something went wrong saving your request. Please email us directly at rushilmaniar2010@gmail.com."
       );
       return;
     }
+
+    // 2) Best-effort email notification via Web3Forms. Never block success on
+    //    this — the lead is already saved in Supabase if the email fails.
+    try {
+      await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `New demo request — ${v.company.trim()}`,
+          from_name: "Sutura Genomics website",
+          name: v.fullName.trim(),
+          email: v.email.trim(),
+          company: v.company.trim(),
+          role: v.role.trim() || "—",
+          company_size: v.size,
+          looking_for: v.looking.trim(),
+          source: v.source.trim() || "—",
+        }),
+      });
+    } catch (err) {
+      console.error("web3forms email failed (lead is still saved):", err);
+    }
+
+    setSubmitting(false);
     setSubmitted(true);
   };
 
