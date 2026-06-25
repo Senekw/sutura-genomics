@@ -48,7 +48,16 @@ export default function Home() {
         />
       </p>
 
-      <Link className="btn fade d2" href="/demo">
+      {/* Plain-language description of what the product does (no em dashes) */}
+      <p className="desc fade d2">
+        Sutura aligns spatial transcriptomics tissue sections so the same cells
+        line up from one slice to the next. Where optimal transport methods slip
+        on torn or distorted tissue, our graph deep learning model learns the
+        registration directly and stays accurate through the tears and folds that
+        real samples actually have.
+      </p>
+
+      <Link className="btn fade d3" href="/demo">
         Book a demo
         <span className="arrow" aria-hidden="true">
           &rarr;

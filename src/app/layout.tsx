@@ -9,9 +9,9 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Sutura Genomics — The alignment layer for spatial transcriptomics",
+  title: "Sutura Genomics: The alignment layer for spatial transcriptomics",
   description:
-    "Sutura Genomics is building graph deep-learning infrastructure for aligning spatial transcriptomics tissue slices — designed for the tears and discontinuities that optimal-transport methods can't represent.",
+    "Sutura Genomics is building graph deep-learning infrastructure for aligning spatial transcriptomics tissue slices, designed for the tears and discontinuities that optimal-transport methods can't represent.",
 };
 
 export default function RootLayout({

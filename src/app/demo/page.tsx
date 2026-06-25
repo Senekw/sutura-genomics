@@ -106,15 +106,15 @@ export default function DemoPage() {
         },
         body: JSON.stringify({
           access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `New demo request — ${v.company.trim()}`,
+          subject: `New demo request from ${v.company.trim()}`,
           from_name: "Sutura Genomics website",
           name: v.fullName.trim(),
           email: v.email.trim(),
           company: v.company.trim(),
-          role: v.role.trim() || "—",
+          role: v.role.trim() || "Not provided",
           company_size: v.size,
           looking_for: v.looking.trim(),
-          source: v.source.trim() || "—",
+          source: v.source.trim() || "Not provided",
         }),
       });
     } catch (err) {
@@ -136,18 +136,28 @@ export default function DemoPage() {
         <ArrowLeft className="h-4 w-4" /> Back
       </Link>
 
-      <div className="mt-6 w-full max-w-md">
-        <div className="mb-7 flex flex-col items-center text-center">
+      <div className="mt-6 grid w-full max-w-4xl gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+        {/* Left: intro + plain-language description (no em dashes) */}
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <Logo size={40} withWordmark={false} className="mb-4" />
           <h1 className="text-xl font-light tracking-tight text-foreground">
             Get in touch
           </h1>
           <p className="mt-1.5 text-sm font-light text-muted-foreground">
-            Tell us a bit about you and the tissue you work with — we&rsquo;ll be
-            in touch.
+            Tell us a bit about you and the tissue you work with, and we&rsquo;ll
+            be in touch.
+          </p>
+          <p className="mt-4 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
+            Sutura aligns spatial transcriptomics tissue sections so the same
+            cells line up from one slice to the next. Where optimal transport
+            methods slip on torn or distorted tissue, our graph deep learning
+            model learns the registration directly and stays accurate through the
+            tears and folds that real samples actually have.
           </p>
         </div>
 
+        {/* Right: form / confirmation */}
+        <div className="w-full">
         {submitted ? (
           <div className="flex flex-col items-center rounded-2xl border border-border bg-white/80 px-6 py-12 text-center backdrop-blur-sm">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#6633ee]/10">
@@ -298,6 +308,7 @@ export default function DemoPage() {
             </div>
           </form>
         )}
+        </div>
       </div>
     </main>
   );
