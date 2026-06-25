@@ -33,12 +33,12 @@ const sections = [
   {
     title: "Your rights",
     content:
-      "You can request deletion of your information at any time by emailing rushilmaniar2010@gmail.com.",
+      "You can request deletion of your information at any time by emailing suturagenomics@gmail.com.",
   },
   {
     title: "Contact",
     content:
-      "For any privacy-related questions: rushilmaniar2010@gmail.com",
+      "For any privacy-related questions: suturagenomics@gmail.com",
   },
 ];
 
@@ -71,14 +71,14 @@ export default function PrivacyPolicyModal({
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {section.content.includes("@") ? (
                   <>
-                    {section.content.split("rushilmaniar2010@gmail.com")[0]}
+                    {section.content.split("suturagenomics@gmail.com")[0]}
                     <a
-                      href="mailto:rushilmaniar2010@gmail.com"
+                      href="mailto:suturagenomics@gmail.com"
                       className="text-[#6633ee] hover:underline"
                     >
-                      rushilmaniar2010@gmail.com
+                      suturagenomics@gmail.com
                     </a>
-                    {section.content.split("rushilmaniar2010@gmail.com")[1]}
+                    {section.content.split("suturagenomics@gmail.com")[1]}
                   </>
                 ) : (
                   section.content

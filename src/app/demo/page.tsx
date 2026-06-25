@@ -90,7 +90,7 @@ export default function DemoPage() {
       setSubmitting(false);
       console.error("demo_requests insert failed:", error);
       setSubmitError(
-        "Something went wrong saving your request. Please email us directly at rushilmaniar2010@gmail.com."
+        "Something went wrong saving your request. Please email us directly at suturagenomics@gmail.com."
       );
       return;
     }

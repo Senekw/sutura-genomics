@@ -163,16 +163,6 @@ body {
   color: var(--cb-ink);
 }
 
-.landing .desc {
-  margin: 20px auto 0;
-  max-width: 33rem;
-  font-size: 15px;
-  font-weight: 300;
-  line-height: 1.65;
-  letter-spacing: 0.01em;
-  color: var(--cb-muted);
-}
-
 .landing .btn {
   margin-top: 34px;
   display: inline-flex;
@@ -214,10 +204,8 @@ body {
 .landing .team {
   margin: 40px 0 0;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px 56px;
+  flex-direction: column;
+  gap: 24px;
 }
 .landing .member {
   line-height: 1.45;
