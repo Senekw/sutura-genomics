@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Weekly automated PRs for vulnerable / outdated npm dependencies.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+  # Keep GitHub Actions versions current too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
