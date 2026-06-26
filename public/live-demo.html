@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sutura Genomics — Live Alignment Demo</title>
+<style>
+  :root{
+    --ink:#111;--muted:#7c7c84;--hair:rgba(17,17,17,.10);
+    --accent:#6633ee;--accent-soft:#efeaff;--ref:#c9c9d2;--bg:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;letter-spacing:-.01em;font-weight:300}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 24px 56px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  header img{width:34px;height:34px;object-fit:contain}
+  header .word{font-size:24px;font-weight:300;letter-spacing:.01em}
+  .sub{color:var(--muted);font-size:15px;margin:2px 0 26px;line-height:1.5;max-width:680px}
+  .grid{display:grid;grid-template-columns:1.25fr .85fr;gap:26px;align-items:start}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--hair);border-radius:16px;background:#fff;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;background:
+    radial-gradient(120% 120% at 50% 0%,#fbfaff 0%,#ffffff 60%)}
+  .controls{padding:18px 18px 20px}
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .row+.row{margin-top:14px}
+  label.cap{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+  .sevval{font-variant-numeric:tabular-nums;font-weight:400;min-width:26px;text-align:right}
+  button{font:inherit;font-weight:400;border:0;border-radius:999px;cursor:pointer;
+    padding:11px 18px;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+  button:active{transform:translateY(1px)}
+  .b-primary{background:var(--accent);color:#fff}
+  .b-primary:hover{box-shadow:0 8px 22px rgba(102,51,238,.32)}
+  .b-ghost{background:#f4f4f6;color:var(--ink)}
+  .b-ghost:hover{background:#ececf0}
+  .b-dark{background:var(--ink);color:#fff}
+  .legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-top:14px;flex-wrap:wrap}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .cards{display:flex;flex-direction:column;gap:14px}
+  .card{border:1px solid var(--hair);border-radius:16px;padding:18px}
+  .card .name{font-size:13px;color:var(--muted);letter-spacing:.03em}
+  .card .num{font-size:40px;font-weight:300;line-height:1.05;margin-top:6px;font-variant-numeric:tabular-nums}
+  .card .unit{font-size:15px;color:var(--muted);margin-left:6px}
+  .card.sutura{background:linear-gradient(180deg,var(--accent-soft),#fff);border-color:#e3dbff}
+  .card.sutura .num{color:var(--accent)}
+  .card .note{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .ratio{text-align:center;font-size:14px;color:var(--ink);background:#f7f6ff;
+    border:1px solid #e7e1ff;border-radius:12px;padding:12px;font-weight:400}
+  .ratio b{color:var(--accent)}
+  .bars{margin-top:4px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-top:9px;font-size:12.5px}
+  .bar-row .lab{width:62px;color:var(--muted)}
+  .track{flex:1;height:9px;background:#f0f0f3;border-radius:6px;overflow:hidden}
+  .fill{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .foot{margin-top:30px;font-size:12px;color:var(--muted);line-height:1.6;max-width:780px}
+  .pill{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:4px 10px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pill">Live demo</div>
+  <header>
+    <img src="/sutura-logo.png" alt="" onerror="this.style.display='none'"/>
+    <span class="word">Sutura Genomics</span>
+  </header>
+  <p class="sub">
+    Two serial tissue sections never lie flat the same way. Drag the tear slider to
+    distort the second section, then align it. Sutura's graph model snaps the spots
+    back onto their true positions where optimal transport drifts at the tear.
+    Error numbers below are real medians from our DLPFC benchmark.
+  </p>
+
+  <div class="grid">
+    <div class="panel">
+      <canvas id="cv" width="640" height="460"></canvas>
+      <div class="controls">
+        <div class="row">
+          <label class="cap">Tissue tear severity</label>
+          <input id="sev" type="range" min="0" max="8" step="0.1" value="4" />
+          <span class="sevval" id="sevval">4</span>
+        </div>
+        <div class="row">
+          <button class="b-primary" id="runSutura">Align with Sutura</button>
+          <button class="b-ghost" id="runPaste">Align with PASTE2 (OT)</button>
+          <button class="b-dark" id="reset">Reset tear</button>
+        </div>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--ref)"></span>Reference section</span>
+          <span><span class="dot" style="background:var(--accent)"></span>Moving section</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="ratio" id="ratio">Sutura is <b>6.6&times;</b> more accurate at this tear</div>
+      <div class="card sutura">
+        <div class="name">SUTURA · median registration error</div>
+        <div class="num"><span id="sNum">103</span><span class="unit">px</span></div>
+        <div class="note" id="sNote">Below one spot pitch (137 px) — sub-spot accuracy.</div>
+      </div>
+      <div class="card">
+        <div class="name">PASTE2 (optimal transport) · median error</div>
+        <div class="num"><span id="pNum">729</span><span class="unit">px</span></div>
+        <div class="note">Drifts several spot pitches off at the tear.</div>
+        <div class="bars">
+          <div class="bar-row"><span class="lab">Sutura</span><div class="track"><div class="fill" id="bS" style="background:var(--accent)"></div></div></div>
+          <div class="bar-row"><span class="lab">PASTE2</span><div class="track"><div class="fill" id="bP" style="background:#c9c9d2"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">
+    The point-cloud animation is an illustration of the registration task. The
+    median error values are measured results from Sutura's internal benchmark on
+    the DLPFC spatial-transcriptomics dataset (array-bridge ground truth, torn-warp
+    regime), where Sutura stays sub-spot-pitch across severities while PASTE2
+    degrades from 658 px to 838 px. One spot pitch = 137 px.
+  </p>
+</div>
+
+<script>
+(function(){
+  // ---- real benchmark medians (px) at severities 0,1,2,3,4,6,8 ----
+  const SEV=[0,1,2,3,4,6,8];
+  const SUT=[99,100,100,102,103,109,118];
+  const PAS=[658,655,689,716,729,773,838];
+  const PITCH=137, MAXERR=900;
+  function interp(arr,s){
+    if(s<=SEV[0])return arr[0]; if(s>=SEV[SEV.length-1])return arr[arr.length-1];
+    for(let i=0;i<SEV.length-1;i++){if(s>=SEV[i]&&s<=SEV[i+1]){
+      const t=(s-SEV[i])/(SEV[i+1]-SEV[i]); return arr[i]+t*(arr[i+1]-arr[i]);}}
+    return arr[arr.length-1];
+  }
+
+  const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height, cx=W/2, cy=H/2;
+
+  // ---- build a tissue-like point cloud (layered oval) ----
+  const N=520, base=[];
+  let seed=12345; const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+  for(let i=0;i<N;i++){
+    const a=rnd()*Math.PI*2, r=Math.sqrt(rnd());
+    const x=cx+Math.cos(a)*r*170, y=cy+Math.sin(a)*r*150*(0.9+0.2*Math.sin(a*2));
+    base.push({x,y});
+  }
+  // reference (target) = base. current drawn positions start deformed.
+  const cur=base.map(p=>({x:p.x,y:p.y}));
+
+  function deform(sev){
+    // tear along vertical seam at cx: right half slides + slight rotation/offset
+    const off=(sev/8)*150;            // tear opening grows with severity
+    const rot=(sev/8)*0.10 + 0.06;    // global misalignment
+    const tx=18, ty=10;
+    return base.map(p=>{
+      let x=p.x, y=p.y;
+      if(x>cx){ x+=off*0.7; y+= off*0.18; }    // torn flap displaced
+      // global rigid misalignment of the whole moving section
+      const dx=x-cx, dy=y-cy;
+      x=cx+dx*Math.cos(rot)-dy*Math.sin(rot)+tx;
+      y=cy+dx*Math.sin(rot)+dy*Math.cos(rot)+ty;
+      return {x,y};
+    });
+  }
+  function sutaraResidual(sev){ // near-perfect: tiny jitter scaled to real (sub-pitch) error
+    const e=interp(SUT,sev), sc=e/PITCH*4;
+    return base.map(p=>({x:p.x+(rnd()-.5)*sc, y:p.y+(rnd()-.5)*sc}));
+  }
+  function pasteResidual(sev){ // residual concentrated near the seam, scaled to real error
+    const e=interp(PAS,sev), sc=e/MAXERR;
+    return base.map(p=>{
+      const nearSeam=Math.exp(-Math.pow((p.x-cx)/90,2));
+      const d=(p.x>cx?1:-1)*sc*70*nearSeam + (rnd()-.5)*sc*40;
+      return {x:p.x+d, y:p.y+(rnd()-.5)*sc*40*nearSeam};
+    });
+  }
+
+  let target=deform(4), anim=null;
+  function setTarget(t){ if(anim)cancelAnimationFrame(anim); const from=cur.map(p=>({x:p.x,y:p.y}));
+    const t0=performance.now(), dur=900;
+    (function step(now){ const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+      for(let i=0;i<N;i++){cur[i].x=from[i].x+(t[i].x-from[i].x)*e; cur[i].y=from[i].y+(t[i].y-from[i].y)*e;}
+      draw(); if(k<1)anim=requestAnimationFrame(step); })(t0);
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // reference
+    ctx.fillStyle=getCSS('--ref');
+    for(const p of base){ctx.beginPath();ctx.arc(p.x,p.y,2.4,0,7);ctx.fill();}
+    // moving
+    ctx.fillStyle=getCSS('--accent');
+    for(const p of cur){ctx.beginPath();ctx.arc(p.x,p.y,2.4,0,7);ctx.fill();}
+  }
+  function getCSS(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+
+  // ---- metrics UI ----
+  const sNum=document.getElementById('sNum'),pNum=document.getElementById('pNum'),
+    bS=document.getElementById('bS'),bP=document.getElementById('bP'),
+    ratio=document.getElementById('ratio'),sNote=document.getElementById('sNote');
+  function updateMetrics(sev){
+    const s=interp(SUT,sev), p=interp(PAS,sev);
+    sNum.textContent=Math.round(s); pNum.textContent=Math.round(p);
+    bS.style.width=(s/MAXERR*100)+'%'; bP.style.width=(p/MAXERR*100)+'%';
+    ratio.innerHTML='Sutura is <b>'+(p/s).toFixed(1)+'&times;</b> more accurate at this tear';
+    sNote.textContent = s<PITCH ? 'Below one spot pitch (137 px) — sub-spot accuracy.'
+                                : 'Near one spot pitch — still spot-level.';
+  }
+
+  // ---- controls ----
+  const sev=document.getElementById('sev'), sevval=document.getElementById('sevval');
+  function onSev(){ const s=parseFloat(sev.value); sevval.textContent=s.toFixed(s%1?1:0);
+    target=deform(s); updateMetrics(s); setTarget(target); }
+  sev.addEventListener('input',onSev);
+  document.getElementById('runSutura').onclick=()=>setTarget(sutaraResidual(parseFloat(sev.value)));
+  document.getElementById('runPaste').onclick=()=>setTarget(pasteResidual(parseFloat(sev.value)));
+  document.getElementById('reset').onclick=()=>setTarget(deform(parseFloat(sev.value)));
+
+  // init
+  for(let i=0;i<N;i++){cur[i].x=target[i].x;cur[i].y=target[i].y;}
+  updateMetrics(4); draw();
+})();
+</script>
+</body>
+</html>
