@@ -1,0 +1,52 @@
+name: Security CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for the secret scan
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Fail only on high/critical. The known moderate (build-time postcss in
+      # Next) is tracked separately and should not block deploys.
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Install gitleaks
+        run: |
+          VER=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep -oP '"tag_name": "v\K[^"]+')
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz" -o gl.tar.gz
+          tar -xzf gl.tar.gz gitleaks
+          sudo mv gitleaks /usr/local/bin/gitleaks
+
+      - name: Secret scan
+        run: gitleaks detect --no-banner --redact --config .gitleaks.toml
+
+      - name: Generate SBOM (CycloneDX)
+        run: npm sbom --sbom-format=cyclonedx > sbom.cyclonedx.json || echo '{"note":"sbom generation skipped"}' > sbom.cyclonedx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.cyclonedx.json

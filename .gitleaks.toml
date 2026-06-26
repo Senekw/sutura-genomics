@@ -1,0 +1,26 @@
+title = "Sutura Genomics gitleaks config"
+
+# Start from gitleaks' built-in rule set, then allowlist values that are public
+# by design so the scan only fires on genuinely sensitive leaks.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public-by-design keys and non-secret research data"
+
+# The research/ tree is scientific data + model code, no web secrets. Skip it to
+# avoid entropy false positives on CSV/checkpoint contents.
+paths = [
+  '''research/.*''',
+]
+
+# These three are intentionally shipped to the browser and protected by RLS /
+# provider-side spam controls, not by secrecy:
+#   - Supabase anon (public) key
+#   - Supabase publishable key
+#   - Web3Forms access key
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZS[A-Za-z0-9._-]+''',
+  '''sb_publishable_[A-Za-z0-9_]+''',
+  '''31af204b-f37d-41d6-815f-e720fd494926''',
+]

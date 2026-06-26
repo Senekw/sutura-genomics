@@ -1,0 +1,3 @@
+# Default owner for everything in this repo. Combined with branch protection
+# ("Require review from Code Owners"), this enforces review before merge.
+* @Senekw
