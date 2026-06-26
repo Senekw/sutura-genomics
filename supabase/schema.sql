@@ -32,3 +32,29 @@ create policy "public can insert demo requests"
   for insert
   to public
   with check (true);
+
+-- Server-side validation (this is your real validation layer: there is no app
+-- server, so Postgres enforces it regardless of what the client sends). Bounds
+-- field sizes to stop oversized/garbage payloads and checks the email shape.
+-- Re-runnable: drop the constraint if present, then add it.
+do $$
+begin
+  alter table public.demo_requests drop constraint if exists dr_email_chk;
+  alter table public.demo_requests drop constraint if exists dr_full_name_len;
+  alter table public.demo_requests drop constraint if exists dr_company_len;
+  alter table public.demo_requests drop constraint if exists dr_role_len;
+  alter table public.demo_requests drop constraint if exists dr_company_size_len;
+  alter table public.demo_requests drop constraint if exists dr_looking_len;
+  alter table public.demo_requests drop constraint if exists dr_source_len;
+
+  alter table public.demo_requests
+    add constraint dr_email_chk
+      check (email ~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'
+             and char_length(email) <= 320),
+    add constraint dr_full_name_len    check (char_length(full_name) between 1 and 200),
+    add constraint dr_company_len      check (char_length(company)   between 1 and 200),
+    add constraint dr_role_len         check (role is null or char_length(role) <= 200),
+    add constraint dr_company_size_len check (char_length(company_size) <= 40),
+    add constraint dr_looking_len      check (char_length(looking_for) between 1 and 5000),
+    add constraint dr_source_len       check (source is null or char_length(source) <= 300);
+end $$;

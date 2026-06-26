@@ -45,6 +45,8 @@ export default function DemoPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Honeypot: hidden from humans; bots tend to fill every field.
+  const [hp, setHp] = useState("");
 
   const set =
     (key: keyof FormState) =>
@@ -74,6 +76,13 @@ export default function DemoPage() {
     if (!validate()) return;
     setSubmitError(null);
     setSubmitting(true);
+
+    // Honeypot tripped => treat as a bot. Silently acknowledge, store nothing.
+    if (hp) {
+      setSubmitting(false);
+      setSubmitted(true);
+      return;
+    }
 
     // 1) Save the lead to Supabase (the source of truth).
     const { error } = await supabase.from("demo_requests").insert({
@@ -183,6 +192,30 @@ export default function DemoPage() {
             noValidate
             className="rounded-2xl border border-border bg-white/80 p-6 backdrop-blur-sm sm:p-7"
           >
+            {/* Honeypot field: visually hidden, off the tab order, ignored by
+                humans. If a bot fills it, onSubmit drops the submission. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                width: 1,
+                height: 1,
+                overflow: "hidden",
+              }}
+            >
+              <label htmlFor="company_url">Company website</label>
+              <input
+                id="company_url"
+                name="company_url"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={hp}
+                onChange={(e) => setHp(e.target.value)}
+              />
+            </div>
+
             <div className="flex flex-col gap-4">
               <Input
                 label="Full name"
