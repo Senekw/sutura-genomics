@@ -1,0 +1,33 @@
+========================================================================
+Sutura VALIDATION ABLATIONS — independent reproduction
+========================================================================
+pair 151507/151508 | A 4226 spots, B 4384 spots | pitch 137.0px | bridge 95.4% | same_genes=True
+
+[A] Reproduce Sutura headline tear curve from arca_cross.pt
+    sev | median  mean   p90   (px)
+      0 |   99.1  115.3   200.1
+      1 |   99.5  114.6   197.1
+      2 |   99.5  118.5   205.1
+      3 |  101.9  130.3   221.0
+      4 |  103.1  145.2   238.8
+      6 |  108.4  214.8   422.1
+      8 |  118.0  318.6  1205.5
+    -> sev0 median 99.1px, sev8 median 118.0px (brief claims 99 -> 118)
+
+[B] Array-bridge residual (raw B own coords vs bridge GT) — slice-to-slice
+    median 8.1px  mean 8.3px  p90 9.4px (0.06 pitches)
+    -> if small, gt_A ~= B's own coords, so 'predict A-frame' == undo the warp
+
+[C] Expression-NN baseline (NO training, NO warp info)
+    1-NN   : median 2532.2px  mean 2960.2px  p90 5897.7px
+    10-NN  : median 2190.7px  mean 2334.9px  p90 4011.6px
+    -> constant across ALL severities (Z is warp-invariant). Compare to Sutura.
+
+[D] Geometry-dependence of the trained Sutura model
+    unwarped      : reg-err median   95.9px  mean  106.7px
+    warp_sev8     : reg-err median  118.0px  mean  318.6px
+    shuffled_geom : reg-err median 3032.2px  mean 3095.1px
+    pred shift warp_sev8 vs unwarped : median 18.9px
+    pred shift warp_sev8 vs SHUFFLED : median 2988.8px
+    -> if reg-err on shuffled_geom stays low, model ignores B geometry
+========================================================================

@@ -1,0 +1,26 @@
+============================================================================================
+HELD-OUT MULTI-SEED ERROR BARS — folds S2 & S3 (tear regime, 5 seeds: 0,9999,10000,10001,10002)
+registration error median px, mean +/- 95% CI across seeds
+============================================================================================
+
+### Fold S2  (held-out donor 151669/151670) ###
+ sev |      Sutura global |    Sutura perslice |      PASTE2 bary |    PASTE2 argmax | STalign(s0)
+--------------------------------------------------------------------------------------------
+   0 |      1504 +/-    6 |      1236 +/-    2 |    528 +/-    7 |    601 +/-    0 |         199
+   4 |      1507 +/-   12 |      1241 +/-    7 |    580 +/-   12 |    626 +/-   12 |         414
+   8 |      1584 +/-   52 |      1270 +/-   14 |    697 +/-   18 |    738 +/-   15 |         744
+   Sutura-global degradation sev0->8: 1504 -> 1584 px (+80)
+   PASTE2-bary  degradation sev0->8: 528 -> 697 px (+170)
+   STalign      degradation sev0->8: 199 -> 744 px
+
+### Fold S3  (held-out donor 151673/151674) ###
+ sev |      Sutura global |    Sutura perslice |      PASTE2 bary |    PASTE2 argmax | STalign(s0)
+--------------------------------------------------------------------------------------------
+   0 |      1429 +/-    3 |      1326 +/-    6 |    397 +/-    7 |    414 +/-    1 |         108
+   4 |      1422 +/-   11 |      1332 +/-   10 |    465 +/-    8 |    479 +/-    0 |         453
+   8 |      1461 +/-   52 |      1373 +/-   34 |    539 +/-   19 |    572 +/-   23 |         903
+   Sutura-global degradation sev0->8: 1429 -> 1461 px (+32)
+   PASTE2-bary  degradation sev0->8: 397 -> 539 px (+142)
+   STalign      degradation sev0->8: 108 -> 903 px
+
+(In-sample S1 reference for scale: Sutura 99->118, PASTE2 bary 659->838, STalign 79->866.)

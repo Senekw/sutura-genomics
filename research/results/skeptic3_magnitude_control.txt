@@ -1,0 +1,17 @@
+subsample n=400  pitch=238.4px  (PASTE2 pca dissim, s=0.99 alpha=0.1)
+====================================================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+   smooth max=0 (baseline): max=      0px mean=      0px | median_bary=  238.8 argmax=  238.8 | acc= 68.0% (n=397)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+smooth max=1096 (=tear sev8 SMOOTH-part only): max=   1096px mean=    709px | median_bary=  276.0 argmax=  276.0 | acc= 67.2% (n=397)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+smooth max=2028 (=tear sev8 MEAN disp): max=   2028px mean=   1312px | median_bary=  365.8 argmax=  365.8 | acc= 66.8% (n=397)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+smooth max=4337 (=tear sev8 MAX disp): max=   4337px mean=   2806px | median_bary=  965.0 argmax=  965.0 | acc= 50.7% (n=397)
+====================================================================================================
+If high-magnitude SMOOTH stays ~flat -> degradation is discontinuity-specific (claim survives).
+If high-magnitude SMOOTH also degrades -> tear effect confounded by magnitude (claim weakened).

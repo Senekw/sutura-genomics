@@ -1,0 +1,17 @@
+ITEM 1b — PASTE2 multi-seed cross-tear (151507/151508), seeds 0/9999/10000/10001/10002
+  sev0: bary 653.8+/-3.2  argmax 722.2+/-4.9  acc 64.9+/-0.3%
+  sev4: bary 712.9+/-15.1  argmax 760.1+/-14.1  acc 63.3+/-1.2%
+  sev8: bary 806.3+/-40.6  argmax 854.5+/-26.8  acc 60.5+/-1.9%
+
+ITEM 3 — leave-one-donor-out (Sutura held-out median px, tear sev0->sev8)
+  Br5292: global 1410->1538  perslice 1041->1204  | PASTE2 bary 658->838  argmax 729->863
+  Br5595: global 1509->1674  perslice 1236->1295  | PASTE2 bary 526->691  argmax 601->730
+  Br8100: global 1433->1559  perslice 1321->1432  | PASTE2 bary 407->551  argmax 415->600
+
+ITEM 4 — magnitude-matched smooth control (151507/151508)
+  smooth sev8: mean_disp 725px  bary 657  argmax 719  acc 64.2%
+  smooth sev12: mean_disp 1088px  bary 687  argmax 729  acc 63.3%
+  smooth sev16: mean_disp 1451px  bary 700  argmax 731  acc 62.8%
+  smooth sev20: mean_disp 1813px  bary 725  argmax 767  acc 61.4%
+  smooth sev22: mean_disp 1994px  bary 731  argmax 769  acc 60.2%
+  TEAR sev8 (ref): mean_disp 2028px  bary 838  argmax 863  acc 57.5%
