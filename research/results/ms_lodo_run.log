@@ -1,0 +1,449 @@
+[2026-06-27 02:38:08] === MS-LODO batch START (folds S2,S3) ===
+[2026-06-27 02:38:08] START PASTE2 151669/151670 seed=0 -> ms_tear_S2_seed0
+[2026-06-27 02:38:08] START PASTE2 151673/151674 seed=0 -> ms_tear_S3_seed0
+[2026-06-27 02:38:08] START PASTE2 151669/151670 seed=9999 -> ms_tear_S2_seed9999
+[2026-06-27 02:38:08] START PASTE2 151673/151674 seed=9999 -> ms_tear_S3_seed9999
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3639 target=3673  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  391.4px argmax=  413.0px  acc= 72.7% floor=17.4%  (163s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  471.4px argmax=  479.0px  acc= 71.1% floor=17.4%  (231s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  552.6px argmax=  553.5px  acc= 66.5% floor=17.4%  (262s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed9999.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed9999.png
+[2026-06-27 02:49:13] OK   PASTE2 ms_tear_S3_seed9999
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3639 target=3673  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  406.9px argmax=  414.5px  acc= 72.5% floor=17.4%  (123s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  465.0px argmax=  479.0px  acc= 69.9% floor=17.4%  (363s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  551.0px argmax=  600.4px  acc= 65.2% floor=17.4%  (264s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed0.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed0.png
+[2026-06-27 02:50:46] OK   PASTE2 ms_tear_S3_seed0
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3661 target=3498  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  526.2px argmax=  600.6px  acc= 80.9% floor=40.9%  (176s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  571.3px argmax=  630.3px  acc= 79.4% floor=40.9%  (278s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  691.2px argmax=  730.0px  acc= 77.4% floor=40.9%  (303s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed0.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed0.png
+[2026-06-27 02:50:52] OK   PASTE2 ms_tear_S2_seed0
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3661 target=3498  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  519.1px argmax=  600.4px  acc= 81.7% floor=40.9%  (176s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  562.6px argmax=  602.1px  acc= 80.3% floor=40.9%  (306s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  693.5px argmax=  731.7px  acc= 76.3% floor=40.9%  (323s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed9999.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed9999.png
+[2026-06-27 02:51:40] OK   PASTE2 ms_tear_S2_seed9999
+[2026-06-27 02:51:40] START PASTE2 151673/151674 seed=10000 -> ms_tear_S3_seed10000
+[2026-06-27 02:51:40] START PASTE2 151669/151670 seed=10001 -> ms_tear_S2_seed10001
+[2026-06-27 02:51:40] START PASTE2 151669/151670 seed=10000 -> ms_tear_S2_seed10000
+[2026-06-27 02:51:40] START PASTE2 151673/151674 seed=10001 -> ms_tear_S3_seed10001
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3639 target=3673  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  395.7px argmax=  414.0px  acc= 72.8% floor=17.4%  (264s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  467.8px argmax=  479.0px  acc= 70.1% floor=17.4%  (336s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  536.2px argmax=  552.6px  acc= 66.8% floor=17.4%  (356s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10001.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10001.png
+[2026-06-27 03:07:45] OK   PASTE2 ms_tear_S3_seed10001
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3639 target=3673  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  387.9px argmax=  413.7px  acc= 72.9% floor=17.4%  (264s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  449.4px argmax=  477.9px  acc= 71.2% floor=17.4%  (370s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  503.0px argmax=  551.0px  acc= 66.7% floor=17.4%  (371s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10000.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10000.png
+[2026-06-27 03:08:35] OK   PASTE2 ms_tear_S3_seed10000
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3661 target=3498  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  538.0px argmax=  601.2px  acc= 81.4% floor=40.9%  (289s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  581.8px argmax=  631.7px  acc= 80.8% floor=40.9%  (477s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  671.5px argmax=  728.5px  acc= 79.5% floor=40.9%  (372s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10001.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10001.png
+[2026-06-27 03:10:45] OK   PASTE2 ms_tear_S2_seed10001
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3661 target=3498  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  522.7px argmax=  600.5px  acc= 81.4% floor=40.9%  (395s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  586.1px argmax=  631.7px  acc= 79.6% floor=40.9%  (673s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  725.8px argmax=  768.7px  acc= 76.4% floor=40.9%  (261s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10000.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10000.png
+[2026-06-27 03:13:56] OK   PASTE2 ms_tear_S2_seed10000
+[2026-06-27 03:13:56] START PASTE2 151669/151670 seed=10002 -> ms_tear_S2_seed10002
+[2026-06-27 03:13:56] START PASTE2 151673/151674 seed=10002 -> ms_tear_S3_seed10002
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3639 target=3673  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  401.9px argmax=  414.5px  acc= 72.1% floor=17.4%  (242s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  469.4px argmax=  478.3px  acc= 69.9% floor=17.4%  (167s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  553.0px argmax=  600.3px  acc= 65.5% floor=17.4%  (150s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10002.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10002.png
+[2026-06-27 03:23:21] OK   PASTE2 ms_tear_S3_seed10002
+======================================================================
+ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+  severities    : [0.0, 4.0, 8.0]
+  dissimilarity : pca  s=0.99 alpha=0.1  tear=True
+  spots         : ref=3661 target=3498  pitch=137.0px
+======================================================================
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 0.0: reg_err median bary=  533.0px argmax=  600.8px  acc= 81.5% floor=40.9%  (159s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 4.0: reg_err median bary=  596.6px argmax=  632.6px  acc= 80.8% floor=40.9%  (191s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  sev= 8.0: reg_err median bary=  705.4px argmax=  731.7px  acc= 78.7% floor=40.9%  (270s)
+
+wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10002.csv
+wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10002.png
+[2026-06-27 03:24:21] OK   PASTE2 ms_tear_S2_seed10002
+[2026-06-27 03:24:21] START STalign 151669/151670 -> _S2
+[2026-06-27 03:24:21] START STalign 151673/151674 -> _S3
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1043: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  L = torch.tensor(L,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1044: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  T = torch.tensor(T,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1046: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  I = torch.tensor(I,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1047: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  J = torch.tensor(J,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/torch/functional.py:505: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4384.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1043: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  L = torch.tensor(L,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1044: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  T = torch.tensor(T,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1046: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  I = torch.tensor(I,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1047: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  J = torch.tensor(J,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/torch/functional.py:505: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4384.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1115: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xI = [torch.tensor(x,device=device,dtype=dtype) for x in xI]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1116: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xJ = [torch.tensor(x,device=device,dtype=dtype) for x in xJ]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1115: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xI = [torch.tensor(x,device=device,dtype=dtype) for x in xI]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1116: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xJ = [torch.tensor(x,device=device,dtype=dtype) for x in xJ]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1301: UserWarning: Data has no positive values, and therefore cannot be log-scaled.
+  axE[2].set_yscale('log')
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1301: UserWarning: Data has no positive values, and therefore cannot be log-scaled.
+  axE[2].set_yscale('log')
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1043: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  L = torch.tensor(L,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1044: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  T = torch.tensor(T,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1046: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  I = torch.tensor(I,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1047: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  J = torch.tensor(J,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1115: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xI = [torch.tensor(x,device=device,dtype=dtype) for x in xI]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1116: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xJ = [torch.tensor(x,device=device,dtype=dtype) for x in xJ]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1301: UserWarning: Data has no positive values, and therefore cannot be log-scaled.
+  axE[2].set_yscale('log')
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1043: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  L = torch.tensor(L,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1044: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  T = torch.tensor(T,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1046: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  I = torch.tensor(I,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1047: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  J = torch.tensor(J,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1115: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xI = [torch.tensor(x,device=device,dtype=dtype) for x in xI]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1116: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xJ = [torch.tensor(x,device=device,dtype=dtype) for x in xJ]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1301: UserWarning: Data has no positive values, and therefore cannot be log-scaled.
+  axE[2].set_yscale('log')
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1043: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  L = torch.tensor(L,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1044: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  T = torch.tensor(T,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1046: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  I = torch.tensor(I,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1047: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  J = torch.tensor(J,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1115: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xI = [torch.tensor(x,device=device,dtype=dtype) for x in xI]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1116: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xJ = [torch.tensor(x,device=device,dtype=dtype) for x in xJ]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1301: UserWarning: Data has no positive values, and therefore cannot be log-scaled.
+  axE[2].set_yscale('log')
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1043: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  L = torch.tensor(L,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1044: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  T = torch.tensor(T,device=device,dtype=dtype,requires_grad=True)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1046: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  I = torch.tensor(I,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1047: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  J = torch.tensor(J,device=device,dtype=dtype)
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1115: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xI = [torch.tensor(x,device=device,dtype=dtype) for x in xI]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1116: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  xJ = [torch.tensor(x,device=device,dtype=dtype) for x in xJ]
+/Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/STalign/STalign.py:1301: UserWarning: Data has no positive values, and therefore cannot be log-scaled.
+  axE[2].set_yscale('log')
+  sev  0: median   107.9px  mean   215.7px  p90   466.1px  (n=3502, 66s)
+  sev  4: median   453.4px  mean   963.3px  p90  2174.0px  (n=3502, 71s)
+  sev  8: median   902.5px  mean  1973.3px  p90  4275.5px  (n=3502, 74s)
+wrote /Users/seangplee/biostartup-main/results/stalign_tear_S3.csv
+[2026-06-27 03:27:57] OK   STalign _S3
+  sev  0: median   198.9px  mean   207.4px  p90   335.2px  (n=3363, 67s)
+  sev  4: median   414.2px  mean   782.8px  p90  1661.1px  (n=3363, 74s)
+  sev  8: median   743.8px  mean  1782.2px  p90  3905.1px  (n=3363, 74s)
+wrote /Users/seangplee/biostartup-main/results/stalign_tear_S2.csv
+[2026-06-27 03:28:00] OK   STalign _S2
+[2026-06-27 03:28:00] === running Sutura multi-seed held-out eval ===
+================================================================================
+SUTURA held-out MULTI-SEED eval (folds S2 & S3, tear) — 5 seeds [0, 9999, 10000, 10001, 10002]
+================================================================================
+
+[S2 / global]  held-out 151669/151670 (bridge 96.1%, pitch 137.0px) | ckpt lodo_global_heldBr5595
+   sev  0: median  1503.9 +/-  5.7 (95%CI)   mean  1696.6   p90  3253.0
+   sev  4: median  1506.9 +/- 12.0 (95%CI)   mean  1700.7   p90  3251.4
+   sev  8: median  1583.7 +/- 51.9 (95%CI)   mean  1747.4   p90  3243.5
+
+[S2 / perslice]  held-out 151669/151670 (bridge 96.1%, pitch 137.0px) | ckpt lodo_perslice_heldBr5595
+   sev  0: median  1236.1 +/-  2.2 (95%CI)   mean  1362.5   p90  2298.6
+   sev  4: median  1240.6 +/-  6.8 (95%CI)   mean  1364.2   p90  2301.1
+   sev  8: median  1270.5 +/- 14.1 (95%CI)   mean  1405.1   p90  2403.5
+
+[S3 / global]  held-out 151673/151674 (bridge 95.3%, pitch 137.0px) | ckpt lodo_global_heldBr8100
+   sev  0: median  1428.8 +/-  3.1 (95%CI)   mean  1619.5   p90  2757.5
+   sev  4: median  1422.0 +/- 10.8 (95%CI)   mean  1609.5   p90  2754.1
+   sev  8: median  1461.1 +/- 51.6 (95%CI)   mean  1645.3   p90  2826.9
+
+[S3 / perslice]  held-out 151673/151674 (bridge 95.3%, pitch 137.0px) | ckpt lodo_perslice_heldBr8100
+   sev  0: median  1325.8 +/-  5.6 (95%CI)   mean  1505.8   p90  2529.9
+   sev  4: median  1331.7 +/-  9.8 (95%CI)   mean  1508.2   p90  2538.5
+   sev  8: median  1372.5 +/- 33.8 (95%CI)   mean  1552.7   p90  2649.7
+
+wrote /Users/seangplee/biostartup-main/results/sutura_multiseed_lodo.csv  (28 rows)
+[2026-06-27 03:28:33] OK   sutura_multiseed_lodo
+[2026-06-27 03:28:33] === MS-LODO batch COMPLETE (0 failures) ===
