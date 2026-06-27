@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-ROOT = Path("/Users/seangplee/biostartup-main")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 import anndata as ad
 from scipy.spatial import cKDTree

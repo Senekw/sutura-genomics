@@ -9,7 +9,7 @@
 # Sequential within waves of 4 (thread-capped) so 10 cores aren't oversubscribed.
 # Idempotent: re-running overwrites the same result files. DONE marker written last.
 set -u
-cd /Users/seangplee/biostartup-main
+cd "$(dirname "$0")/.."
 export PYTHONUTF8=1
 # cap per-process BLAS threads so 4 parallel jobs share 10 cores cleanly
 export OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 MKL_NUM_THREADS=3 NUMEXPR_NUM_THREADS=3

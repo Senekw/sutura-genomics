@@ -14,7 +14,7 @@ bit-identical to how each model was trained and originally evaluated.
 Seeds [0, 9999, 10000, 10001, 10002] are disjoint from training's rng.integers(1,9998)
 and match the in-sample multi-seed set exactly. Tear regime, full severity grid.
 
-Run: /Users/seangplee/biostartup-main/.venv/bin/python validation/multiseed_lodo.py
+Run: python validation/multiseed_lodo.py
 Out: results/sutura_multiseed_lodo.csv
 """
 from __future__ import annotations
@@ -24,7 +24,7 @@ import numpy as np
 import torch
 import anndata as ad
 
-ROOT = Path("/Users/seangplee/biostartup-main")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from train_cross import ARCACrossNet
 from train_cross_loo import (fit_shared_basis, build_pair, eval_curve,

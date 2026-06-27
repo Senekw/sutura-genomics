@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 import anndata as ad
 
-ROOT = Path("/Users/seangplee/biostartup-main")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from paste2.PASTE2 import partial_pairwise_align

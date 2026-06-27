@@ -3,7 +3,7 @@
 # Creates a Python 3.12 venv and downloads the spatialLIBD slices needed to
 # independently reproduce the Sutura results. Idempotent: re-running skips done work.
 set -e
-PROJ=/Users/seangplee/biostartup-main
+PROJ="$(cd "$(dirname "$0")/.." && pwd)"
 VENV=$PROJ/.venv
 LOG=/tmp/arca_setup.log
 cd "$PROJ"

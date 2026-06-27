@@ -3,7 +3,7 @@
 # Each fold: train on TWO donor pairs, test on the HELD-OUT donor pair.
 #   Br5292=151507/151508  Br5595=151669/151670  Br8100=151673/151674
 set -e
-cd /Users/seangplee/biostartup-main
+cd "$(dirname "$0")/.."
 export PYTHONUTF8=1
 PY=.venv/bin/python
 

@@ -1,6 +1,6 @@
 """Item 1 (multi-seed CIs) + Item 2 (same-estimator fair comparison) for Sutura.
 
-Run: /Users/seangplee/biostartup-main/.venv/bin/python validation/multiseed_fair.py
+Run: python validation/multiseed_fair.py
 
 Item 1 — multi-seed eval of the trained checkpoint over 5 warp seeds DISJOINT from
 training (training drew rng.integers(1,9999) -> [1,9998]; we use 0,9999,10000,10001,
@@ -19,7 +19,7 @@ import numpy as np
 import torch
 from scipy.spatial import cKDTree
 
-ROOT = Path("/Users/seangplee/biostartup-main")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 import anndata as ad
 from train_cross import ARCACrossNet, cross_features, array_bridge, graph_tensors

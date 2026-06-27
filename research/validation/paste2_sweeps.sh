@@ -2,7 +2,7 @@
 # Item 1b (PASTE2 multi-seed tear CIs) + Item 4 (magnitude-matched smooth control)
 # + PASTE2 tear on the 3rd donor pair (for the 3-fold LODO head-to-head).
 set -e
-cd /Users/seangplee/biostartup-main
+cd "$(dirname "$0")/.."
 export PYTHONUTF8=1
 PY=.venv/bin/python
 

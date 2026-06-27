@@ -2,7 +2,7 @@
 Output is the source of every figure in ABSTRACT_v3.md."""
 import csv, numpy as np
 from pathlib import Path
-R = Path("/Users/seangplee/biostartup-main/results")
+R = Path(__file__).resolve().parents[1] / "results"
 def rd(f): return {float(r['severity']): r for r in csv.DictReader(open(R/f))}
 
 print("ITEM 1b — PASTE2 multi-seed cross-tear (151507/151508), seeds 0/9999/10000/10001/10002")

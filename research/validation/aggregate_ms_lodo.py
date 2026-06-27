@@ -10,7 +10,7 @@ Writes:
 import csv, numpy as np
 from pathlib import Path
 
-R = Path("/Users/seangplee/biostartup-main/results")
+R = Path(__file__).resolve().parents[1] / "results"
 SEEDS = [0, 9999, 10000, 10001, 10002]
 SEV = [0.0, 4.0, 8.0]
 FOLDS = {"S2": "151669/151670", "S3": "151673/151674"}

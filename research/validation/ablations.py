@@ -1,7 +1,7 @@
 """Sutura validation ablations — independent reproduction + decisive tests.
 
 Run with the validation venv:
-    /Users/seangplee/biostartup-main/.venv/bin/python validation/ablations.py
+    python validation/ablations.py
 
 Tests:
  [A] Reproduce the Sutura headline tear curve from arca_cross.pt (sanity: ~99->118px).
@@ -22,7 +22,7 @@ import numpy as np
 import torch
 from scipy.spatial import cKDTree
 
-ROOT = Path("/Users/seangplee/biostartup-main")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import anndata as ad

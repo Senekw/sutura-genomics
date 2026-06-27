@@ -10,7 +10,7 @@ from pathlib import Path
 import anndata as ad
 import requests
 
-DATA_DIR = Path("/Users/seangplee/biostartup-main/data")
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 RAW_DIR = DATA_DIR / "raw"
 
 FIGSHARE_URLS = {
