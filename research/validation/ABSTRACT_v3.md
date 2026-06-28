@@ -21,8 +21,8 @@ magnitude: a multi-seed deformation benchmark and a supervised graph cross-atten
 **Background.** Three-dimensional reconstruction from serial spatial-transcriptomics (ST) sections requires
 registering adjacent slices, but physical sectioning introduces *tears* — discontinuous, non-isometric
 deformations. Leading methods rely on priors that tears strain: PASTE/PASTE2 use Fused Gromov-Wasserstein
-optimal transport (OT), which assumes near-isometric preservation of within-slice distances, and STalign uses
-diffeomorphic (LDDMM) mapping, which cannot change tissue topology. Learned-deformation ST methods are emerging
+optimal transport (OT), which assumes near-isometric preservation of within-slice distances, while STalign and
+CODA use diffeomorphic (LDDMM) mapping, which cannot change tissue topology. Learned-deformation ST methods are emerging
 (STaCker, INST-Align), but OT/diffeomorphic behaviour under tearing has not been systematically characterised.
 
 **Methods.** On the spatialLIBD human DLPFC Visium dataset (Maynard et al., 2021; 3 donors), we build a
@@ -51,16 +51,24 @@ under leave-one-donor-out the advantage vanishes on **all three donors**. On the
 **five warp seeds**, median error is **1236±2→1373±34 px** (per-slice standardisation) / **1429±3→1584±52 px**
 (pooled) — flat across severity but **~1.8–3.6× worse than PASTE2** on the same unseen tissue (held-out PASTE2
 **397±7→697±18 px**, 5 seeds); the third fold is consistent (single-seed 1041–1538 px). Per-slice feature
-standardisation narrows the gap but never closes it, and **no batch-integration method (Harmony/Scanorama) was
-applied** — donor-invariance remains open.
+standardisation narrows the gap but never closes it. A targeted **contrastive correspondence loss**
+(InfoNCE-style; **single-seed**, evaluated under LODO on all three donors) closes the gap substantially on two of
+them — best held-out median falls from a no-contrastive baseline of ~1300→1400 px to **816→949 px (S1)** and
+**749→826 px (S2)**, a ~38–42% reduction that reaches **~1.1–1.2× of PASTE2 at the worst-case (sev8) tear** — but
+helps only modestly on the third (**S3 1248→1333 px, ~13%**, still ~2.4× PASTE2) and **does not surpass PASTE2 on
+any donor**. Batch integration (Harmony/Scanorama) was **not** applied. Donor-invariance is improved but remains
+open.
 
 **Conclusion.** Tearing is a real, magnitude-controlled failure mode of OT/diffeomorphic ST registration. A
 learned local-correspondence model fits it in-sample, but donor-invariant generalisation — a recognised hard
 problem for deep ST models — remains open across every donor tested. We both quantify the gap (5-seed CIs on two
 held-out donors) and **diagnose its mechanism**: cross-donor batch shift pushes held-out expression embeddings
-off-distribution, collapsing cross-attention toward uniform so predictions regress to the tissue centroid. This
-defines the path (batch integration + multi-donor encoders + a contrastive correspondence loss) and the benchmark
-against learned-deformation incumbents (STaCker, INST-Align).
+off-distribution, collapsing cross-attention toward uniform so predictions regress to the tissue centroid. We
+test the most direct fix for this mechanism — a **contrastive correspondence loss** — which (single-seed) roughly
+halves the held-out gap on two of three donors and nears PASTE2 at the worst-case tear, but does not surpass it and
+helps only modestly on the third: donor-invariance is **improved, not solved**. The remaining path (batch
+integration + multi-donor encoders) and the benchmark against learned-deformation incumbents (STaCker, INST-Align)
+stay open.
 
 ---
 
@@ -73,6 +81,7 @@ against learned-deformation incumbents (STaCker, INST-Align).
 | Sutura in-sample "99→118" (1 seed) | **99→106 px median** (5 seeds, CI); 118 was an unlucky seed | item 1 |
 | generalization = 1 fold (1029–1593) | **3-fold LODO, folds S2/S3 now 5-seed: held-out 1236–1584 px (±2–52 CI), ~1.8–3.6× worse than PASTE2 (397±7→697±18)** | item 3 + ms-lodo |
 | fair estimator not shown | Sutura hard-correspondence ~137 px vs PASTE2 argmax 722–855 px (in-sample) | item 2 |
+| contrastive loss = future "path" item | **tested (single-seed, 3-fold LODO):** best held-out 816→949 (S1), 749→826 (S2), 1248→1333 (S3) px; ~38–42% gap reduction on S1/S2 reaching ~1.1–1.2× PASTE2 at sev8, ~13% on S3; **never beats PASTE2** | results/arca_ctr_*_test{S1,S2,S3}_test_curve.csv |
 
 ## Net effect of the validation
 - **Strengthened:** the OT-tearing thesis is now multi-seed **and** magnitude-controlled (the falsify lane's
@@ -91,6 +100,10 @@ against learned-deformation incumbents (STaCker, INST-Align).
 - ❌ **STaCker** could not be run (it is an *image*-registration method needing H&E histology our coordinate-warp
   benchmark lacks, and has no public code repo) and ❌ **INST-Align** could not be run (code unreleased as of
   Jun 2026). Their published DLPFC numbers are the only available reference; no head-to-head was fabricated.
+- ⊟ **CODA** (Mao et al., bioRxiv 2025) uses the **same global-affine + LDDMM diffeomorphic framework as STalign**.
+  We therefore take the STalign result above as the **representative benchmark for this diffeomorphic class** and
+  do not report a separate CODA number; its keypoint/LDDMM stack did not build on our platform, and a global-only
+  run on already-aligned slices is not a fair test of the method.
 
 ## Remaining (not blocking an honest submission)
 - The **S1-held-out fold (heldBr5292) is still single-seed**; its multi-seed CIs would make all three folds
