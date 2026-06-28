@@ -1,0 +1,18 @@
+C:\Users\karti\arca\baselines\GPSA\gpsa\models\vgpsa.py:257: UserWarning: torch.cholesky is deprecated in favor of torch.linalg.cholesky and will be removed in a future PyTorch release.
+L = torch.cholesky(A)
+should be replaced with
+L = torch.linalg.cholesky(A)
+and
+U = torch.cholesky(A, upper=True)
+should be replaced with
+U = torch.linalg.cholesky(A).mH
+This transform will produce equivalent results for all valid (symmetric positive definite) inputs. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\aten\src\ATen\native\BatchLinearAlgebra.cpp:1776.)
+  self.curr_Omega_tril_list = torch.cholesky(curr_Omega_G)
+  sev= 0.0: GPSA median=     8.9px mean=   170.1 p90=   418.6 n=4182 (64s)
+  sev= 1.0: GPSA median=   119.7px mean=   254.8 p90=   538.7 n=4182 (58s)
+  sev= 2.0: GPSA median=   235.8px mean=   506.3 p90=  1070.2 n=4182 (62s)
+  sev= 3.0: GPSA median=   352.2px mean=   757.9 p90=  1601.7 n=4182 (58s)
+  sev= 4.0: GPSA median=   468.0px mean=  1009.4 p90=  2133.3 n=4182 (57s)
+  sev= 6.0: GPSA median=   700.2px mean=  1512.6 p90=  3196.1 n=4182 (62s)
+  sev= 8.0: GPSA median=   931.5px mean=  2015.7 p90=  4258.8 n=4182 (110s)
+wrote C:\Users\karti\arca\results\gpsa_tear.csv
