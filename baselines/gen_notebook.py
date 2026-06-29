@@ -11,6 +11,8 @@ def code(*lines):
 cells = [
     md("# Sutura — quick inference",
        "",
+       "> **Pre-executed — outputs visible on GitHub. To re-run locally, install jupyter and nbconvert separately.**",
+       "",
        "Register a **moving** slice **B** onto a **reference** slice **A**: for every",
        "spot in B, predict its coordinate in A's frame. This notebook runs the",
        "pretrained checkpoint end-to-end on a spatialLIBD DLPFC slice pair (CPU, < 1 min).",
