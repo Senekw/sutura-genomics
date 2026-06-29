@@ -178,13 +178,29 @@ export default function DemoPage() {
             </p>
             <p className="mt-1.5 text-sm font-light text-muted-foreground">
               We&rsquo;ll reach out at{" "}
-              <span className="text-foreground">{v.email}</span> shortly.
+              <span className="text-foreground">{v.email}</span> within 24 hours.
             </p>
-            <Link href="/" className="mt-6">
-              <Button variant="outline" size="sm" className="rounded-full">
-                Back to home
-              </Button>
-            </Link>
+            <p className="mt-4 text-[13px] font-light text-muted-foreground">
+              While you wait, see how Sutura works:
+            </p>
+            <div className="mt-3 flex w-full flex-col items-center gap-2.5 sm:flex-row sm:justify-center">
+              <Link href="/sneak-peek" className="w-full sm:w-auto">
+                <Button
+                  size="sm"
+                  className="w-full rounded-full bg-[#6633ee] text-white hover:bg-[#5528d6]"
+                >
+                  Watch a sneak peek
+                  <span aria-hidden="true" className="ml-1.5">
+                    &rarr;
+                  </span>
+                </Button>
+              </Link>
+              <Link href="/" className="w-full sm:w-auto">
+                <Button variant="outline" size="sm" className="w-full rounded-full">
+                  Back to home
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <form
