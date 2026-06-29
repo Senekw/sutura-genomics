@@ -1,5 +1,5 @@
 """
-ARCA — data preparation for the spatialLIBD DLPFC dataset.
+Sutura — data preparation for the spatialLIBD DLPFC dataset.
 
 Downloads two *adjacent* DLPFC Visium slices (default: 151507 & 151508, the
 consecutive 10 um sections from subject 1) and exports them as .h5ad into
@@ -135,7 +135,7 @@ def standardize(sample_id: str, src: Path) -> ad.AnnData:
 
 
 def main(pair: tuple[str, str]) -> None:
-    print(f"ARCA data prep — adjacent DLPFC pair: {pair[0]} & {pair[1]}\n")
+    print(f"Sutura data prep — adjacent DLPFC pair: {pair[0]} & {pair[1]}\n")
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     for sample_id in pair:

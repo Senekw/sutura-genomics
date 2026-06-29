@@ -1,5 +1,5 @@
 """
-ARCA — leave-one-out training WITH a donor-invariant contrastive correspondence
+Sutura — leave-one-out training WITH a donor-invariant contrastive correspondence
 loss (option (a) from RESUME.md). Tests whether supervising the cross-slice
 SIMILARITY GEOMETRY (not just per-spot coordinates) lets the learned matching
 transfer to unseen donors, where coordinate regression alone did not.
@@ -45,7 +45,7 @@ import numpy as np
 import torch
 from scipy.spatial import cKDTree
 
-from train_cross import ARCACrossNet
+from train_cross import SuturaCrossNet
 from train_cross_loo import (fit_shared_basis, build_pair, warp_graph,
                              assert_same_genes, parse_pairs, write_curve)
 from scoring import registration_error_stats
@@ -192,11 +192,11 @@ def main() -> None:
     test = attach_correspondence(build_pair(test_ref, test_smp, project,
                                             args.knn), args.target_sigma)
 
-    model = ARCACrossNet(args.pca_dim, args.hidden, args.layers, args.attn_dim)
+    model = SuturaCrossNet(args.pca_dim, args.hidden, args.layers, args.attn_dim)
     n_params = sum(q.numel() for q in model.parameters())
 
     print("=" * 72)
-    print("ARCA LOO + contrastive correspondence loss")
+    print("Sutura LOO + contrastive correspondence loss")
     print("=" * 72)
     print(f"  readout       : {args.readout}  lambda={args.lambda_contrastive}  "
           f"temp={args.temp}  sigma={args.target_sigma} pitch")

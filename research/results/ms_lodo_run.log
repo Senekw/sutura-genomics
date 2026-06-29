@@ -52,7 +52,7 @@
 /Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
   utils.warn_names_duplicates("obs")
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+Sutura deformation sweep — mode=cross  ref=151673 sample=151674
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3639 target=3673  pitch=137.0px
@@ -71,7 +71,7 @@ wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed9999.png
 [2026-06-27 02:49:13] OK   PASTE2 ms_tear_S3_seed9999
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+Sutura deformation sweep — mode=cross  ref=151673 sample=151674
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3639 target=3673  pitch=137.0px
@@ -90,7 +90,7 @@ wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed0.png
 [2026-06-27 02:50:46] OK   PASTE2 ms_tear_S3_seed0
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+Sutura deformation sweep — mode=cross  ref=151669 sample=151670
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3661 target=3498  pitch=137.0px
@@ -109,7 +109,7 @@ wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed0.png
 [2026-06-27 02:50:52] OK   PASTE2 ms_tear_S2_seed0
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+Sutura deformation sweep — mode=cross  ref=151669 sample=151670
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3661 target=3498  pitch=137.0px
@@ -176,7 +176,7 @@ wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 /Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
   utils.warn_names_duplicates("obs")
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+Sutura deformation sweep — mode=cross  ref=151673 sample=151674
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3639 target=3673  pitch=137.0px
@@ -195,7 +195,7 @@ wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10001.png
 [2026-06-27 03:07:45] OK   PASTE2 ms_tear_S3_seed10001
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+Sutura deformation sweep — mode=cross  ref=151673 sample=151674
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3639 target=3673  pitch=137.0px
@@ -218,7 +218,7 @@ wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 /Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
   utils.warn_names_duplicates("obs")
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+Sutura deformation sweep — mode=cross  ref=151669 sample=151670
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3661 target=3498  pitch=137.0px
@@ -237,7 +237,7 @@ wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S2_seed10001.png
 [2026-06-27 03:10:45] OK   PASTE2 ms_tear_S2_seed10001
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+Sutura deformation sweep — mode=cross  ref=151669 sample=151670
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3661 target=3498  pitch=137.0px
@@ -282,7 +282,7 @@ wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 /Users/seangplee/biostartup-main/.venv/lib/python3.12/site-packages/anndata/_core/anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
   utils.warn_names_duplicates("obs")
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151673 sample=151674
+Sutura deformation sweep — mode=cross  ref=151673 sample=151674
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3639 target=3673  pitch=137.0px
@@ -301,7 +301,7 @@ wrote CSV  -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear
 wrote plot -> /Users/seangplee/biostartup-main/results/sweep_deformation_ms_tear_S3_seed10002.png
 [2026-06-27 03:23:21] OK   PASTE2 ms_tear_S3_seed10002
 ======================================================================
-ARCA deformation sweep — mode=cross  ref=151669 sample=151670
+Sutura deformation sweep — mode=cross  ref=151669 sample=151670
   severities    : [0.0, 4.0, 8.0]
   dissimilarity : pca  s=0.99 alpha=0.1  tear=True
   spots         : ref=3661 target=3498  pitch=137.0px

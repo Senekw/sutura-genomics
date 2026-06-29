@@ -1,9 +1,9 @@
 """
-ARCA — leave-one-out CROSS-SAMPLE generalization test.
+Sutura — leave-one-out CROSS-SAMPLE generalization test.
 
 Addresses caveat #2 of the head-to-head (RESUME.md): the original arca_cross was
 trained AND evaluated on the SAME 151507/151508 tissue (only warp seeds held out),
-so it proved ARCA learns *that pair's* deformation distribution — not that it
+so it proved Sutura learns *that pair's* deformation distribution — not that it
 generalizes to unseen tissue. This script trains on one set of donor pairs and
 evaluates on a DIFFERENT, held-out donor pair (no tissue overlap), so the curve
 reported on the held-out pair is a true cross-sample generalization result.
@@ -19,7 +19,7 @@ Two things make cross-tissue eval valid where the per-pair model did not:
      the TRAINING slices only, then .transform every slice (train AND held-out)
      into that same basis. The held-out tissue never touches the basis fit, so
      "model never saw the test tissue" holds for features too, not just weights.
-  2. PAIR-AGNOSTIC INFERENCE. ARCACrossNet's coarse coordinate is attn @ A_coords
+  2. PAIR-AGNOSTIC INFERENCE. SuturaCrossNet's coarse coordinate is attn @ A_coords
      in whatever A frame you pass in, and the encoder is shared — so a model
      trained on pair P predicts in pair Q's A frame with no per-pair parameters.
 
@@ -52,7 +52,7 @@ from scipy.sparse import issparse, vstack as svstack
 from scipy.spatial import cKDTree
 from sklearn.decomposition import TruncatedSVD
 
-from train_cross import ARCACrossNet, _lognorm, array_bridge, graph_tensors
+from train_cross import SuturaCrossNet, _lognorm, array_bridge, graph_tensors
 from warp_slice import apply_warp
 from scoring import registration_error_stats
 
@@ -218,11 +218,11 @@ def main() -> None:
     pairs = [build_pair(ref, smp, project, args.knn) for ref, smp in train_pairs]
     test = build_pair(test_ref, test_smp, project, args.knn)
 
-    model = ARCACrossNet(args.pca_dim, args.hidden, args.layers, args.attn_dim)
+    model = SuturaCrossNet(args.pca_dim, args.hidden, args.layers, args.attn_dim)
     n_params = sum(q.numel() for q in model.parameters())
 
     print("=" * 70)
-    print("ARCA leave-one-out CROSS-SAMPLE generalization — design summary")
+    print("Sutura leave-one-out CROSS-SAMPLE generalization — design summary")
     print("=" * 70)
     print(f"  feature basis : shared TruncatedSVD dim={args.pca_dim}, "
           f"fit on {len(train_slices)} TRAINING slices only "

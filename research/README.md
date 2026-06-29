@@ -4,16 +4,16 @@ The model and experiments behind Sutura Genomics: **graph deep learning for
 spatial-transcriptomics tissue registration**, built for the torn /
 non-isometric warps optimal transport can't represent.
 
-> **Naming.** The product is **Sutura Genomics**. `ARCA` is the internal codename
-> for the registration model; it persists in code identifiers (`ARCACrossNet`),
+> **Naming.** The product is **Sutura Genomics**. `Sutura` is the internal codename
+> for the registration model; it persists in code identifiers (`SuturaCrossNet`),
 > checkpoint filenames (`arca_*.pt`), and the run scripts so trained artifacts
-> stay loadable and results stay reproducible. Treat "ARCA" and "the Sutura
+> stay loadable and results stay reproducible. Treat "Sutura" and "the Sutura
 > model" as the same thing.
 
 ## What's here
 
 - `src/` — model + experiment code (PyTorch / torch-geometric).
-  - `train_cross.py` — two-slice cross deformation model (`ARCACrossNet`).
+  - `train_cross.py` — two-slice cross deformation model (`SuturaCrossNet`).
   - `train_cross_loo.py` — leave-one-donor-out cross-sample training/eval.
   - `train_cross_contrastive.py` — LOO + donor-invariant contrastive
     correspondence loss (the current direction).

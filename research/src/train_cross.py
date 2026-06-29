@@ -1,5 +1,5 @@
 """
-ARCA — two-slice CROSS deformation model (scaffold; matches the PASTE2 headline).
+Sutura — two-slice CROSS deformation model (scaffold; matches the PASTE2 headline).
 
 Task (identical to the PASTE2 cross stress test):
   reference A = 151507 (fixed), moving B = warped-151508. For each B spot,
@@ -7,7 +7,7 @@ Task (identical to the PASTE2 cross stress test):
   at the SAME Visium array position (the array bridge, ~95% coverage), which is
   invariant to the warp. Registration error is then measured in A's pixel frame
   by scoring.registration_error_stats — the SAME metric and axes as
-  results/headline_summary.png, so ARCA's curve overlays directly on PASTE2's.
+  results/headline_summary.png, so Sutura's curve overlays directly on PASTE2's.
 
 Architecture (deformation-field regression, conditioned on BOTH slices):
   1. Shared expression features: one TruncatedSVD basis fit on A and B together
@@ -117,7 +117,7 @@ class Encoder(nn.Module):
         return h
 
 
-class ARCACrossNet(nn.Module):
+class SuturaCrossNet(nn.Module):
     """Two-slice cross model: B spots -> predicted A-frame coordinates (pitch units)."""
 
     def __init__(self, feat_dim, hidden=64, layers=3, attn_dim=64):
@@ -188,7 +188,7 @@ def main() -> None:
     # Eval grid matched to the PASTE2 tear sweep (run_full_sweep.ps1 regime [2/3]):
     # apply_warp(B, sev, seed=0, tear=True) for sev in 0,1,2,3,4,6,8. Holding
     # eval-seed FIXED across severities reproduces the sweep's exact warped
-    # slices, so ARCA's reg-err overlays directly on sweep_deformation_cross_tear.
+    # slices, so Sutura's reg-err overlays directly on sweep_deformation_cross_tear.
     p.add_argument("--eval-severities", default="0,1,2,3,4,6,8")
     p.add_argument("--eval-seed", type=int, default=0,
                    help="fixed seed for ALL eval warps (matches the sweep's --seed)")
@@ -207,11 +207,11 @@ def main() -> None:
 
     Z_A, Z_B = cross_features(A, B0, args.pca_dim, args.seed)
     gt_A, have = array_bridge(A, B0)
-    model = ARCACrossNet(args.pca_dim, args.hidden, args.layers, args.attn_dim)
+    model = SuturaCrossNet(args.pca_dim, args.hidden, args.layers, args.attn_dim)
     n_params = sum(p.numel() for p in model.parameters())
 
     print("=" * 68)
-    print("ARCA two-slice CROSS model — design summary")
+    print("Sutura two-slice CROSS model — design summary")
     print("=" * 68)
     print(f"  reference A   : {args.reference}  ({A.n_obs} spots)")
     print(f"  moving   B    : {args.sample}  ({B0.n_obs} spots)")

@@ -1,6 +1,6 @@
-# Sutura Genomics (model codename: ARCA) — resume checkpoint
+# Sutura Genomics (model codename: Sutura) — resume checkpoint
 
-> Rebranded: the product is **Sutura Genomics**. "ARCA" below is the internal
+> Rebranded: the product is **Sutura Genomics**. "Sutura" below is the internal
 > model codename and is kept in code/checkpoint names for reproducibility.
 
 ================================================================================
@@ -12,7 +12,7 @@ failure (section below). Trained the shared encoder on TWO donors and evaluated
 on the held-out third, across all 3 folds, under two feature-standardization
 modes. **Multi-donor training did NOT fix generalization, and neither did the
 batch-correction variant.** But it changed the failure mechanism in an
-informative way. ARCA still loses to PASTE2 on every unseen donor.
+informative way. Sutura still loses to PASTE2 on every unseen donor.
 
 ### Setup
 - Downloaded subj3 pair 151673/151674 (so all 3 donors on disk now).
@@ -24,11 +24,11 @@ informative way. ARCA still loses to PASTE2 on every unseen donor.
   * `perslice` = standardize each slice by its OWN stats (cheap batch correction,
     re-centers every slice incl. the unseen donor to zero-mean/unit-var).
 - PASTE2 baselines on all 3 held-out pairs (subj3 sweep added this run).
-- Orchestrated by run_loo_3donor.ps1 (ran as detached scheduled task ARCA_LOO3);
+- Orchestrated by run_loo_3donor.ps1 (ran as detached scheduled task Sutura_LOO3);
   finished 2026-06-22 16:05 UTC, 0 failures.
 
 ### Result — registration error MEDIAN (px), tear regime, sev0->8
-| held-out | ARCA in-sample | ARCA held-out (global) | ARCA held-out (perslice) | PASTE2 held-out |
+| held-out | Sutura in-sample | Sutura held-out (global) | Sutura held-out (perslice) | PASTE2 held-out |
 |----------|----------------|------------------------|--------------------------|-----------------|
 |   S1     |   121 -> 148   |      1254 -> 1421       |       1082 -> 1242        |    658 -> 838   |
 |   S2     |   110 -> 130   |      1164 -> 1289       |       1182 -> 1198        |    526 -> 691   |
@@ -36,16 +36,16 @@ informative way. ARCA still loses to PASTE2 on every unseen donor.
 (figure: results/arca_loo3_summary.png — one panel per held-out donor)
 
 ### Verdict (three clean conclusions)
-1. **In-sample is excellent, held-out is not.** Trained on 2 donors, ARCA stays
+1. **In-sample is excellent, held-out is not.** Trained on 2 donors, Sutura stays
    SUB-PITCH on its training donors (82-148 px) but lands ~8-11 spot pitches out
    on the unseen donor (1080-1557 px) in EVERY fold. Adding a second training
    donor did NOT buy donor-invariance.
 2. **Per-slice batch correction helps only marginally.** perslice beats global on
    2 of 3 folds (S1 -180px, S3 -140px) and is ~flat-but-equal on S2 — a real but
    small (~10-15%) gain that does not close the ~1000px gap.
-3. **ARCA loses to PASTE2 on every unseen donor.** PASTE2 (unsupervised, no
-   train/test gap) is 407-838 px held-out; ARCA is 2-3x worse on all 3 donors.
-   ARCA's earlier "win" was entirely contingent on training on the test tissue.
+3. **Sutura loses to PASTE2 on every unseen donor.** PASTE2 (unsupervised, no
+   train/test gap) is 407-838 px held-out; Sutura is 2-3x worse on all 3 donors.
+   Sutura's earlier "win" was entirely contingent on training on the test tissue.
 
 ### Mechanism CHANGED vs single-donor (diagnosed, fold S1, sev0)
 - Single-donor run: attention near-UNIFORM (eff. support 2367/3661 A-spots) ->
@@ -68,9 +68,9 @@ features. Promising directions, in rough priority:
 (c) more donors (the dataset has 12 slices / 6 pairs; we used 3 pairs) so the
     encoder sees more cross-donor variation;
 (d) geometry-aware matching (optimal-transport head on embeddings, i.e. graft
-    PASTE2's strength onto ARCA) since pure soft-attention mismatches across
+    PASTE2's strength onto Sutura) since pure soft-attention mismatches across
     donors.
-Honest read: ARCA as a learned registrar is NOT yet competitive with PASTE2
+Honest read: Sutura as a learned registrar is NOT yet competitive with PASTE2
 out-of-sample. The in-sample win is real but does not generalize; (a) is the
 most direct test of whether the architecture can be salvaged.
 
@@ -87,7 +87,7 @@ most direct test of whether the architecture can be salvaged.
 ================================================================================
 
 Ran the cross-sample generalization test that caveat #2 (below) demanded. The
-result is a clean NEGATIVE: **ARCA's in-sample win does NOT transfer to an unseen
+result is a clean NEGATIVE: **Sutura's in-sample win does NOT transfer to an unseen
 donor as currently built.** This is the honest answer, mechanistically diagnosed.
 
 ### Setup (`src/train_cross_loo.py`, NEW)
@@ -100,7 +100,7 @@ donor as currently built.** This is the honest answer, mechanistically diagnosed
   whatever A frame is passed). Same loss/metric/eval grid as the headline.
 
 ### Result — registration error MEDIAN (px), tear regime
-| severity | ARCA in-sample (subj1) | ARCA HELD-OUT (subj2) |
+| severity | Sutura in-sample (subj1) | Sutura HELD-OUT (subj2) |
 |----------|------------------------|-----------------------|
 |    0     |          95            |        1508           |
 |    8     |         118            |        1594           |
@@ -136,12 +136,12 @@ error. The failure is in FEATURE/REPRESENTATION TRANSFER, not the deformation he
   tissue vs PASTE2 run on the same held-out pair: sweep_deformation_cross_tear_loo).
 
 ================================================================================
-## UPDATE 2026-06-20 (late) — ARCA GRAPH MODEL TRAINED + HEAD-TO-HEAD DONE
+## UPDATE 2026-06-20 (late) — Sutura GRAPH MODEL TRAINED + HEAD-TO-HEAD DONE
 ================================================================================
 
-ARCA's two-slice cross deformation model (`src/train_cross.py`, `ARCACrossNet`)
+Sutura's two-slice cross deformation model (`src/train_cross.py`, `SuturaCrossNet`)
 was trained and evaluated head-to-head against PASTE2 on the SAME torn warps.
-This is the first real ARCA-vs-PASTE2 result. **ARCA wins on both axes.**
+This is the first real Sutura-vs-PASTE2 result. **Sutura wins on both axes.**
 
 ### What ran
 - Smoke run first (30 ep) — confirmed loss drops cleanly + correct tear ordering.
@@ -156,7 +156,7 @@ This is the first real ARCA-vs-PASTE2 result. **ARCA wins on both axes.**
   descent to plateau. params=74178, hidden=64, 3 DeformConv layers, pca-dim=50.
 
 ### Final numbers — registration error MEDIAN (px), tear regime, same warps/GT
-| severity | PASTE2 (GW/OT) | ARCA (GNN) |
+| severity | PASTE2 (GW/OT) | Sutura (GNN) |
 |----------|----------------|------------|
 |    0     |     658        |     99     |
 |    1     |     655        |    100     |
@@ -166,21 +166,21 @@ This is the first real ARCA-vs-PASTE2 result. **ARCA wins on both axes.**
 |    6     |     773        |    109     |
 |    8     |     838        |    118     |
 
-- ARCA median is **~6.6-7.1x lower** than PASTE2 across the whole range and stays
+- Sutura median is **~6.6-7.1x lower** than PASTE2 across the whole range and stays
   **below 1 spot pitch (137 px)** at every severity (sub-spot accuracy on torn
   tissue, where PASTE2 is 5-6 pitches off).
-- Robustness (the headline claim): ARCA median rises only +19 px (99->118, +19%)
+- Robustness (the headline claim): Sutura median rises only +19 px (99->118, +19%)
   from sev0->sev8; PASTE2 rises +180 px (658->838, +27%). Tearing — exactly what
-  ARCA targets — is where it most outperforms GW/OT.
+  Sutura targets — is where it most outperforms GW/OT.
 - PASTE2 label-transfer accuracy over the same sweep: 64.4% -> 57.5% (sev0->8).
 
 ### CAVEATS (state these before any paper claim — do NOT oversell)
-1. **ARCA's error TAIL grows at the tear**, even though the median is flat:
+1. **Sutura's error TAIL grows at the tear**, even though the median is flat:
    sev8 mean = 318.8 px, p90 = 1205.4 px (vs median 118). The torn-region spots
    (the genuine discontinuity) carry the error; the bulk of tissue stays
    sub-pitch. Correct framing: "most spots stay sub-pitch; the torn seam itself
    is the hard tail." See right panel of arca_vs_paste2_tear.png.
-2. **Same-pair train/eval.** ARCA trained AND evaluated on the same 151507/151508
+2. **Same-pair train/eval.** Sutura trained AND evaluated on the same 151507/151508
    pair (held-out warp seeds, same tissue). It learns this deformation
    distribution, not unseen tissue. A cross-sample / leave-one-out eval is the
    next rigor step before claiming generalization.
@@ -188,10 +188,10 @@ This is the first real ARCA-vs-PASTE2 result. **ARCA wins on both axes.**
    realization per severity. Multi-seed eval would give error bars.
 
 ### Exact artifacts on disk (results/)
-- `arca_cross_curve.csv`  — final ARCA curve (severity, reg_err_median/mean/p90, n=4182).
+- `arca_cross_curve.csv`  — final Sutura curve (severity, reg_err_median/mean/p90, n=4182).
 - `arca_cross.pt`         — trained checkpoint (state_dict + args + pitch=137.0).
 - `arca_vs_paste2_tear.png` — overlay figure (left: median head-to-head; right:
-                              ARCA median/mean/p90 showing the tail).
+                              Sutura median/mean/p90 showing the tail).
 - `arca_cross_smoke_loss.png`, `arca_cross_smoke_history.csv` — smoke-run loss curve.
 - PASTE2 comparison source: `sweep_deformation_cross_tear.csv` (reg_err_median col).
 
@@ -203,7 +203,7 @@ This is the first real ARCA-vs-PASTE2 result. **ARCA wins on both axes.**
 - `src/_smoke_cross.py` — NEW. Per-epoch loss/val logging harness for sanity.
 
 ### Next steps (offered, not yet done)
-(a) add ARCA curve into combined `headline_summary.png`;
+(a) add Sutura curve into combined `headline_summary.png`;
 (b) multi-seed eval for error bars; (c) leave-one-out cross-sample generalization test.
 
 ================================================================================
@@ -271,7 +271,7 @@ Then ask for the **full three-regime report**. Expected reads:
 ## Open scientific conclusion so far
 PASTE2 (GW/OT) is robust to smooth (near-isometric) warps but degrades steadily
 under tearing (non-isometric), even at default alpha=0.1 — the torn-tissue
-failure mode ARCA targets. The alpha=0.5 confirmatory should sharpen this; the
+failure mode Sutura targets. The alpha=0.5 confirmatory should sharpen this; the
 full 28-run alpha sweep was deliberately SKIPPED (headline already at alpha=0.1).
-Next project step after confirmatory: build ARCA's graph model and overlay its
+Next project step after confirmatory: build Sutura's graph model and overlay its
 curve on the tear axes.

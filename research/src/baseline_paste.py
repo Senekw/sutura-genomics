@@ -1,11 +1,11 @@
 """
-ARCA baseline — PASTE2 partial alignment + layer-label transfer accuracy.
+Sutura baseline — PASTE2 partial alignment + layer-label transfer accuracy.
 
 Aligns two adjacent DLPFC slices with PASTE2's partial fused Gromov-Wasserstein
 solver, then evaluates the alignment by label transfer: map each spot in slice A
 to its highest-probability partner in slice B (argmax over the transport matrix
 row) and report the fraction whose manual cortical-layer label (obs["layer"])
-matches. That fraction is the OT baseline ARCA must beat on warped/torn tissue.
+matches. That fraction is the OT baseline Sutura must beat on warped/torn tissue.
 
 The transport matrix is saved to results/.
 
@@ -73,7 +73,7 @@ def main() -> None:
     args = p.parse_args()
 
     print("=" * 64)
-    print(f"ARCA baseline — PASTE2 partial alignment")
+    print(f"Sutura baseline — PASTE2 partial alignment")
     print(f"  pair          : {args.sample_a} -> {args.sample_b}")
     print(f"  overlap s     : {args.s}")
     print(f"  alpha         : {args.alpha}")

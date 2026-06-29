@@ -1,4 +1,4 @@
-# ARCA argmax acceptance check + alpha=0.5 confirmatory (full spots, pca).
+# Sutura argmax acceptance check + alpha=0.5 confirmatory (full spots, pca).
 # 3 invocations x 2 severities (0,8) = 6 PASTE2 runs. Persists transport matrices.
 $py = "$PSScriptRoot\.venv\Scripts\python.exe"
 $sweep = "$PSScriptRoot\src\sweep_deformation.py"

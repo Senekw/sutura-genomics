@@ -1,5 +1,5 @@
 # Sutura Genomics — Independent Validation Report
-**Prepared for:** Sean Lee · **Date:** 2026-06-24 · **Scope:** every claim in `ARCA_Cofounder_Brief (3).pdf`
+**Prepared for:** Sean Lee · **Date:** 2026-06-24 · **Scope:** every claim in `Sutura_Cofounder_Brief (3).pdf`
 
 This report independently re-derives or refutes every load-bearing claim in the brief. All Sutura/PASTE2
 numbers were **re-run from the actual code + data on this machine** (not taken on faith from the brief).

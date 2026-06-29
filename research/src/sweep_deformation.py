@@ -1,5 +1,5 @@
 """
-ARCA — deformation stress test for the OT baseline (PASTE2).
+Sutura — deformation stress test for the OT baseline (PASTE2).
 
 For a sweep of warp severities, warp slice 151508 with a known displacement
 field (src/warp_slice.apply_warp), run PASTE2 partial alignment of
@@ -227,7 +227,7 @@ def main() -> None:
     pitch_px = float(np.median(d[:, 1]))
 
     print("=" * 70)
-    print(f"ARCA deformation sweep — mode={args.mode}  "
+    print(f"Sutura deformation sweep — mode={args.mode}  "
           f"ref={args.reference} sample={args.sample}")
     print(f"  severities    : {severities}")
     print(f"  dissimilarity : {args.dissimilarity}  s={args.s} alpha={args.alpha}"
