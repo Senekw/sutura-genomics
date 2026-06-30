@@ -18,7 +18,7 @@ Run: python validation/multiseed_lodo.py
 Out: results/sutura_multiseed_lodo.csv
 """
 from __future__ import annotations
-import sys, csv
+import sys, csv, argparse
 from pathlib import Path
 import numpy as np
 import torch
@@ -72,11 +72,25 @@ def load_fold(ckpt_stem):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--stems", default="",
+                    help="comma list of checkpoint stems in results/ to evaluate. "
+                         "Each fold's display name, test pair, and feature mode are "
+                         "read from the checkpoint's own saved args, so this works "
+                         "for any LODO run (e.g. the 2-pair-per-donor stems). "
+                         "Default (empty) = the original hardcoded S2/S3 folds.")
+    ap.add_argument("--out", default="sutura_multiseed_lodo.csv",
+                    help="output CSV name written under results/")
+    args = ap.parse_args()
+
+    folds = ([(s.strip(), None, s.strip()) for s in args.stems.split(",") if s.strip()]
+             if args.stems else FOLDS)
+
     out_rows = []
     print("=" * 80)
-    print("SUTURA held-out MULTI-SEED eval (folds S2 & S3, tear) — 5 seeds", SEEDS)
+    print(f"SUTURA held-out MULTI-SEED eval ({len(folds)} checkpoints, tear) — 5 seeds", SEEDS)
     print("=" * 80)
-    for fold, pair, stem in FOLDS:
+    for fold, pair, stem in folds:
         model, test, eval_sev, knn, mode = load_fold(stem)
         bridge = 100 * test["have"].mean()
         print(f"\n[{fold} / {mode}]  held-out {test['ref']}/{test['smp']} "
@@ -106,7 +120,7 @@ def main():
                       f"+/- {row['median_ci']:4.1f} (95%CI)   "
                       f"mean {row['mean_mean']:7.1f}   p90 {row['p90_mean']:7.1f}")
 
-    out_csv = RESULTS / "sutura_multiseed_lodo.csv"
+    out_csv = RESULTS / args.out
     with open(out_csv, "w", newline="") as fh:
         wr = csv.DictWriter(fh, fieldnames=list(out_rows[0].keys()))
         wr.writeheader(); wr.writerows(out_rows)
