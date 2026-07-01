@@ -19,10 +19,13 @@
 # Fixed seeds live in train_cross_loo.py (seed 0); CPU torch is not bit-exact, but
 # pinned threads + fixed seeds give stable, reproducible curves.
 #
-# WATCHDOG. Each fold's training run is wrapped in a 45-min watchdog (est. ~30 min
-# each): if one hangs it is force-killed (process tree) with exit 124 and the batch
-# moves on, so a stuck run cannot trap the machine overnight. The 5-seed eval is
-# similarly capped at 20 min.
+# WATCHDOG. Each fold's training run is wrapped in a 90-min watchdog (~2x the
+# observed ~45-min fold time at 6 pinned threads): if one hangs it is force-killed
+# (process tree) with exit 124 and the batch moves on, so a stuck run cannot trap
+# the machine overnight. The 5-seed eval is similarly capped at 20 min.
+# NOTE: an earlier 45-min watchdog was too tight (folds run 40-45 min at 6 threads,
+# and a stray double-run doubled that), so every fold tripped it before saving a
+# checkpoint. 90 min gives clear margin for a single, correctly-isolated run.
 #
 # 3 folds x 2 feature modes (global, perslice) = 6 training runs, then a 5-seed
 # eval puts 95% CIs on every held-out curve. PASTE2 held-out baselines for all
@@ -96,7 +99,7 @@ foreach ($mode in $modes) {
         $out = "lodo2_{0}_held{1}" -f $mode, $f.tag
         $stems += $out
         if (Test-Path "results\$out.pt") { Log "skip (exists) $out"; continue }
-        Log "RUN mode=$mode fold=test$($f.tag)  train=[$($f.train)]  out=$out (watchdog 45min)"
+        Log "RUN mode=$mode fold=test$($f.tag)  train=[$($f.train)]  out=$out (watchdog 90min)"
         # 4 training pairs -> 48 steps/epoch keeps ~1200 steps/pair (matches the
         # 1-pair run's per-pair supervision); eval grid + seed match the PASTE2 sweep.
         $argList = @(
@@ -105,7 +108,7 @@ foreach ($mode in $modes) {
             "--feature-mode", $mode, "--steps-per-epoch", "48", "--epochs", "100",
             "--out", $out
         )
-        $code = Invoke-Watched $argList (45 * 60 * 1000) ("fold test$($f.tag)/$mode")
+        $code = Invoke-Watched $argList (90 * 60 * 1000) ("fold test$($f.tag)/$mode")
         if ($code -ne 0) {
             Log "  !! FAILED (exit $code) mode=$mode fold=test$($f.tag)"; $failures++
         } else { Log "  ok mode=$mode fold=test$($f.tag)" }
