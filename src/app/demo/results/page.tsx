@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, RotateCcw } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Check, RotateCcw, Move3d } from "lucide-react";
 
 import { Logo } from "@/components/logo";
 import { isAuthed } from "@/lib/demoAuth";
+
+// 3D viewer is client-only (three.js) — never server-render it.
+const TissueStack3D = dynamic(() => import("./TissueStack3D"), { ssr: false });
 
 // Real medians from Sutura's internal DLPFC benchmark (see public/live-demo.html).
 const SUTURA_PX = 103;
@@ -15,11 +19,20 @@ const PITCH_PX = 137; // one Visium spot pitch
 const RATIO = (PASTE2_PX / SUTURA_PX).toFixed(1); // ~7.1×
 const MAXERR = 900;
 
+// Cortical-layer legend — palette matches research/src/make_stack_json.py.
+const LEGEND = [
+  ["L1", "#5e4fa2"],
+  ["L2", "#3a7ecf"],
+  ["L3", "#66c2a5"],
+  ["L4", "#a6d96a"],
+  ["L5", "#fee08b"],
+  ["L6", "#fdae61"],
+  ["WM", "#d53e4f"],
+] as const;
+
 export default function DemoResultsPage() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
-  const beforeRef = useRef<HTMLCanvasElement | null>(null);
-  const afterRef = useRef<HTMLCanvasElement | null>(null);
   const [bars, setBars] = useState(false);
 
   useEffect(() => {
@@ -32,9 +45,7 @@ export default function DemoResultsPage() {
 
   useEffect(() => {
     if (!ready) return;
-    drawCloud(beforeRef.current, "torn");
-    drawCloud(afterRef.current, "aligned");
-    const id = window.setTimeout(() => setBars(true), 120);
+    const id = window.setTimeout(() => setBars(true), 200);
     return () => window.clearTimeout(id);
   }, [ready]);
 
@@ -52,36 +63,37 @@ export default function DemoResultsPage() {
             Alignment complete
           </div>
           <h1 className="mt-4 text-2xl font-light tracking-tight text-foreground sm:text-3xl">
-            DLPFC Br5292 — Slice 151508 aligned
+            DLPFC Br5292 aligned volume
           </h1>
           <p className="mt-2 max-w-xl text-sm font-light leading-relaxed text-muted-foreground">
-            4,384 spots registered across the serial sections in 14.8 s. Sutura
-            recovers the true tissue geometry straight through the tear, staying
-            below one spot pitch where optimal-transport pipelines drift.
+            Four serial sections (151507–151510) registered into a single 3D
+            volume. Sutura recovers the true tissue geometry straight through the
+            tear, staying below one spot pitch where optimal-transport pipelines
+            drift.
           </p>
         </div>
 
-        {/* Before / after */}
-        <div className="mt-9 grid gap-4 sm:grid-cols-2">
-          <figure className="overflow-hidden rounded-2xl border border-border bg-white">
-            <canvas ref={beforeRef} className="block h-[220px] w-full" />
-            <figcaption className="flex items-center justify-between border-t border-border px-4 py-3">
-              <span className="text-[13px] font-normal text-foreground">Input · torn section</span>
-              <span className="text-[12px] font-light text-muted-foreground">
-                misaligned at the tear
+        {/* 3D stacked tissue block */}
+        <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-white">
+          <div className="relative h-[440px] w-full [background:radial-gradient(120%_120%_at_50%_0%,#faf9ff_0%,#ffffff_60%)]">
+            <TissueStack3D />
+            <div className="pointer-events-none absolute left-4 top-3.5 flex items-center gap-1.5 text-[11px] font-light uppercase tracking-[0.14em] text-[#6633ee]">
+              <Move3d className="h-3.5 w-3.5" strokeWidth={1.8} />
+              4 slices · drag to rotate · scroll to zoom
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border px-4 py-3">
+            <span className="text-[12px] font-light text-muted-foreground">Cortical layer</span>
+            {LEGEND.map(([label, color]) => (
+              <span key={label} className="inline-flex items-center gap-1.5 text-[12px] font-light text-foreground">
+                <i
+                  className="inline-block h-2.5 w-2.5 rounded-full"
+                  style={{ background: color }}
+                />
+                {label}
               </span>
-            </figcaption>
-          </figure>
-
-          <figure className="overflow-hidden rounded-2xl border border-[#e3dbff] bg-gradient-to-b from-[#faf8ff] to-white">
-            <canvas ref={afterRef} className="block h-[220px] w-full" />
-            <figcaption className="flex items-center justify-between border-t border-[#e3dbff] px-4 py-3">
-              <span className="text-[13px] font-normal text-[#6633ee]">Sutura · aligned</span>
-              <span className="text-[12px] font-light text-muted-foreground">
-                sub-spot accuracy
-              </span>
-            </figcaption>
-          </figure>
+            ))}
+          </div>
         </div>
 
         {/* Metrics */}
@@ -130,7 +142,7 @@ export default function DemoResultsPage() {
             <div className="rounded-2xl border border-border bg-white p-6">
               <div className="text-[13px] font-light text-muted-foreground">Spots registered</div>
               <div className="mt-1 text-[44px] font-light leading-none text-foreground">
-                4,384
+                17,536
               </div>
             </div>
           </div>
@@ -195,76 +207,4 @@ function BarRow({
       </span>
     </div>
   );
-}
-
-// Draws a reference (gray) + moving (purple) point cloud, either torn/misaligned
-// or cleanly aligned. Deterministic — seeded so both canvases look consistent.
-function drawCloud(canvas: HTMLCanvasElement | null, mode: "torn" | "aligned") {
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  const rect = canvas.getBoundingClientRect();
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.round(rect.width * dpr);
-  canvas.height = Math.round(rect.height * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  const w = rect.width;
-  const h = rect.height;
-  const cx = w / 2;
-  const cy = h / 2;
-  const scale = Math.min(w, h) * 0.42;
-
-  let seed = 20260702;
-  const rnd = () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  };
-
-  const N = 380;
-  const base: { x: number; y: number }[] = [];
-  for (let i = 0; i < N; i++) {
-    const a = rnd() * Math.PI * 2;
-    const r = Math.sqrt(rnd());
-    base.push({
-      x: Math.cos(a) * r * 0.92,
-      y: Math.sin(a) * r * 0.78 * (0.9 + 0.18 * Math.sin(a * 2)),
-    });
-  }
-
-  ctx.clearRect(0, 0, w, h);
-
-  // Reference section (ground truth) — faint gray.
-  ctx.fillStyle = "#c9c9d2";
-  for (const p of base) {
-    ctx.beginPath();
-    ctx.arc(cx + p.x * scale, cy + p.y * scale, 2, 0, 7);
-    ctx.fill();
-  }
-
-  // Moving section — purple.
-  ctx.fillStyle = "#6633ee";
-  for (const p of base) {
-    let x = p.x;
-    let y = p.y;
-    if (mode === "torn") {
-      // Torn flap on the right slides out + global misalignment.
-      if (x > 0) {
-        x += 0.34;
-        y += 0.08;
-      }
-      const rot = 0.09;
-      const dx = x;
-      const dy = y;
-      x = dx * Math.cos(rot) - dy * Math.sin(rot) + 0.05;
-      y = dx * Math.sin(rot) + dy * Math.cos(rot) + 0.03;
-    } else {
-      // Aligned — tiny sub-pitch jitter only.
-      x += (rnd() - 0.5) * 0.02;
-      y += (rnd() - 0.5) * 0.02;
-    }
-    ctx.beginPath();
-    ctx.arc(cx + x * scale, cy + y * scale, 2, 0, 7);
-    ctx.fill();
-  }
 }

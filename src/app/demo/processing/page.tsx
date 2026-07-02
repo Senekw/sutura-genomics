@@ -217,6 +217,11 @@ export default function DemoProcessingPage() {
           </div>
         </div>
 
+        {/* Demo-mode disclosure: the model isn't run on arbitrary uploads yet. */}
+        <p className="mt-4 w-full rounded-lg border border-[#e7e1ff] bg-[#faf8ff] px-3.5 py-2.5 text-center text-[12px] font-light leading-relaxed text-muted-foreground">
+          Demo mode: showing precomputed alignment on reference dataset.
+        </p>
+
         {/* Overall progress */}
         <div className="mt-7 w-full">
           <div className="flex items-baseline justify-between">
