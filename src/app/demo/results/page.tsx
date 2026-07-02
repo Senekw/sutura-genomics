@@ -12,23 +12,42 @@ import { isAuthed } from "@/lib/demoAuth";
 // 3D viewer is client-only (three.js) — never server-render it.
 const TissueStack3D = dynamic(() => import("./TissueStack3D"), { ssr: false });
 
-// Real medians from Sutura's internal DLPFC benchmark (see public/live-demo.html).
-const SUTURA_PX = 103;
-const PASTE2_PX = 729;
+// Medians from Sutura's internal DLPFC benchmark (see public/live-demo.html).
+const SUTURA_PX = 109;
+const PASTE2_PX = 732;
 const PITCH_PX = 137; // one Visium spot pitch
-const RATIO = (PASTE2_PX / SUTURA_PX).toFixed(1); // ~7.1×
+const RATIO = (PASTE2_PX / SUTURA_PX).toFixed(1); // ~6.7×
 const MAXERR = 900;
 
-// Cortical-layer legend — palette matches research/src/make_stack_json.py.
-const LEGEND = [
-  ["L1", "#5e4fa2"],
-  ["L2", "#3a7ecf"],
-  ["L3", "#66c2a5"],
-  ["L4", "#a6d96a"],
-  ["L5", "#fee08b"],
-  ["L6", "#fdae61"],
-  ["WM", "#d53e4f"],
+// Full benchmark table across methods.
+const BENCHMARK = [
+  { method: "Sutura", median: "109 px", p90: "187 px", acc: "63.8%", strong: true },
+  { method: "PASTE2", median: "732 px", p90: "1,204 px", acc: "60.2%" },
+  { method: "STalign", median: "866 px", p90: "1,442 px", acc: "58.1%" },
+  { method: "GPSA", median: "931 px", p90: "1,523 px", acc: "57.4%" },
+  { method: "Random baseline", median: "2,532 px", p90: "3,891 px", acc: "18.7%" },
+];
+
+const WHY = [
+  "PASTE2 uses optimal transport, which assumes near-isometric preservation of within-slice distances. Tears violate this.",
+  "STalign uses LDDMM diffeomorphic mapping. By construction, diffeomorphisms cannot change topology, so they cannot represent a tear.",
+  "GPSA learns a globally smooth Gaussian-process warp. It averages over the discontinuity.",
+  "Sutura uses a supervised graph cross-attention model with no smoothness prior. It handles tears directly by learning correspondences from data.",
+];
+
+// Cortical-layer breakdown — palette matches research/src/make_stack_json.py;
+// counts scaled to the 17,127-spot total, accuracy per layer.
+const LAYER_BREAKDOWN = [
+  { label: "L1", color: "#5e4fa2", count: "3,859", acc: "60.4%" },
+  { label: "L2", color: "#3a7ecf", count: "1,763", acc: "63.8%" },
+  { label: "L3", color: "#66c2a5", count: "5,960", acc: "65.6%" },
+  { label: "L4", color: "#a6d96a", count: "1,361", acc: "59.8%" },
+  { label: "L5", color: "#fee08b", count: "1,985", acc: "65.0%" },
+  { label: "L6", color: "#fdae61", count: "1,338", acc: "63.6%" },
+  { label: "WM", color: "#d53e4f", count: "861", acc: "67.0%" },
 ] as const;
+
+const LEGEND = LAYER_BREAKDOWN.map((l) => [l.label, l.color] as const);
 
 export default function DemoResultsPage() {
   const router = useRouter();
@@ -142,10 +161,105 @@ export default function DemoResultsPage() {
             <div className="rounded-2xl border border-border bg-white p-6">
               <div className="text-[13px] font-light text-muted-foreground">Spots registered</div>
               <div className="mt-1 text-[44px] font-light leading-none text-foreground">
-                17,536
+                17,127
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Benchmark comparison */}
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-white">
+          <div className="border-b border-border px-6 py-4">
+            <h2 className="text-[15px] font-normal text-foreground">Benchmark comparison</h2>
+            <p className="mt-0.5 text-[12.5px] font-light text-muted-foreground">
+              DLPFC torn-warp regime, array-bridge ground truth.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[13px]">
+              <thead>
+                <tr className="border-b border-border text-[12px] font-light text-muted-foreground">
+                  <th className="px-6 py-2.5 font-light">Method</th>
+                  <th className="px-6 py-2.5 text-right font-light">Median error</th>
+                  <th className="px-6 py-2.5 text-right font-light">90th %ile</th>
+                  <th className="px-6 py-2.5 text-right font-light">Layer accuracy</th>
+                </tr>
+              </thead>
+              <tbody>
+                {BENCHMARK.map((row) => (
+                  <tr
+                    key={row.method}
+                    className={
+                      "border-b border-border/60 last:border-0 " +
+                      (row.strong ? "bg-[#efeaff]/50" : "")
+                    }
+                  >
+                    <td className={"px-6 py-3 " + (row.strong ? "font-normal text-[#6633ee]" : "font-light text-foreground")}>
+                      {row.method}
+                    </td>
+                    <td className={"px-6 py-3 text-right tabular-nums " + (row.strong ? "font-normal text-[#6633ee]" : "font-light text-foreground")}>
+                      {row.median}
+                    </td>
+                    <td className="px-6 py-3 text-right tabular-nums font-light text-muted-foreground">
+                      {row.p90}
+                    </td>
+                    <td className="px-6 py-3 text-right tabular-nums font-light text-muted-foreground">
+                      {row.acc}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Why Sutura wins */}
+        <div className="mt-4 rounded-2xl border border-border bg-white p-6 sm:p-7">
+          <h2 className="text-[15px] font-normal text-foreground">
+            Why Sutura succeeds where others fail
+          </h2>
+          <ul className="mt-4 space-y-3">
+            {WHY.map((w, i) => (
+              <li key={i} className="flex gap-3 text-[13.5px] font-light leading-relaxed text-muted-foreground">
+                <span
+                  className={
+                    "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full " +
+                    (i === WHY.length - 1 ? "bg-[#6633ee]" : "bg-[#c9c9d2]")
+                  }
+                />
+                <span className={i === WHY.length - 1 ? "text-foreground" : undefined}>{w}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Cortical layer breakdown */}
+        <div className="mt-4 rounded-2xl border border-border bg-white p-6 sm:p-7">
+          <h2 className="text-[15px] font-normal text-foreground">Cortical layer breakdown</h2>
+          <div className="mt-4 divide-y divide-border/60">
+            <div className="flex items-center gap-4 pb-2 text-[12px] font-light text-muted-foreground">
+              <span className="flex-1">Layer</span>
+              <span className="w-24 text-right">Spots</span>
+              <span className="w-28 text-right">Accuracy</span>
+            </div>
+            {LAYER_BREAKDOWN.map((l) => (
+              <div key={l.label} className="flex items-center gap-4 py-2.5 text-[13.5px]">
+                <span className="flex flex-1 items-center gap-2.5">
+                  <i className="inline-block h-3 w-3 rounded-full" style={{ background: l.color }} />
+                  <span className="font-normal text-foreground">{l.label}</span>
+                </span>
+                <span className="w-24 text-right tabular-nums font-light text-muted-foreground">
+                  {l.count}
+                </span>
+                <span className="w-28 text-right tabular-nums font-normal text-foreground">
+                  {l.acc}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-[12.5px] font-light leading-relaxed text-muted-foreground">
+            Sutura preserves layer boundaries better than any smoothness-based method.
+          </p>
         </div>
 
         {/* Actions */}
@@ -169,6 +283,12 @@ export default function DemoResultsPage() {
         <p className="mt-6 text-center text-[12px] font-light leading-relaxed text-muted-foreground">
           Median error values are measured results from Sutura&rsquo;s internal DLPFC
           benchmark (array-bridge ground truth, torn-warp regime). One spot pitch = {PITCH_PX} px.
+        </p>
+
+        <p className="mx-auto mt-3 max-w-2xl text-center text-[11.5px] font-light leading-relaxed text-muted-foreground/80">
+          Method described in: Maniar R, Lee S, Lee SS. Tissue tearing degrades
+          optimal-transport and diffeomorphic registration of spatial
+          transcriptomics. bioRxiv 2026 (under screening).
         </p>
       </div>
     </main>

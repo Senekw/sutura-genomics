@@ -9,13 +9,41 @@ import { isAuthed } from "@/lib/demoAuth";
 
 // Pipeline steps. Durations (seconds) sum to ~15s of substantive-feeling work.
 const STEPS = [
-  { label: "Loading spatial data", seconds: 2 },
-  { label: "Building kNN graph", seconds: 2 },
-  { label: "Extracting graph embeddings", seconds: 3 },
-  { label: "Detecting tissue features", seconds: 2 },
-  { label: "Handling tear discontinuities", seconds: 3 },
-  { label: "Cross-attention alignment", seconds: 2 },
-  { label: "Refining spot coordinates", seconds: 1 },
+  {
+    label: "Loading spatial data",
+    detail: "Reading obsm[spatial] coordinates and obs[layer] annotations",
+    seconds: 2,
+  },
+  {
+    label: "Building kNN graph",
+    detail: "k=6, symmetrized, edge features from spot pitch",
+    seconds: 2,
+  },
+  {
+    label: "Extracting graph embeddings",
+    detail: "50-dim TruncatedSVD → 3-layer DeformConv encoder",
+    seconds: 3,
+  },
+  {
+    label: "Detecting tissue features",
+    detail: "Per-spot embeddings zA, zB computed",
+    seconds: 2,
+  },
+  {
+    label: "Handling tear discontinuities",
+    detail: "Cross-attention scoring correspondences",
+    seconds: 3,
+  },
+  {
+    label: "Cross-attention alignment",
+    detail: "Softmax weights over reference spots",
+    seconds: 2,
+  },
+  {
+    label: "Refining spot coordinates",
+    detail: "Barycentric combo + learned residual",
+    seconds: 1,
+  },
 ] as const;
 
 const TOTAL = STEPS.reduce((s, x) => s + x.seconds, 0);
@@ -287,6 +315,16 @@ export default function DemoProcessingPage() {
                   >
                     {step.label}
                   </span>
+                  {(isActive || isDone) && (
+                    <p
+                      className={
+                        "mt-0.5 font-mono text-[11px] leading-relaxed " +
+                        (isActive ? "text-[#6633ee]" : "text-muted-foreground/50")
+                      }
+                    >
+                      {step.detail}
+                    </p>
+                  )}
                   {isActive && (
                     <div className="mt-1.5 h-[3px] w-full overflow-hidden rounded-full bg-[#ece7fb]">
                       <div

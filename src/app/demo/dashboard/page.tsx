@@ -14,6 +14,9 @@ import {
   UploadCloud,
   FileCheck2,
   AlertCircle,
+  ChevronDown,
+  Clock,
+  CheckCircle2,
 } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -32,6 +35,32 @@ const META = [
   { icon: Layers, label: "Section", value: "Slice 151508" },
 ];
 
+// Expanded dataset detail (revealed on hover).
+const DETAIL: [string, string][] = [
+  ["Species", "Human"],
+  ["Tissue", "Dorsolateral prefrontal cortex"],
+  ["Donor", "Br5292"],
+  ["Platform", "10x Genomics Visium"],
+  ["Sections", "4 adjacent (151507–151510)"],
+  ["Total spots", "17,127 across all slices"],
+  ["Gene panel", "33,538 genes"],
+  ["Annotations", "L1–L6 + WM cortical layers"],
+  ["Source", "spatialLIBD (Maynard et al. 2021)"],
+];
+
+const TOP_STATS = [
+  ["12", "alignments run today"],
+  ["4,384", "avg spots"],
+  ["108 px", "avg error"],
+];
+
+// Recent runs (illustrative history).
+const RECENT = [
+  { name: "DLPFC Br5292 · 4 sections", when: "2 hours ago", err: "109 px" },
+  { name: "DLPFC Br5595 · 4 sections", when: "Yesterday, 18:42", err: "114 px" },
+  { name: "DLPFC Br8100 · 3 sections", when: "Jun 30, 11:20", err: "121 px" },
+];
+
 type UploadPhase = "idle" | "reading" | "uploading" | "done" | "error";
 
 export default function DemoDashboardPage() {
@@ -44,6 +73,7 @@ export default function DemoDashboardPage() {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthed()) {
@@ -147,6 +177,21 @@ export default function DemoDashboardPage() {
       {/* ───────────── Main ───────────── */}
       <main className="flex-1 px-6 py-8 sm:px-10 sm:py-12">
         <div className="mx-auto max-w-3xl">
+          {/* Stats bar */}
+          <div className="mb-8 flex flex-wrap items-center gap-x-8 gap-y-3 rounded-xl border border-border bg-white/70 px-5 py-3.5 backdrop-blur-sm">
+            {TOP_STATS.map(([value, label], i) => (
+              <div key={label} className="flex items-center gap-8">
+                {i > 0 && <span className="hidden h-6 w-px bg-border sm:block" />}
+                <div>
+                  <span className="text-lg font-normal tracking-tight text-foreground">
+                    {value}
+                  </span>{" "}
+                  <span className="text-[13px] font-light text-muted-foreground">{label}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-light tracking-tight text-foreground">
@@ -276,7 +321,11 @@ export default function DemoDashboardPage() {
           )}
 
           {/* ───────────── Reference dataset card ───────────── */}
-          <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-white shadow-sm shadow-black/[0.03]">
+          <div
+            onMouseEnter={() => setDetailOpen(true)}
+            onMouseLeave={() => setDetailOpen(false)}
+            className="mt-8 overflow-hidden rounded-2xl border border-border bg-white shadow-sm shadow-black/[0.03] transition-colors hover:border-[#d7cff5]"
+          >
             <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
               <div className="flex items-start gap-4">
                 <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#efeaff] to-white ring-1 ring-[#e3dbff]">
@@ -290,6 +339,17 @@ export default function DemoDashboardPage() {
                     <span className="rounded-full bg-[#efeaff] px-2 py-0.5 text-[11px] font-light uppercase tracking-wide text-[#6633ee]">
                       Reference
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => setDetailOpen((o) => !o)}
+                      className="ml-1 inline-flex items-center gap-1 text-[12px] font-light text-muted-foreground transition-colors hover:text-[#6633ee]"
+                    >
+                      Details
+                      <ChevronDown
+                        className={"h-3.5 w-3.5 transition-transform " + (detailOpen ? "rotate-180" : "")}
+                        strokeWidth={1.8}
+                      />
+                    </button>
                   </div>
                   <p className="mt-1 text-sm font-light text-muted-foreground">
                     Human dorsolateral prefrontal cortex · layered reference section
@@ -315,6 +375,26 @@ export default function DemoDashboardPage() {
               </div>
             </div>
 
+            {/* Expandable dataset detail */}
+            <div
+              className={
+                "grid overflow-hidden border-t border-border transition-all duration-300 ease-out " +
+                (detailOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0")
+              }
+            >
+              <dl className="grid grid-cols-1 gap-x-10 gap-y-0 px-6 py-2 sm:grid-cols-2 sm:px-7">
+                {DETAIL.map(([k, v]) => (
+                  <div
+                    key={k}
+                    className="flex items-baseline justify-between gap-4 border-b border-border/60 py-2.5 text-[13px]"
+                  >
+                    <dt className="shrink-0 font-light text-muted-foreground">{k}</dt>
+                    <dd className="text-right font-normal text-foreground">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
             <div className="flex items-center justify-between gap-4 border-t border-border bg-secondary/40 px-6 py-4 sm:px-7">
               <span className="text-[13px] font-light text-muted-foreground">
                 Aligns this section against its serial neighbours with the Sutura graph model.
@@ -333,7 +413,38 @@ export default function DemoDashboardPage() {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[12px] font-light text-muted-foreground sm:text-left">
+          {/* ───────────── Recent runs ───────────── */}
+          <div className="mt-10">
+            <h2 className="text-sm font-normal tracking-tight text-foreground">Recent runs</h2>
+            <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-white">
+              {RECENT.map((r, i) => (
+                <div
+                  key={r.name}
+                  className={
+                    "flex items-center justify-between gap-4 px-5 py-3.5 " +
+                    (i > 0 ? "border-t border-border" : "")
+                  }
+                >
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-[#6633ee]" strokeWidth={1.8} />
+                    <div>
+                      <p className="text-[13.5px] font-normal text-foreground">{r.name}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-[12px] font-light text-muted-foreground">
+                        <Clock className="h-3 w-3" strokeWidth={1.6} />
+                        {r.when}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="tabular-nums text-[13.5px] font-normal text-foreground">{r.err}</p>
+                    <p className="text-[12px] font-light text-muted-foreground">median error</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="mt-8 text-center text-[12px] font-light text-muted-foreground sm:text-left">
             Signed in as{" "}
             <span className="text-foreground/70">suturagenomics1010101</span>
           </p>
