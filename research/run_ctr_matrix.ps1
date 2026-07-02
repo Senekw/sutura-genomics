@@ -1,5 +1,5 @@
 # ============================================================================
-# ARCA — contrastive correspondence loss, 3-donor LOO matrix (option a).
+# Sutura — contrastive correspondence loss, 3-donor LOO matrix (option a).
 #
 # Tests whether a donor-invariant InfoNCE-style match loss makes correspondence
 # transfer to unseen donors. Matrix (feature mode = global, fixed):
@@ -38,7 +38,7 @@ $sweep = @(
     @{ lam = 2.0; tag = "2p0"; ros = @("cosine", "attn") }
 )
 
-Log "=== ARCA contrastive LOO matrix START ==="
+Log "=== Sutura contrastive LOO matrix START ==="
 $fail = 0; $n = 0
 foreach ($f in $folds) {
     foreach ($s in $sweep) {
@@ -57,6 +57,6 @@ foreach ($f in $folds) {
         }
     }
 }
-Log "=== ARCA contrastive LOO matrix COMPLETE ($fail failures) ==="
+Log "=== Sutura contrastive LOO matrix COMPLETE ($fail failures) ==="
 "contrastive LOO matrix finished {0} with {1} failures." -f (Get-Date -Format "u"), $fail |
     Out-File -FilePath $done -Encoding utf8

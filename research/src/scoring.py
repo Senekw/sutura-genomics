@@ -1,5 +1,5 @@
 """
-Shared scoring utilities for ARCA alignment evaluation (numpy-only).
+Shared scoring utilities for Sutura alignment evaluation (numpy-only).
 
 Label-transfer accuracy: map each spot in slice A to its highest-probability
 partner in slice B (argmax over the transport-matrix row) and measure how often

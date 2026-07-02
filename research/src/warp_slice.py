@@ -1,5 +1,5 @@
 """
-ARCA — synthetic non-rigid warp of a spatial-transcriptomics slice.
+Sutura — synthetic non-rigid warp of a spatial-transcriptomics slice.
 
 Applies a KNOWN smooth displacement field (sum of Gaussian radial bumps) to a
 slice's spot coordinates so we retain exact ground-truth correspondence between

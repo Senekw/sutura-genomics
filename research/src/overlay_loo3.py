@@ -2,12 +2,12 @@
 
 One panel per held-out donor (leave-out S1 / S2 / S3). Each panel overlays, vs
 tear severity, the registration-error median (px):
-  - ARCA in-sample (the fold's training pairs, held-out warp seeds) — green
-  - ARCA held-out, global feature standardization      — blue
-  - ARCA held-out, perslice (batch-corrected) features — purple
+  - Sutura in-sample (the fold's training pairs, held-out warp seeds) — green
+  - Sutura held-out, global feature standardization      — blue
+  - Sutura held-out, perslice (batch-corrected) features — purple
   - PASTE2 (unsupervised) on the same held-out pair    — crimson
 
-Verdict the figure encodes: multi-donor training keeps ARCA sub-pitch IN-SAMPLE
+Verdict the figure encodes: multi-donor training keeps Sutura sub-pitch IN-SAMPLE
 but does NOT transfer — held-out medians sit ~8-11 spot pitches out under both
 feature modes, above PASTE2 on every unseen donor. perslice helps marginally.
 """
@@ -46,11 +46,11 @@ for ax, (tag, pretty, pfile) in zip(axes, FOLDS):
     ps = load(f"arca_loo3_perslice_test{tag}_test_curve.csv")
     p2 = load(pfile)
     if tr: ax.plot(*tr, "o-", color="tab:green", lw=2, ms=6,
-                   label="ARCA in-sample (train donors)")
+                   label="Sutura in-sample (train donors)")
     if g: ax.plot(*g, "o-", color="tab:blue", lw=2, ms=6,
-                  label="ARCA held-out (global)")
+                  label="Sutura held-out (global)")
     if ps: ax.plot(*ps, "s-", color="tab:purple", lw=2, ms=6,
-                   label="ARCA held-out (perslice)")
+                   label="Sutura held-out (perslice)")
     if p2: ax.plot(*p2, "D-", color="crimson", lw=2, ms=6,
                    label="PASTE2 (held-out)")
     ax.axhline(PITCH, color="gray", ls=":", lw=1, label=f"1 spot pitch ({PITCH:.0f}px)")
@@ -59,7 +59,7 @@ for ax, (tag, pretty, pfile) in zip(axes, FOLDS):
     ax.grid(alpha=0.3)
 axes[0].set_ylabel("registration error — median (px)")
 axes[0].legend(fontsize=8, loc="center right")
-fig.suptitle("3-donor leave-one-out: ARCA does not transfer to unseen donors "
+fig.suptitle("3-donor leave-one-out: Sutura does not transfer to unseen donors "
              "(in-sample sub-pitch; held-out ~8-11 pitches, above PASTE2)",
              fontsize=12)
 fig.tight_layout(rect=[0, 0, 1, 0.96])
@@ -68,7 +68,7 @@ fig.savefig(out, dpi=130)
 print(f"wrote {out}")
 
 # console summary table
-print("\nheld-out | ARCA in-sample | ARCA global | ARCA perslice | PASTE2   (median sev0->8, px)")
+print("\nheld-out | Sutura in-sample | Sutura global | Sutura perslice | PASTE2   (median sev0->8, px)")
 for tag, pretty, pfile in FOLDS:
     def s(name):
         c = load(name)
