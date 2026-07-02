@@ -1,247 +1,248 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import data from "./data.json";
 
-// cortical-layer palette: Layer1..Layer6, WM, NA
-const LAYER_COLORS = [
-  "#f9c74f", // Layer1
-  "#f9844a", // Layer2
-  "#f3722c", // Layer3
-  "#90be6d", // Layer4
-  "#43aa8b", // Layer5
-  "#577590", // Layer6
-  "#9d4edd", // WM
-  "#3a3f4b", // NA
-];
-const COLOR_OBJS = LAYER_COLORS.map((c) => new THREE.Color(c));
+// render instance colors at their exact hex values (no linear/sRGB surprises)
+THREE.ColorManagement.enabled = false;
 
-function useCloud(spots, layers, tornMask, breakTint) {
-  return useMemo(() => {
-    const n = spots.length;
-    const pos = new Float32Array(n * 3);
-    const col = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) {
-      pos[i * 3] = spots[i][0];
-      pos[i * 3 + 1] = -spots[i][1]; // image y is top-down
-      pos[i * 3 + 2] = 0;
-      let c = COLOR_OBJS[layers ? layers[i] : 7];
-      if (breakTint && tornMask && tornMask[i]) c = COLOR_OBJS[6];
-      col[i * 3] = c.r;
-      col[i * 3 + 1] = c.g;
-      col[i * 3 + 2] = c.b;
+const N = data.n;
+const DISP = 1.35; // display scale
+const ZSCALE = 3.0; // exaggerate slab depth so 3D reads
+const COLORS = data.layerColors.map((c) => new THREE.Color(c));
+
+// build a Float32 position array for a given state key
+function statePositions(key) {
+  const src = data[key];
+  const z = data.z;
+  const a = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    a[i * 3] = src[i][0] * DISP;
+    a[i * 3 + 1] = -src[i][1] * DISP; // flip image-y
+    a[i * 3 + 2] = z[i] * DISP * ZSCALE;
+  }
+  return a;
+}
+
+const STATE_POS = {
+  clean: statePositions("clean"),
+  torn: statePositions("torn"),
+  paste2: statePositions("paste2"),
+  sutura: statePositions("sutura"),
+};
+
+const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+function Tissue({ targetKey }) {
+  const meshRef = useRef();
+  const groupRef = useRef();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  // live displayed positions (start clean)
+  const cur = useRef(Float32Array.from(STATE_POS.clean));
+  const from = useRef(Float32Array.from(STATE_POS.clean));
+  const anim = useRef({ t: 1, key: targetKey });
+
+  // per-instance colors, built once and attached declaratively so the buffer
+  // exists at mount (otherwise the shader compiles without the color path)
+  const colorArray = useMemo(() => {
+    const c = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const col = COLORS[data.layer[i]];
+      c[i * 3] = col.r;
+      c[i * 3 + 1] = col.g;
+      c[i * 3 + 2] = col.b;
     }
-    return { pos, col, n };
-  }, [spots, layers, tornMask, breakTint]);
-}
+    return c;
+  }, []);
 
-function Cloud({ spots, layers, tornMask, size = 0.02, breakTint = false }) {
-  const { pos, col } = useCloud(spots, layers, tornMask, breakTint);
-  const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    g.setAttribute("color", new THREE.BufferAttribute(col, 3));
-    return g;
-  }, [pos, col]);
-  return (
-    <points geometry={geo}>
-      <pointsMaterial
-        size={size}
-        vertexColors
-        sizeAttenuation
-        transparent
-        opacity={0.92}
-        depthWrite={false}
-      />
-    </points>
-  );
-}
+  // assign per-instance colors before first paint
+  useLayoutEffect(() => {
+    const m = meshRef.current;
+    if (!m) return;
+    m.instanceColor = new THREE.InstancedBufferAttribute(colorArray, 3);
+    m.instanceColor.needsUpdate = true;
+    m.material.needsUpdate = true;
+  }, [colorArray]);
 
-// -------- landing: four real slices, stacked in depth --------
-function StackedSlices() {
-  const group = useRef();
-  useFrame((_, dt) => {
-    if (group.current) group.current.rotation.y += dt * 0.18;
+  // when target changes, snapshot current as "from" and restart the morph
+  useEffect(() => {
+    from.current = Float32Array.from(cur.current);
+    anim.current = { t: 0, key: targetKey };
+  }, [targetKey]);
+
+  useFrame((state, dt) => {
+    const g = groupRef.current;
+    const m = meshRef.current;
+    if (!m) return;
+    // gentle oscillation — shows 3D depth without ever going edge-on
+    const tt = state.clock.elapsedTime;
+    if (g) {
+      g.rotation.y = 0.6 * Math.sin(tt * 0.32);
+      g.rotation.x = -0.45 + 0.12 * Math.sin(tt * 0.24);
+    }
+
+    const a = anim.current;
+    if (a.t < 1) {
+      a.t = Math.min(1, a.t + dt / 1.25);
+      const e = easeInOut(a.t);
+      const tgt = STATE_POS[a.key];
+      const c = cur.current;
+      const f = from.current;
+      for (let i = 0; i < N * 3; i++) c[i] = f[i] + (tgt[i] - f[i]) * e;
+      for (let i = 0; i < N; i++) {
+        dummy.position.set(c[i * 3], c[i * 3 + 1], c[i * 3 + 2]);
+        dummy.updateMatrix();
+        m.setMatrixAt(i, dummy.matrix);
+      }
+      m.instanceMatrix.needsUpdate = true;
+    }
   });
-  const slices = data.landing;
-  const gap = 0.55;
+
+  // initial matrices
+  useEffect(() => {
+    const m = meshRef.current;
+    if (!m) return;
+    const c = cur.current;
+    for (let i = 0; i < N; i++) {
+      dummy.position.set(c[i * 3], c[i * 3 + 1], c[i * 3 + 2]);
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  }, []);
+
   return (
-    <group ref={group} rotation={[-0.9, 0, 0]}>
-      {slices.map((s, i) => (
-        <group key={s.id} position={[0, 0, (i - (slices.length - 1) / 2) * gap]}>
-          <Cloud spots={s.spots} layers={s.layers} size={0.018} />
-        </group>
-      ))}
+    <group ref={groupRef}>
+      <instancedMesh ref={meshRef} args={[undefined, undefined, N]}>
+        <sphereGeometry args={[0.015, 10, 10]} />
+        <meshLambertMaterial toneMapped={false} />
+      </instancedMesh>
     </group>
   );
 }
 
-function LandingCanvas() {
+function Scene({ targetKey }) {
   return (
-    <Canvas camera={{ position: [0, 0, 3.2], fov: 42 }} dpr={[1, 2]}>
-      <StackedSlices />
+    <Canvas camera={{ position: [0, 0, 3.1], fov: 42 }} dpr={[1, 2]}>
+      <color attach="background" args={["#070b16"]} />
+      <fog attach="fog" args={["#070b16", 3.2, 6.5]} />
+      <ambientLight intensity={0.95} />
+      <directionalLight position={[3, 4, 5]} intensity={0.5} />
+      <directionalLight position={[-4, -2, 2]} intensity={0.25} color="#8fd4ff" />
+      <Tissue targetKey={targetKey} />
     </Canvas>
   );
 }
 
-// -------- compare: one aligned/torn cloud, auto-rotating --------
-function CompareCanvas({ spots, layers, tornMask, breakTint, tint }) {
-  return (
-    <Canvas camera={{ position: [0, 0, 2.7], fov: 42 }} dpr={[1, 2]}>
-      <group rotation={[-0.35, 0, 0]}>
-        <Cloud
-          spots={spots}
-          layers={layers}
-          tornMask={tornMask}
-          breakTint={breakTint}
-          size={0.019}
-        />
-      </group>
-      <OrbitControls
-        autoRotate
-        autoRotateSpeed={0.9}
-        enablePan={false}
-        enableZoom={false}
-        minPolarAngle={Math.PI / 2 - 0.6}
-        maxPolarAngle={Math.PI / 2 + 0.6}
-      />
-    </Canvas>
-  );
-}
+const STEPS = [
+  {
+    key: "clean",
+    kicker: "Real DLPFC tissue",
+    title: "Human cortex, mapped in 3D",
+    body: `${N.toLocaleString()} real Visium spots from a DLPFC section, colored by cortical layer (L1–L6, white matter).`,
+    button: "Simulate a tear",
+  },
+  {
+    key: "torn",
+    kicker: "The problem",
+    title: "The tissue tears",
+    body: "This is what happens during sectioning — a chunk shears away along a cut line. Existing tools can't handle it.",
+    button: "Try PASTE2",
+  },
+  {
+    key: "paste2",
+    kicker: "Existing method",
+    title: "PASTE2 fails",
+    body: "PASTE2 smears the tear. The tissue geometry is broken and layers no longer line up.",
+    button: "Try Sutura",
+    metric: { val: data.paste2_px, tone: "bad", label: "median error" },
+  },
+  {
+    key: "sutura",
+    kicker: "Sutura",
+    title: "Sutura works",
+    body: "7× more accurate. Sutura recovers the true tissue geometry straight through the tear.",
+    metric: { val: data.sutura_px, tone: "good", label: "median error" },
+  },
+];
 
 export default function App() {
-  const [aligned, setAligned] = useState(true);
-  const t = data.tear;
-
-  const leftSpots = aligned ? t.paste2 : t.torn;
-  const rightSpots = aligned ? t.sutura : t.torn;
+  const initStep = (() => {
+    const p = new URLSearchParams(window.location.search).get("step");
+    const n = parseInt(p, 10);
+    return Number.isFinite(n) && n >= 0 && n < 4 ? n : 0;
+  })();
+  const [step, setStep] = useState(initStep);
+  const s = STEPS[step];
 
   return (
-    <div className="wrap">
-      <nav className="nav">
+    <div className="app">
+      <header className="topbar">
         <div className="brand">
           <span className="dot" />
           Sutura Genomics
         </div>
-        <a href="https://suturagenomics.bio" target="_blank" rel="noreferrer">
-          suturagenomics.bio →
-        </a>
-      </nav>
-
-      <header className="hero">
-        <div className="eyebrow">Spatial transcriptomics · alignment</div>
-        <h1>
-          Alignment that handles <span className="accent">torn tissue</span>.
-        </h1>
-        <p className="sub">
-          Real tissue tears, folds, and detaches on the slide. Classical
-          optimal-transport methods break where the tissue does. Sutura recovers
-          the true geometry — even through a tear.
-        </p>
+        <div className="tagline">alignment that handles torn tissue</div>
       </header>
 
       <div className="stage">
-        <LandingCanvas />
-        <div className="caption">
-          4 DLPFC Visium slices · real spots, colored by cortical layer · drag to
-          explore
+        <Scene targetKey={s.key} />
+
+        <div className="overlay-text">
+          <div className="kicker">{s.kicker}</div>
+          <h1>{s.title}</h1>
+          <p>{s.body}</p>
         </div>
-      </div>
 
-      <Legend />
-
-      <div className="controls">
-        <div className="toggle">
-          <button
-            className={!aligned ? "on" : ""}
-            onClick={() => setAligned(false)}
-          >
-            Show torn
-          </button>
-          <button
-            className={aligned ? "on" : ""}
-            onClick={() => setAligned(true)}
-          >
-            Show aligned
-          </button>
-        </div>
-      </div>
-
-      <p className="section-title">
-        {aligned
-          ? "Same torn slice, aligned to the reference — two methods, side by side."
-          : "A single slice with a tear (severity 5) and a smooth warp — the input both methods must solve."}
-      </p>
-
-      <div className="compare">
-        <div className="card">
-          <div className="head">
-            <span className="name">PASTE2</span>
-            <span className="tag bad">optimal transport</span>
-          </div>
-          <div className="canvas-holder">
-            <CompareCanvas
-              spots={leftSpots}
-              layers={t.layers}
-              tornMask={t.torn_mask}
-              breakTint={!aligned}
-            />
-          </div>
-          <div className="metric">
-            <span className="label">median registration error</span>
-            <span className="val bad">
-              {t.paste2_px}
+        {s.metric && (
+          <div className={`metric ${s.metric.tone}`} key={s.key}>
+            <div className="num">
+              {s.metric.val}
               <span className="unit">px</span>
-            </span>
+            </div>
+            <div className="mlabel">{s.metric.label}</div>
           </div>
-        </div>
+        )}
 
-        <div className="card">
-          <div className="head">
-            <span className="name">Sutura</span>
-            <span className="tag good">learned, tear-aware</span>
-          </div>
-          <div className="canvas-holder">
-            <CompareCanvas
-              spots={rightSpots}
-              layers={t.layers}
-              tornMask={t.torn_mask}
-              breakTint={!aligned}
-            />
-          </div>
-          <div className="metric">
-            <span className="label">median registration error</span>
-            <span className="val good">
-              {t.sutura_px}
-              <span className="unit">px</span>
-            </span>
-          </div>
-        </div>
+        <Legend />
       </div>
 
-      <div className="footer">
-        <a
-          className="btn primary"
-          href="https://www.biorxiv.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Read the paper →
-        </a>
-        <a
-          className="btn ghost"
-          href="https://suturagenomics.bio"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Learn more
-        </a>
-      </div>
+      <div className="dock">
+        <div className="steps">
+          {STEPS.map((st, i) => (
+            <div
+              key={st.key}
+              className={`chip ${i === step ? "active" : ""} ${
+                i < step ? "done" : ""
+              }`}
+            >
+              <span className="idx">{i + 1}</span>
+              {st.kicker}
+            </div>
+          ))}
+        </div>
 
-      <div className="tail">
-        DLPFC Visium dataset · errors measured against array-bridge ground truth.
-        © Sutura Genomics.
+        <div className="actions">
+          {step > 0 && (
+            <button className="btn ghost" onClick={() => setStep(0)}>
+              ↺ Reset
+            </button>
+          )}
+          {s.button ? (
+            <button className="btn primary" onClick={() => setStep(step + 1)}>
+              {s.button} →
+            </button>
+          ) : (
+            <div className="links">
+              <a className="btn primary" href="https://www.biorxiv.org/" target="_blank" rel="noreferrer">
+                Read the paper →
+              </a>
+              <a className="btn ghost" href="https://suturagenomics.bio" target="_blank" rel="noreferrer">
+                Learn more
+              </a>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -252,8 +253,8 @@ function Legend() {
     <div className="legend">
       {data.layers.map((name, i) => (
         <span key={name}>
-          <i style={{ background: LAYER_COLORS[i] }} />
-          {name}
+          <i style={{ background: data.layerColors[i] }} />
+          {name.replace("Layer", "L")}
         </span>
       ))}
     </div>
