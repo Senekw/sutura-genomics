@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 
 import { Logo } from "@/components/logo";
 import { isAuthed } from "@/lib/demoAuth";
+import { getDataset, currentDatasetId } from "@/lib/demoDatasets";
 
 // Pipeline steps. Durations (seconds) sum to ~15s of substantive-feeling work.
 const STEPS = [
@@ -63,6 +64,7 @@ export default function DemoProcessingPage() {
   const spotsRef = useRef<Spot[] | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [ready, setReady] = useState(false);
+  const [datasetName, setDatasetName] = useState("DLPFC Br5292");
 
   // Gate on the demo session, like the dashboard.
   useEffect(() => {
@@ -70,6 +72,7 @@ export default function DemoProcessingPage() {
       router.replace("/demo/login");
       return;
     }
+    setDatasetName(getDataset(currentDatasetId()).name);
     setReady(true);
   }, [router]);
 
@@ -241,7 +244,7 @@ export default function DemoProcessingPage() {
           {/* Scanning shimmer */}
           <div className="pointer-events-none absolute inset-0 animate-[scan_2.6s_ease-in-out_infinite] bg-gradient-to-b from-transparent via-[#6633ee]/[0.06] to-transparent" />
           <div className="absolute left-4 top-3.5 text-[11px] font-light uppercase tracking-[0.14em] text-[#6633ee]">
-            Aligning · DLPFC Br5292 151508
+            Aligning · {datasetName}
           </div>
         </div>
 
