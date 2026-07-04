@@ -9,8 +9,6 @@ import {
   LogOut,
   ArrowRight,
   Layers,
-  CircleDot,
-  Microscope,
   UploadCloud,
   FileCheck2,
   AlertCircle,
@@ -22,30 +20,12 @@ import {
 import { Logo } from "@/components/logo";
 import { isAuthed, signOut } from "@/lib/demoAuth";
 import { parseSpotCount, uploadH5ad, type UploadResult } from "@/lib/h5adUpload";
+import { DATASETS, selectDataset, type DemoDataset } from "@/lib/demoDatasets";
 
 const NAV = [
   { key: "datasets", label: "Datasets", icon: Database },
   { key: "runs", label: "Runs", icon: Activity },
   { key: "settings", label: "Settings", icon: Settings },
-];
-
-const META = [
-  { icon: Microscope, label: "Platform", value: "10x Visium" },
-  { icon: CircleDot, label: "Spots", value: "4,384" },
-  { icon: Layers, label: "Section", value: "Slice 151508" },
-];
-
-// Expanded dataset detail (revealed on hover).
-const DETAIL: [string, string][] = [
-  ["Species", "Human"],
-  ["Tissue", "Dorsolateral prefrontal cortex"],
-  ["Donor", "Br5292"],
-  ["Platform", "10x Genomics Visium"],
-  ["Sections", "4 adjacent (151507–151510)"],
-  ["Total spots", "17,127 across all slices"],
-  ["Gene panel", "33,538 genes"],
-  ["Annotations", "L1–L6 + WM cortical layers"],
-  ["Source", "spatialLIBD (Maynard et al. 2021)"],
 ];
 
 const TOP_STATS = [
@@ -54,11 +34,10 @@ const TOP_STATS = [
   ["108 px", "avg error"],
 ];
 
-// Recent runs (illustrative history).
 const RECENT = [
   { name: "DLPFC Br5292 · 4 sections", when: "2 hours ago", err: "109 px" },
-  { name: "DLPFC Br5595 · 4 sections", when: "Yesterday, 18:42", err: "114 px" },
-  { name: "DLPFC Br8100 · 3 sections", when: "Jun 30, 11:20", err: "121 px" },
+  { name: "Breast Tumor HTAN · 4 sections", when: "Yesterday, 18:42", err: "124 px" },
+  { name: "Kidney PCEN · 3 sections", when: "Jul 1, 11:20", err: "131 px" },
 ];
 
 type UploadPhase = "idle" | "reading" | "uploading" | "done" | "error";
@@ -73,7 +52,9 @@ export default function DemoDashboardPage() {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
+
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const [pinId, setPinId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthed()) {
@@ -88,6 +69,11 @@ export default function DemoDashboardPage() {
     router.replace("/demo/login");
   };
 
+  const runDataset = (id: string) => {
+    selectDataset(id);
+    router.push("/demo/processing");
+  };
+
   const handleFile = async (file: File) => {
     setErrorMsg(null);
     if (!/\.h5ad$/i.test(file.name)) {
@@ -95,15 +81,12 @@ export default function DemoDashboardPage() {
       setErrorMsg("Please choose a .h5ad file.");
       return;
     }
-
     setResult(null);
     setPhase("reading");
     setProgress(0);
     const spots = await parseSpotCount(file);
-
     setPhase("uploading");
     const res = await uploadH5ad(file, spots, setProgress);
-
     try {
       window.sessionStorage.setItem(
         "sutura_demo_upload",
@@ -129,8 +112,6 @@ export default function DemoDashboardPage() {
     if (f) handleFile(f);
   };
 
-  const onRun = () => router.push("/demo/processing");
-
   if (!ready) return <div className="min-h-screen bg-[#f7f6fb]" />;
 
   return (
@@ -140,7 +121,6 @@ export default function DemoDashboardPage() {
         <div className="px-2">
           <Logo size={30} withWordmark />
         </div>
-
         <nav className="mt-9 flex flex-col gap-1">
           {NAV.map((item) => {
             const active = item.key === "datasets";
@@ -163,7 +143,6 @@ export default function DemoDashboardPage() {
             );
           })}
         </nav>
-
         <button
           type="button"
           onClick={onLogout}
@@ -183,9 +162,7 @@ export default function DemoDashboardPage() {
               <div key={label} className="flex items-center gap-8">
                 {i > 0 && <span className="hidden h-6 w-px bg-border sm:block" />}
                 <div>
-                  <span className="text-lg font-normal tracking-tight text-foreground">
-                    {value}
-                  </span>{" "}
+                  <span className="text-lg font-normal tracking-tight text-foreground">{value}</span>{" "}
                   <span className="text-[13px] font-light text-muted-foreground">{label}</span>
                 </div>
               </div>
@@ -194,26 +171,18 @@ export default function DemoDashboardPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-light tracking-tight text-foreground">
-                Datasets
-              </h1>
+              <h1 className="text-2xl font-light tracking-tight text-foreground">Datasets</h1>
               <p className="mt-1 text-sm font-light text-muted-foreground">
-                Upload your own section, or run the reference dataset below.
+                Upload your own section, or pick a dataset to align.
               </p>
             </div>
             <span className="rounded-full border border-border bg-white px-3 py-1 text-[12px] font-light text-muted-foreground">
-              1 dataset
+              {DATASETS.length} datasets
             </span>
           </div>
 
-          {/* ───────────── Upload drop zone ───────────── */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".h5ad"
-            className="hidden"
-            onChange={onInputChange}
-          />
+          {/* Upload drop zone */}
+          <input ref={fileInputRef} type="file" accept=".h5ad" className="hidden" onChange={onInputChange} />
 
           {phase === "done" && result ? (
             <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-[#e3dbff] bg-gradient-to-b from-[#faf8ff] to-white p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -252,7 +221,7 @@ export default function DemoDashboardPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={onRun}
+                  onClick={() => runDataset("dlpfc")}
                   className="group inline-flex items-center gap-2 rounded-full bg-[#6633ee] px-5 py-2.5 text-[14px] font-normal text-white shadow-sm shadow-[#6633ee]/25 transition-all hover:-translate-y-0.5 hover:bg-[#5a2ce0]"
                 >
                   Align
@@ -275,7 +244,7 @@ export default function DemoDashboardPage() {
               onDragLeave={() => setDragging(false)}
               onDrop={onDrop}
               className={
-                "mt-6 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-colors " +
+                "mt-6 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-colors " +
                 (dragging
                   ? "border-[#6633ee] bg-[#efeaff]/60"
                   : "border-[#d7cff5] bg-white/70 hover:border-[#6633ee]/60 hover:bg-[#faf8ff]")
@@ -291,9 +260,7 @@ export default function DemoDashboardPage() {
                     <div
                       className={
                         "h-full rounded-full bg-[#6633ee] " +
-                        (phase === "reading"
-                          ? "w-2/5 animate-pulse"
-                          : "transition-[width] duration-150 ease-linear")
+                        (phase === "reading" ? "w-2/5 animate-pulse" : "transition-[width] duration-150 ease-linear")
                       }
                       style={phase === "uploading" ? { width: `${Math.round(progress * 100)}%` } : undefined}
                     />
@@ -301,10 +268,10 @@ export default function DemoDashboardPage() {
                 </div>
               ) : (
                 <>
-                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#efeaff]">
+                  <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#efeaff]">
                     <UploadCloud className="h-6 w-6 text-[#6633ee]" strokeWidth={1.6} />
                   </div>
-                  <p className="mt-4 text-[15px] font-normal text-foreground">
+                  <p className="mt-3 text-[15px] font-normal text-foreground">
                     Drop <span className="text-[#6633ee]">.h5ad</span> file to align your data
                   </p>
                   <p className="mt-1 text-[13px] font-light text-muted-foreground">
@@ -320,97 +287,19 @@ export default function DemoDashboardPage() {
             </div>
           )}
 
-          {/* ───────────── Reference dataset card ───────────── */}
-          <div
-            onMouseEnter={() => setDetailOpen(true)}
-            onMouseLeave={() => setDetailOpen(false)}
-            className="mt-8 overflow-hidden rounded-2xl border border-border bg-white shadow-sm shadow-black/[0.03] transition-colors hover:border-[#d7cff5]"
-          >
-            <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
-              <div className="flex items-start gap-4">
-                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#efeaff] to-white ring-1 ring-[#e3dbff]">
-                  <Layers className="h-6 w-6 text-[#6633ee]" strokeWidth={1.6} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-normal tracking-tight text-foreground">
-                      DLPFC Br5292 — Slice 151508
-                    </h2>
-                    <span className="rounded-full bg-[#efeaff] px-2 py-0.5 text-[11px] font-light uppercase tracking-wide text-[#6633ee]">
-                      Reference
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setDetailOpen((o) => !o)}
-                      className="ml-1 inline-flex items-center gap-1 text-[12px] font-light text-muted-foreground transition-colors hover:text-[#6633ee]"
-                    >
-                      Details
-                      <ChevronDown
-                        className={"h-3.5 w-3.5 transition-transform " + (detailOpen ? "rotate-180" : "")}
-                        strokeWidth={1.8}
-                      />
-                    </button>
-                  </div>
-                  <p className="mt-1 text-sm font-light text-muted-foreground">
-                    Human dorsolateral prefrontal cortex · layered reference section
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-                    {META.map((m) => {
-                      const Icon = m.icon;
-                      return (
-                        <div key={m.label} className="flex items-center gap-2">
-                          <Icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.6} />
-                          <span className="text-[13px] font-light text-muted-foreground">
-                            {m.label}
-                          </span>
-                          <span className="text-[13px] font-normal text-foreground">
-                            {m.value}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Expandable dataset detail */}
-            <div
-              className={
-                "grid overflow-hidden border-t border-border transition-all duration-300 ease-out " +
-                (detailOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0")
-              }
-            >
-              <dl className="grid grid-cols-1 gap-x-10 gap-y-0 px-6 py-2 sm:grid-cols-2 sm:px-7">
-                {DETAIL.map(([k, v]) => (
-                  <div
-                    key={k}
-                    className="flex items-baseline justify-between gap-4 border-b border-border/60 py-2.5 text-[13px]"
-                  >
-                    <dt className="shrink-0 font-light text-muted-foreground">{k}</dt>
-                    <dd className="text-right font-normal text-foreground">{v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            <div className="flex items-center justify-between gap-4 border-t border-border bg-secondary/40 px-6 py-4 sm:px-7">
-              <span className="text-[13px] font-light text-muted-foreground">
-                Aligns this section against its serial neighbours with the Sutura graph model.
-              </span>
-              <button
-                type="button"
-                onClick={onRun}
-                className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[#6633ee] px-6 py-3 text-[15px] font-normal text-white shadow-sm shadow-[#6633ee]/25 transition-all hover:-translate-y-0.5 hover:bg-[#5a2ce0] hover:shadow-lg hover:shadow-[#6633ee]/30"
-              >
-                Run Alignment
-                <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                  strokeWidth={2}
-                />
-              </button>
-            </div>
+          {/* ───────────── Dataset cards ───────────── */}
+          <div className="mt-6 flex flex-col gap-4">
+            {DATASETS.map((d) => (
+              <DatasetCard
+                key={d.id}
+                d={d}
+                open={hoverId === d.id || pinId === d.id}
+                onEnter={() => setHoverId(d.id)}
+                onLeave={() => setHoverId(null)}
+                onTogglePin={() => setPinId((p) => (p === d.id ? null : d.id))}
+                onRun={() => runDataset(d.id)}
+              />
+            ))}
           </div>
 
           {/* ───────────── Recent runs ───────────── */}
@@ -445,11 +334,103 @@ export default function DemoDashboardPage() {
           </div>
 
           <p className="mt-8 text-center text-[12px] font-light text-muted-foreground sm:text-left">
-            Signed in as{" "}
-            <span className="text-foreground/70">suturagenomics1010101</span>
+            Signed in as <span className="text-foreground/70">suturagenomics1010101</span>
           </p>
         </div>
       </main>
+    </div>
+  );
+}
+
+function DatasetCard({
+  d,
+  open,
+  onEnter,
+  onLeave,
+  onTogglePin,
+  onRun,
+}: {
+  d: DemoDataset;
+  open: boolean;
+  onEnter: () => void;
+  onLeave: () => void;
+  onTogglePin: () => void;
+  onRun: () => void;
+}) {
+  return (
+    <div
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm shadow-black/[0.03] transition-colors hover:border-[#c9bdf3]"
+    >
+      <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+        <div className="flex items-start gap-4">
+          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#efeaff] to-white ring-1 ring-[#e3dbff]">
+            <Layers className="h-6 w-6 text-[#6633ee]" strokeWidth={1.6} />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-normal tracking-tight text-foreground">{d.name}</h2>
+              <span
+                className={
+                  "rounded-full px-2 py-0.5 text-[11px] font-light uppercase tracking-wide " +
+                  (d.real ? "bg-[#efeaff] text-[#6633ee]" : "bg-secondary text-muted-foreground")
+                }
+              >
+                {d.badge}
+              </span>
+              <button
+                type="button"
+                onClick={onTogglePin}
+                className="ml-1 inline-flex items-center gap-1 text-[12px] font-light text-muted-foreground transition-colors hover:text-[#6633ee]"
+              >
+                Details
+                <ChevronDown className={"h-3.5 w-3.5 transition-transform " + (open ? "rotate-180" : "")} strokeWidth={1.8} />
+              </button>
+            </div>
+            <p className="mt-1 text-sm font-light text-muted-foreground">{d.tissue}</p>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+              {d.meta.map((m) => (
+                <div key={m.label} className="flex items-center gap-2">
+                  <span className="text-[13px] font-light text-muted-foreground">{m.label}</span>
+                  <span className="text-[13px] font-normal text-foreground">{m.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Expandable detail */}
+      <div
+        className={
+          "grid overflow-hidden border-t border-border transition-all duration-300 ease-out " +
+          (open ? "max-h-[30rem] opacity-100" : "max-h-0 opacity-0")
+        }
+      >
+        <dl className="grid grid-cols-1 gap-x-10 px-6 py-2 sm:grid-cols-2 sm:px-7">
+          {d.detail.map(([k, v]) => (
+            <div key={k} className="flex items-baseline justify-between gap-4 border-b border-border/60 py-2.5 text-[13px]">
+              <dt className="shrink-0 font-light text-muted-foreground">{k}</dt>
+              <dd className="text-right font-normal text-foreground">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div className="flex items-center justify-between gap-4 border-t border-border bg-secondary/40 px-6 py-4 sm:px-7">
+        <span className="text-[13px] font-light text-muted-foreground">
+          Align this section against its serial neighbours with the Sutura graph model.
+        </span>
+        <button
+          type="button"
+          onClick={onRun}
+          className="group/btn inline-flex shrink-0 items-center gap-2 rounded-full bg-[#6633ee] px-6 py-3 text-[15px] font-normal text-white shadow-sm shadow-[#6633ee]/25 transition-all hover:-translate-y-0.5 hover:bg-[#5a2ce0] hover:shadow-lg hover:shadow-[#6633ee]/30"
+        >
+          Run Alignment
+          <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" strokeWidth={2} />
+        </button>
+      </div>
     </div>
   );
 }
