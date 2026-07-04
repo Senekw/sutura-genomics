@@ -16,6 +16,12 @@
   to = "/.netlify/functions/upload"
   status = 200
 
+# /api/analyze -> the AI-analysis function (server-side Anthropic call).
+[[redirects]]
+  from = "/api/analyze"
+  to = "/.netlify/functions/analyze"
+  status = 200
+
 # Security headers applied to every response.
 [[headers]]
   for = "/*"

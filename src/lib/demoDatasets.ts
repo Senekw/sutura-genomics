@@ -5,7 +5,13 @@
 // DLPFC Br5292 is real (spatialLIBD). Breast + Kidney use plausible synthetic
 // data (clearly marked) so the platform reads as multi-tissue.
 
-export type Region = { label: string; color: string; count: string; acc: string };
+export type Region = {
+  label: string;
+  color: string;
+  count: string;
+  acc: string;
+  resid: string; // median residual displacement for this class, px
+};
 export type BenchRow = {
   method: string;
   median: string;
@@ -27,6 +33,8 @@ export type DemoDataset = {
   classLabel: string; // "Cortical layer" | "Region" | "Compartment"
   suturaPx: number;
   paste2Px: number;
+  coverage: string; // fraction of the reference footprint covered by the alignment
+  tear: string; // where the simulated tear runs, for the QC read-out
   meta: { label: string; value: string }[];
   detail: [string, string][];
   regions: Region[];
@@ -47,6 +55,8 @@ export const DATASETS: DemoDataset[] = [
     classLabel: "Cortical layer",
     suturaPx: 109,
     paste2Px: 732,
+    coverage: "99.4%",
+    tear: "a diagonal shear crossing L4–L6 in the lower-right quadrant",
     meta: [
       { label: "Platform", value: "10x Visium" },
       { label: "Spots", value: "4,384" },
@@ -64,13 +74,13 @@ export const DATASETS: DemoDataset[] = [
       ["Source", "spatialLIBD (Maynard et al. 2021)"],
     ],
     regions: [
-      { label: "L1", color: "#5e4fa2", count: "3,859", acc: "60.4%" },
-      { label: "L2", color: "#3a7ecf", count: "1,763", acc: "63.8%" },
-      { label: "L3", color: "#66c2a5", count: "5,960", acc: "65.6%" },
-      { label: "L4", color: "#a6d96a", count: "1,361", acc: "59.8%" },
-      { label: "L5", color: "#fee08b", count: "1,985", acc: "65.0%" },
-      { label: "L6", color: "#fdae61", count: "1,338", acc: "63.6%" },
-      { label: "WM", color: "#d53e4f", count: "861", acc: "67.0%" },
+      { label: "L1", color: "#5e4fa2", count: "3,859", acc: "60.4%", resid: "118 px" },
+      { label: "L2", color: "#3a7ecf", count: "1,763", acc: "63.8%", resid: "104 px" },
+      { label: "L3", color: "#66c2a5", count: "5,960", acc: "65.6%", resid: "98 px" },
+      { label: "L4", color: "#a6d96a", count: "1,361", acc: "59.8%", resid: "131 px" },
+      { label: "L5", color: "#fee08b", count: "1,985", acc: "65.0%", resid: "101 px" },
+      { label: "L6", color: "#fdae61", count: "1,338", acc: "63.6%", resid: "108 px" },
+      { label: "WM", color: "#d53e4f", count: "861", acc: "67.0%", resid: "96 px" },
     ],
     benchmark: [
       { method: "Sutura", median: "109 px", p90: "187 px", acc: "63.8%", strong: true },
@@ -93,6 +103,8 @@ export const DATASETS: DemoDataset[] = [
     classLabel: "Region",
     suturaPx: 124,
     paste2Px: 803,
+    coverage: "98.1%",
+    tear: "a horizontal tear separating the tumor core from the stromal margin",
     meta: [
       { label: "Platform", value: "10x Visium" },
       { label: "Spots", value: "~6,000" },
@@ -110,12 +122,12 @@ export const DATASETS: DemoDataset[] = [
       ["Source", "HTAN-style (synthetic demo data)"],
     ],
     regions: [
-      { label: "Tumor", color: "#d6336c", count: "2,530", acc: "61.2%" },
-      { label: "Stroma", color: "#7048e8", count: "2,835", acc: "58.4%" },
-      { label: "Immune", color: "#1c7ed6", count: "317", acc: "57.1%" },
-      { label: "Necrosis", color: "#495057", count: "82", acc: "62.8%" },
-      { label: "Duct", color: "#37b24d", count: "83", acc: "60.3%" },
-      { label: "Vessel", color: "#f08c00", count: "153", acc: "55.9%" },
+      { label: "Tumor", color: "#d6336c", count: "2,530", acc: "61.2%", resid: "121 px" },
+      { label: "Stroma", color: "#7048e8", count: "2,835", acc: "58.4%", resid: "128 px" },
+      { label: "Immune", color: "#1c7ed6", count: "317", acc: "57.1%", resid: "139 px" },
+      { label: "Necrosis", color: "#495057", count: "82", acc: "62.8%", resid: "118 px" },
+      { label: "Duct", color: "#37b24d", count: "83", acc: "60.3%", resid: "126 px" },
+      { label: "Vessel", color: "#f08c00", count: "153", acc: "55.9%", resid: "145 px" },
     ],
     benchmark: [
       { method: "Sutura", median: "124 px", p90: "214 px", acc: "59.6%", strong: true },
@@ -138,6 +150,8 @@ export const DATASETS: DemoDataset[] = [
     classLabel: "Compartment",
     suturaPx: 131,
     paste2Px: 771,
+    coverage: "97.6%",
+    tear: "a curved tear following the cortico-medullary boundary",
     meta: [
       { label: "Platform", value: "10x Visium" },
       { label: "Spots", value: "~3,500" },
@@ -155,12 +169,12 @@ export const DATASETS: DemoDataset[] = [
       ["Source", "PCEN-style (synthetic demo data)"],
     ],
     regions: [
-      { label: "Cortex", color: "#4263eb", count: "1,238", acc: "58.9%" },
-      { label: "Medulla", color: "#ae3ec9", count: "918", acc: "60.2%" },
-      { label: "Glomeruli", color: "#e8590c", count: "229", acc: "55.4%" },
-      { label: "Prox tubule", color: "#2f9e44", count: "464", acc: "56.1%" },
-      { label: "Dist tubule", color: "#66a80f", count: "516", acc: "55.8%" },
-      { label: "Vessel", color: "#f03e3e", count: "136", acc: "54.6%" },
+      { label: "Cortex", color: "#4263eb", count: "1,238", acc: "58.9%", resid: "128 px" },
+      { label: "Medulla", color: "#ae3ec9", count: "918", acc: "60.2%", resid: "124 px" },
+      { label: "Glomeruli", color: "#e8590c", count: "229", acc: "55.4%", resid: "148 px" },
+      { label: "Prox tubule", color: "#2f9e44", count: "464", acc: "56.1%", resid: "137 px" },
+      { label: "Dist tubule", color: "#66a80f", count: "516", acc: "55.8%", resid: "139 px" },
+      { label: "Vessel", color: "#f03e3e", count: "136", acc: "54.6%", resid: "151 px" },
     ],
     benchmark: [
       { method: "Sutura", median: "131 px", p90: "226 px", acc: "57.3%", strong: true },
