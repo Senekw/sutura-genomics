@@ -9,6 +9,10 @@ import { Check, RotateCcw, Move3d, Layers2, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { isAuthed } from "@/lib/demoAuth";
 import { getDataset, currentDatasetId, type DemoDataset } from "@/lib/demoDatasets";
+import { addRun, type Run } from "@/lib/demoRuns";
+import { getSettings } from "@/lib/demoSettings";
+import ReportDownload from "@/components/demo/ReportDownload";
+import AnalysisAssistant from "@/components/demo/AnalysisAssistant";
 
 // 3D viewer is client-only (three.js) — never server-render it.
 const TissueStack3D = dynamic(() => import("./TissueStack3D"), { ssr: false });
@@ -30,13 +34,43 @@ export default function DemoResultsPage() {
   // Start unaligned, then auto-heal to aligned shortly after load — the "wow".
   const [aligned, setAligned] = useState(false);
   const [ds, setDs] = useState<DemoDataset | null>(null);
+  const [run, setRun] = useState<Run | null>(null);
 
   useEffect(() => {
     if (!isAuthed()) {
       router.replace("/demo/login");
       return;
     }
-    setDs(getDataset(currentDatasetId()));
+    const dataset = getDataset(currentDatasetId());
+    setDs(dataset);
+
+    // Build the Run for this view. If the dashboard flagged a fresh alignment,
+    // persist it to the run history; otherwise this is a re-view — synthesize a
+    // (non-persisted) run object just for the report download.
+    let pend: { datasetId?: string; params?: Run["params"] } | null = null;
+    try {
+      const raw = window.sessionStorage.getItem("sutura_pending_run");
+      if (raw) pend = JSON.parse(raw);
+      window.sessionStorage.removeItem("sutura_pending_run");
+    } catch {
+      /* ignore */
+    }
+    const params = pend?.params ?? getSettings().params;
+    const base = {
+      datasetId: dataset.id,
+      datasetName: dataset.name,
+      sections: dataset.sections,
+      medianErrorPx: dataset.suturaPx,
+      spots: dataset.spotsRegistered,
+      coverage: dataset.coverage,
+      status: "Complete" as const,
+      params,
+    };
+    if (pend && pend.datasetId === dataset.id) {
+      setRun(addRun(base));
+    } else {
+      setRun({ ...base, id: "current", timestamp: Date.now() });
+    }
     setReady(true);
   }, [router]);
 
@@ -241,6 +275,22 @@ export default function DemoResultsPage() {
             Sutura preserves {ds.classLabel.toLowerCase()} boundaries better than any smoothness-based method.
           </p>
         </div>
+
+        {/* Analysis assistant — grounded one-liner, full analysis, and Q&A */}
+        {run && <AnalysisAssistant ds={ds} run={run} />}
+
+        {/* Export report */}
+        {run && (
+          <div className="mt-4 flex flex-col items-start justify-between gap-3 rounded-2xl border border-border bg-white p-6 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="text-[15px] font-normal text-foreground">Export report</h2>
+              <p className="mt-0.5 text-[12.5px] font-light text-muted-foreground">
+                Metrics, per-{ds.classLabel.toLowerCase()} breakdown, and aligned coordinates.
+              </p>
+            </div>
+            <ReportDownload run={run} />
+          </div>
+        )}
 
         {/* Actions */}
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

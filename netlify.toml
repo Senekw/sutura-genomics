@@ -16,6 +16,12 @@
   to = "/.netlify/functions/upload"
   status = 200
 
+# /api/chat -> grounded Q&A about an alignment (Google Gemini, key from env).
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200
+
 # Security headers applied to every response.
 [[headers]]
   for = "/*"

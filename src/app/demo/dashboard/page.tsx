@@ -3,10 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Database,
-  Activity,
-  Settings,
-  LogOut,
   ArrowRight,
   Layers,
   UploadCloud,
@@ -17,27 +13,17 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-import { Logo } from "@/components/logo";
-import { isAuthed, signOut } from "@/lib/demoAuth";
+import Sidebar from "@/components/demo/Sidebar";
+import { isAuthed } from "@/lib/demoAuth";
 import { parseSpotCount, uploadH5ad, type UploadResult } from "@/lib/h5adUpload";
 import { DATASETS, selectDataset, type DemoDataset } from "@/lib/demoDatasets";
-
-const NAV = [
-  { key: "datasets", label: "Datasets", icon: Database },
-  { key: "runs", label: "Runs", icon: Activity },
-  { key: "settings", label: "Settings", icon: Settings },
-];
+import { getSettings } from "@/lib/demoSettings";
+import { getRuns, formatWhen, type Run } from "@/lib/demoRuns";
 
 const TOP_STATS = [
   ["12", "alignments run today"],
   ["4,384", "avg spots"],
   ["108 px", "avg error"],
-];
-
-const RECENT = [
-  { name: "DLPFC Br5292 · 4 sections", when: "2 hours ago", err: "109 px" },
-  { name: "Breast Tumor HTAN · 4 sections", when: "Yesterday, 18:42", err: "124 px" },
-  { name: "Kidney PCEN · 3 sections", when: "Jul 1, 11:20", err: "131 px" },
 ];
 
 type UploadPhase = "idle" | "reading" | "uploading" | "done" | "error";
@@ -55,23 +41,34 @@ export default function DemoDashboardPage() {
 
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [pinId, setPinId] = useState<string | null>(null);
+  const [recent, setRecent] = useState<Run[]>([]);
 
   useEffect(() => {
     if (!isAuthed()) {
       router.replace("/demo/login");
       return;
     }
+    setRecent(getRuns().slice(0, 3));
     setReady(true);
   }, [router]);
 
-  const onLogout = () => {
-    signOut();
-    router.replace("/demo/login");
-  };
-
   const runDataset = (id: string) => {
     selectDataset(id);
+    try {
+      window.sessionStorage.setItem(
+        "sutura_pending_run",
+        JSON.stringify({ datasetId: id, params: getSettings().params })
+      );
+    } catch {
+      /* ignore */
+    }
     router.push("/demo/processing");
+  };
+
+  const openRun = (run: Run) => {
+    if (run.status !== "Complete") return;
+    selectDataset(run.datasetId);
+    router.push("/demo/results");
   };
 
   const handleFile = async (file: File) => {
@@ -116,42 +113,7 @@ export default function DemoDashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-[#f7f6fb] text-foreground">
-      {/* ───────────── Sidebar ───────────── */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-white/70 px-4 py-6 backdrop-blur-sm sm:flex">
-        <div className="px-2">
-          <Logo size={30} withWordmark />
-        </div>
-        <nav className="mt-9 flex flex-col gap-1">
-          {NAV.map((item) => {
-            const active = item.key === "datasets";
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.key}
-                type="button"
-                aria-current={active ? "page" : undefined}
-                className={
-                  "flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-light transition-colors " +
-                  (active
-                    ? "bg-[#6633ee]/10 text-[#6633ee]"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground")
-                }
-              >
-                <Icon className="h-[17px] w-[17px]" strokeWidth={active ? 2 : 1.6} />
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
-        <button
-          type="button"
-          onClick={onLogout}
-          className="mt-auto flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-light text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          <LogOut className="h-[17px] w-[17px]" strokeWidth={1.6} />
-          Sign out
-        </button>
-      </aside>
+      <Sidebar active="datasets" />
 
       {/* ───────────── Main ───────────── */}
       <main className="flex-1 px-6 py-8 sm:px-10 sm:py-12">
@@ -304,31 +266,49 @@ export default function DemoDashboardPage() {
 
           {/* ───────────── Recent runs ───────────── */}
           <div className="mt-10">
-            <h2 className="text-sm font-normal tracking-tight text-foreground">Recent runs</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-normal tracking-tight text-foreground">Recent runs</h2>
+              <button
+                type="button"
+                onClick={() => router.push("/demo/runs")}
+                className="text-[12px] font-light text-[#6633ee] transition-colors hover:text-[#5a2ce0]"
+              >
+                View all →
+              </button>
+            </div>
             <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-white">
-              {RECENT.map((r, i) => (
-                <div
-                  key={r.name}
+              {recent.map((r, i) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => openRun(r)}
+                  disabled={r.status !== "Complete"}
                   className={
-                    "flex items-center justify-between gap-4 px-5 py-3.5 " +
-                    (i > 0 ? "border-t border-border" : "")
+                    "flex w-full items-center justify-between gap-4 px-5 py-3.5 text-left " +
+                    (i > 0 ? "border-t border-border " : "") +
+                    (r.status === "Complete" ? "transition-colors hover:bg-[#faf8ff]" : "cursor-default")
                   }
                 >
                   <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-[#6633ee]" strokeWidth={1.8} />
+                    <CheckCircle2
+                      className={"h-4 w-4 shrink-0 " + (r.status === "Failed" ? "text-red-500" : "text-[#6633ee]")}
+                      strokeWidth={1.8}
+                    />
                     <div>
-                      <p className="text-[13.5px] font-normal text-foreground">{r.name}</p>
+                      <p className="text-[13.5px] font-normal text-foreground">
+                        {r.datasetName} · {r.sections}
+                      </p>
                       <p className="mt-0.5 flex items-center gap-1 text-[12px] font-light text-muted-foreground">
                         <Clock className="h-3 w-3" strokeWidth={1.6} />
-                        {r.when}
+                        {formatWhen(r.timestamp)} · {r.status}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="tabular-nums text-[13.5px] font-normal text-foreground">{r.err}</p>
+                    <p className="tabular-nums text-[13.5px] font-normal text-foreground">{r.medianErrorPx} px</p>
                     <p className="text-[12px] font-light text-muted-foreground">median error</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
