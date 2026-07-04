@@ -18,13 +18,14 @@ const founders = [
 export default function Home() {
   return (
     <main className="landing">
-      {/* Discreet entry point to the product demo (top-right corner) */}
+      {/* Clear entry point to the product demo (top-right corner) */}
       <Link
         href="/demo/login"
-        className="fade d1 fixed right-6 top-6 z-10 text-[14px] font-light text-[#8a8a8a] transition-colors hover:text-[#111]"
-        style={{ letterSpacing: "0.02em" }}
+        className="fade d1 fixed right-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-full border border-[#111]/15 bg-white px-4 py-2 text-[14px] font-normal text-[#111] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#111]/30 hover:shadow-md"
+        style={{ letterSpacing: "0.01em" }}
       >
         Sign in
+        <span aria-hidden="true">&rarr;</span>
       </Link>
 
       {/* Logo lockup — emblem + wordmark */}
