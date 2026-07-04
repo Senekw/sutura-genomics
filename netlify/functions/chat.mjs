@@ -1,15 +1,15 @@
 // POST /api/chat  (redirected from netlify.toml -> /.netlify/functions/chat)
 //
-// Grounded Q&A about an alignment result, powered by xAI Grok. The results page
-// posts the REAL metrics + a question; Grok answers from those numbers.
+// Grounded Q&A about an alignment result, powered by Google Gemini. The results
+// page posts the REAL metrics + a question; Gemini answers from those numbers.
 //
-// SECURITY: the API key is read from the XAI_API_KEY environment variable
+// SECURITY: the API key is read from the GEMINI_API_KEY environment variable
 // (Netlify env vars) — it is NEVER hardcoded or passed from the client. If it's
 // unset, the endpoint returns 503 and the client falls back to a rule-based
 // answer. Best-effort in-memory rate limiting guards against abuse.
 
-const XAI_URL = "https://api.x.ai/v1/chat/completions";
-const MODEL = "grok-4.3";
+const GEMINI_MODEL = "gemini-flash-latest";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const MAX_TOKENS = 700;
 const SPOT_PITCH_PX = 137;
 
@@ -61,6 +61,12 @@ function contextBlock(c) {
   };
 }
 
+const SYSTEM =
+  "You are a spatial-transcriptomics alignment QC assistant. Answer the user's " +
+  "question about THIS alignment result using only the metrics provided as JSON. " +
+  "Never invent numbers. Be concise (1-4 sentences), technical, and grounded. If the " +
+  "question can't be answered from the metrics, say so briefly.";
+
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed" });
 
@@ -80,40 +86,35 @@ export const handler = async (event) => {
   if (!question || body.context == null || typeof body.context !== "object") {
     return json(400, { error: "Missing question or context." });
   }
-  if (!process.env.XAI_API_KEY) return json(503, { error: "Chat is not configured." });
+  if (!process.env.GEMINI_API_KEY) return json(503, { error: "Chat is not configured." });
 
   const ctx = contextBlock(body.context);
   try {
-    const res = await fetch(XAI_URL, {
+    const res = await fetch(GEMINI_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.XAI_API_KEY}`,
+        "X-goog-api-key": process.env.GEMINI_API_KEY,
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a spatial-transcriptomics alignment QC assistant. Answer the user's " +
-              "question about THIS alignment result using only the metrics provided as JSON. " +
-              "Never invent numbers. Be concise (1-4 sentences), technical, and grounded. If the " +
-              "question can't be answered from the metrics, say so briefly.",
-          },
-          { role: "user", content: "Metrics (JSON):\n" + JSON.stringify(ctx) + "\n\nQuestion: " + question },
+        systemInstruction: { parts: [{ text: SYSTEM }] },
+        contents: [
+          { parts: [{ text: "Metrics (JSON):\n" + JSON.stringify(ctx) + "\n\nQuestion: " + question }] },
         ],
+        generationConfig: { maxOutputTokens: MAX_TOKENS, temperature: 0.4 },
       }),
     });
     if (!res.ok) {
-      console.error("xai error", res.status);
+      console.error("gemini error", res.status);
       return json(502, { error: "Chat backend error." });
     }
     const data = await res.json();
-    const answer = data?.choices?.[0]?.message?.content?.trim();
+    const answer = (data?.candidates?.[0]?.content?.parts || [])
+      .map((p) => p?.text || "")
+      .join("")
+      .trim();
     if (!answer) return json(502, { error: "Empty answer." });
-    return json(200, { answer, model: MODEL });
+    return json(200, { answer, model: GEMINI_MODEL });
   } catch (err) {
     console.error("chat failed:", err?.message);
     return json(502, { error: "Chat failed." });

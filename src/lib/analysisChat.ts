@@ -66,12 +66,12 @@ function rateOk(): boolean {
   }
 }
 
-export type ChatReply = { answer: string; source: "grok" | "fallback" };
+export type ChatReply = { answer: string; source: "gemini" | "fallback" };
 
 export async function askChat(question: string, ds: DemoDataset, run: Run): Promise<ChatReply> {
   const fallback = (): ChatReply => ({
     answer:
-      "Live chat isn't available right now (Grok isn't configured for this deployment). Here's the grounded summary instead:\n\n" +
+      "Live chat isn't available right now (Gemini isn't configured for this deployment). Here's the grounded summary instead:\n\n" +
       fullAnalysis(ds, run),
     source: "fallback",
   });
@@ -92,7 +92,7 @@ export async function askChat(question: string, ds: DemoDataset, run: Run): Prom
     if (!res.ok) return fallback();
     const data = await res.json();
     const answer = typeof data.answer === "string" ? data.answer.trim() : "";
-    return answer ? { answer, source: "grok" } : fallback();
+    return answer ? { answer, source: "gemini" } : fallback();
   } catch {
     return fallback();
   }

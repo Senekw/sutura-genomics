@@ -79,7 +79,7 @@ export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: R
                   {m.role === "assistant" && (
                     <p className="mt-1.5 flex items-center gap-1 text-[10.5px] font-light text-muted-foreground">
                       <Sparkles className="h-2.5 w-2.5 text-[#6633ee]/70" strokeWidth={1.8} />
-                      {m.source === "grok" ? "Grok · grounded in run metrics" : "Rule-based summary"}
+                      {m.source === "gemini" ? "Gemini · grounded in run metrics" : "Rule-based summary"}
                     </p>
                   )}
                 </div>

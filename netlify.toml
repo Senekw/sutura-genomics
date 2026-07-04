@@ -16,7 +16,7 @@
   to = "/.netlify/functions/upload"
   status = 200
 
-# /api/chat -> grounded Q&A about an alignment (xAI Grok, key from env).
+# /api/chat -> grounded Q&A about an alignment (Google Gemini, key from env).
 [[redirects]]
   from = "/api/chat"
   to = "/.netlify/functions/chat"
