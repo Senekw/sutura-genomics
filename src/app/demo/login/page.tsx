@@ -23,7 +23,7 @@ export default function DemoLoginPage() {
     setError(null);
 
     if (!checkCredentials(email, password)) {
-      setError("Those credentials aren't recognized. Check your email and password and try again.");
+      setError("Those credentials aren't recognized. Check your username/email and password and try again.");
       return;
     }
 
@@ -61,9 +61,9 @@ export default function DemoLoginPage() {
         >
           <div className="flex flex-col gap-4">
             <Input
-              label="Email"
+              label="Username or email"
               type="text"
-              placeholder="you@lab.org"
+              placeholder="username or you@lab.org"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
