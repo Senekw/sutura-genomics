@@ -1,14 +1,20 @@
 // Client-side gate for the product demo flow (/demo/login → dashboard → …).
-// This is a scripted product walkthrough, NOT real authentication — the single
-// accepted credential lives here on the client on purpose so prospects can try
-// the flow. Never guard anything sensitive with this.
-export const DEMO_USERNAME = "suturagenomics1010101";
-export const DEMO_PASSWORD = "SpatialBioOrg";
+// This is a scripted product walkthrough, NOT real authentication — the accepted
+// demo credentials live here on the client on purpose so prospects can try the
+// flow. Never guard anything sensitive with this. You can sign in with either
+// the username or (for the first account) its email.
+const DEMO_CREDENTIALS: { logins: string[]; password: string }[] = [
+  { logins: ["suturagenomics1010101", "suturagenomics@gmail.com"], password: "SpatialBioOrg" },
+  { logins: ["SGYC1234"], password: "spatialbioSGYC" },
+];
 
 const STORAGE_KEY = "sutura_demo_authed";
 
-export function checkCredentials(username: string, password: string): boolean {
-  return username.trim() === DEMO_USERNAME && password === DEMO_PASSWORD;
+export function checkCredentials(usernameOrEmail: string, password: string): boolean {
+  const id = usernameOrEmail.trim().toLowerCase();
+  return DEMO_CREDENTIALS.some(
+    (c) => c.logins.some((l) => l.toLowerCase() === id) && c.password === password
+  );
 }
 
 export function signIn(): void {
