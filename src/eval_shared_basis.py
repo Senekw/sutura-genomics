@@ -48,11 +48,10 @@ SEVERITIES = [0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0]
 SEEDS = [0, 1, 2]
 
 
-def eval_new_model():
-    ck = torch.load(RESULTS / "arca_shared_basis.pt", map_location="cpu",
-                    weights_only=False)
+def eval_new_model(checkpoint="arca_shared_basis.pt"):
+    ck = torch.load(RESULTS / checkpoint, map_location="cpu", weights_only=False)
     a = ck["args"]
-    basis = load_basis()
+    basis = load_basis(ROOT / ck.get("basis_path", "results/shared_basis.npz"))
     model = ARCACrossNet(ck["dim"], a["hidden"], a["layers"], a["attn_dim"])
     model.load_state_dict(ck["state_dict"])
     model.eval()

@@ -89,10 +89,11 @@ def main():
     p.add_argument("--tear-prob", type=float, default=0.5)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--quick", action="store_true")
+    p.add_argument("--basis", default="results/shared_basis.npz")
     p.add_argument("--out", default="arca_shared_basis")
     args = p.parse_args()
 
-    basis = load_basis()
+    basis = load_basis(ROOT / args.basis)
     dim = basis["components"].shape[0]
     rng = np.random.default_rng(args.seed)
     torch.manual_seed(args.seed)
@@ -141,7 +142,7 @@ def main():
     torch.save({"state_dict": model.state_dict(), "args": vars(args),
                 "dim": dim, "pitch": {n: train.get(n, heldout)["pitch"]
                                       for n in DONORS},
-                "basis_path": "results/shared_basis.npz",
+                "basis_path": args.basis,
                 "train_donors": TRAIN_DONORS, "heldout": HELDOUT},
                out)
     print(f"\nwrote checkpoint -> {out}")
