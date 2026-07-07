@@ -36,8 +36,14 @@ def curve(dataset, method):
     return xs, [float(np.mean(by[x])) for x in xs]
 
 
+ymax = max(float(np.mean([float(r["median_error_pitch"]) for r in rows
+                          if r["dataset"] == ds and r["method"] == m and
+                          float(r["severity"]) == s]))
+           for ds in order for m in ("sutura", "paste2")
+           for s in {float(r["severity"]) for r in rows if r["dataset"] == ds})
+
 n = len(order)
-fig, axes = plt.subplots(1, n, figsize=(3.6 * n, 4.2), sharey=True)
+fig, axes = plt.subplots(1, n, figsize=(3.6 * n, 4.4), sharey=True)
 if n == 1:
     axes = [axes]
 for ax, ds in zip(axes, order):
@@ -45,13 +51,21 @@ for ax, ds in zip(axes, order):
     px, py = curve(ds, "paste2")
     ax.plot(sx, sy, "o-", color="tab:blue", lw=2, label="Sutura (zero-shot)")
     ax.plot(px, py, "s-", color="crimson", lw=2, label="PASTE2")
-    ax.axhline(1.0, color="gray", ls=":", lw=1, label="1 spot-pitch")
+    ax.axhline(1.0, color="gray", ls=":", lw=1, label="1 spot-pitch (good)")
+    # annotate the severity-averaged medians so both lines are legible even when
+    # Sutura sits near the top of the shared axis
+    ax.annotate(f"Sutura ~{np.mean(sy):.1f}", (sx[len(sx)//2], np.mean(sy)),
+                textcoords="offset points", xytext=(0, 6), ha="center",
+                fontsize=8, color="tab:blue")
+    ax.annotate(f"PASTE2 ~{np.mean(py):.1f}", (px[len(px)//2], np.mean(py)),
+                textcoords="offset points", xytext=(0, -14), ha="center",
+                fontsize=8, color="crimson")
     ax.set_title(f"{ds}\n{kind[ds]}", fontsize=9)
     ax.set_xlabel("tear severity (pitches)")
     ax.grid(alpha=0.3)
-    ax.set_ylim(0, None)
+    ax.set_ylim(0, ymax * 1.12)
 axes[0].set_ylabel("median registration error (spot-pitches)")
-axes[0].legend(fontsize=8, loc="upper left")
+axes[0].legend(fontsize=8, loc="center left")
 fig.suptitle("Sutura zero-shot vs PASTE2 — synthetic tear benchmark across datasets",
              fontsize=12, y=1.02)
 fig.tight_layout()

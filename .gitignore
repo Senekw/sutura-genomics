@@ -14,3 +14,7 @@ data/
 
 # Notebook checkpoints
 .ipynb_checkpoints/
+
+# Transient run logs at repo root (results/*.log are intentionally tracked)
+/err.log
+/sweep_run.log

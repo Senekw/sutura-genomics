@@ -1,0 +1,111 @@
+dataset,tissue,kind,mode,severity,method,seed,median_error,median_error_pitch,mean_error,p90_error,pitch_px,n_scored,runtime_s
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,0.0,sutura,0,99.23,0.724,115.35,200.03,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,1.0,sutura,0,99.69,0.728,114.82,197.36,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,2.0,sutura,0,99.82,0.729,118.73,205.33,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,3.0,sutura,0,102.04,0.745,130.53,221.53,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,4.0,sutura,0,103.16,0.753,145.44,239.21,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,6.0,sutura,0,108.6,0.793,214.97,423.08,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,8.0,sutura,0,118.03,0.861,318.77,1205.43,137.0,4182,0.0
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,0.0,paste2,0,658.09,4.803,764.59,1451.42,137.0,4157,253.28
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,1.0,paste2,0,655.45,4.784,762.15,1441.93,137.0,4156,248.3
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,2.0,paste2,0,688.98,5.029,780.32,1475.86,137.0,4155,290.42
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,3.0,paste2,0,716.28,5.228,806.19,1536.37,137.0,4154,315.46
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,4.0,paste2,0,729.32,5.323,836.95,1597.56,137.0,4155,247.86
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,6.0,paste2,0,773.03,5.642,910.73,1756.27,137.0,4157,254.33
+DLPFC_Br5292_train,human DLPFC (cortex),in-distribution (train donor),cross,8.0,paste2,0,838.2,6.118,983.15,1932.43,137.0,4158,329.31
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,sutura,0,2236.02,16.321,2557.31,4650.96,137.0,3363,0.21
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,1.0,sutura,0,2234.24,16.308,2557.44,4646.7,137.0,3363,0.1
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,2.0,sutura,0,2227.68,16.26,2558.2,4645.7,137.0,3363,0.11
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,3.0,sutura,0,2224.08,16.234,2558.84,4642.02,137.0,3363,0.12
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,sutura,0,2228.71,16.268,2558.17,4641.41,137.0,3363,0.1
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,6.0,sutura,0,2273.94,16.598,2574.98,4640.18,137.0,3363,0.1
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,sutura,0,2311.47,16.872,2596.27,4639.15,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,sutura,1,2228.57,16.267,2555.56,4642.47,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,1.0,sutura,1,2228.57,16.267,2556.44,4644.15,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,2.0,sutura,1,2227.27,16.257,2555.62,4644.26,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,3.0,sutura,1,2221.3,16.213,2556.25,4644.34,137.0,3363,0.08
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,sutura,1,2224.27,16.235,2557.75,4644.44,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,6.0,sutura,1,2231.49,16.288,2558.17,4631.18,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,sutura,1,2229.88,16.276,2559.45,4653.36,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,sutura,2,2236.65,16.325,2556.13,4631.82,137.0,3363,0.08
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,1.0,sutura,2,2235.52,16.317,2554.91,4631.84,137.0,3363,0.08
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,2.0,sutura,2,2230.68,16.282,2553.89,4611.85,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,3.0,sutura,2,2231.47,16.288,2549.22,4627.74,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,sutura,2,2228.27,16.264,2546.33,4632.0,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,6.0,sutura,2,2232.5,16.295,2549.48,4631.67,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,sutura,2,2231.07,16.285,2541.38,4602.89,137.0,3363,0.09
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,paste2,0,526.02,3.839,598.84,1123.99,137.0,3337,212.47
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,paste2,0,571.28,4.17,650.25,1218.98,137.0,3339,282.87
+DLPFC_Br5595,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,paste2,0,691.21,5.045,817.46,1579.75,137.0,3341,365.77
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,sutura,0,2601.53,18.989,2570.97,4184.32,137.0,3502,0.21
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,1.0,sutura,0,2598.75,18.969,2570.64,4195.57,137.0,3502,0.13
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,2.0,sutura,0,2598.5,18.967,2570.82,4189.74,137.0,3502,0.12
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,3.0,sutura,0,2601.61,18.989,2572.02,4205.36,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,sutura,0,2599.62,18.975,2576.49,4193.92,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,6.0,sutura,0,2596.52,18.952,2584.04,4201.77,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,sutura,0,2600.77,18.983,2593.74,4202.01,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,sutura,1,2599.19,18.972,2569.93,4180.19,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,1.0,sutura,1,2599.91,18.977,2571.74,4183.79,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,2.0,sutura,1,2600.35,18.98,2568.04,4184.45,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,3.0,sutura,1,2594.57,18.938,2567.06,4183.85,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,sutura,1,2597.41,18.959,2567.34,4191.6,137.0,3502,0.09
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,6.0,sutura,1,2593.3,18.929,2570.72,4205.47,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,sutura,1,2593.41,18.93,2568.71,4202.69,137.0,3502,0.11
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,sutura,2,2592.54,18.923,2571.23,4204.57,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,1.0,sutura,2,2591.84,18.918,2570.81,4199.85,137.0,3502,0.11
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,2.0,sutura,2,2591.78,18.918,2571.27,4196.12,137.0,3502,0.11
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,3.0,sutura,2,2584.15,18.862,2569.24,4189.46,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,sutura,2,2582.03,18.846,2570.61,4196.38,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,6.0,sutura,2,2609.35,19.046,2592.26,4198.96,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,sutura,2,2675.61,19.529,2617.06,4207.84,137.0,3502,0.1
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,0.0,paste2,0,406.91,2.97,473.3,922.08,137.0,3482,208.03
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,4.0,paste2,0,464.98,3.394,540.21,1080.08,137.0,3476,200.07
+DLPFC_Br8100,human DLPFC (cortex),"cross-donor, same tissue",cross,8.0,paste2,0,551.01,4.022,687.72,1402.5,137.0,3475,142.26
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,0.0,sutura,0,2029.57,14.814,2140.96,3496.99,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,1.0,sutura,0,2031.16,14.826,2140.66,3501.57,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,2.0,sutura,0,2033.48,14.843,2141.33,3501.02,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,3.0,sutura,0,2032.68,14.837,2140.3,3501.66,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,4.0,sutura,0,2036.49,14.865,2140.22,3501.71,137.0,2951,0.06
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,6.0,sutura,0,2053.49,14.989,2151.46,3503.91,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,8.0,sutura,0,2053.42,14.988,2171.75,3502.06,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,0.0,sutura,1,2028.45,14.806,2144.69,3503.84,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,1.0,sutura,1,2028.42,14.806,2144.01,3494.17,137.0,2951,0.08
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,2.0,sutura,1,2027.54,14.8,2143.23,3492.78,137.0,2951,0.08
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,3.0,sutura,1,2034.58,14.851,2142.93,3492.59,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,4.0,sutura,1,2032.72,14.837,2142.24,3496.52,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,6.0,sutura,1,2035.01,14.854,2144.05,3500.17,137.0,2951,0.08
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,8.0,sutura,1,2033.32,14.842,2145.57,3495.79,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,0.0,sutura,2,2017.86,14.729,2138.32,3495.07,137.0,2951,0.09
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,1.0,sutura,2,2017.02,14.723,2138.1,3491.72,137.0,2951,0.09
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,2.0,sutura,2,2014.4,14.704,2138.28,3494.22,137.0,2951,0.09
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,3.0,sutura,2,2020.88,14.751,2139.56,3492.46,137.0,2951,0.08
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,4.0,sutura,2,2032.29,14.834,2137.01,3485.73,137.0,2951,0.08
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,6.0,sutura,2,2040.69,14.896,2136.14,3470.8,137.0,2951,0.07
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,8.0,sutura,2,2049.32,14.959,2150.96,3483.03,137.0,2951,0.08
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,0.0,paste2,0,737.21,5.381,769.74,1095.03,137.0,2923,69.72
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,4.0,paste2,0,742.73,5.421,783.21,1134.65,137.0,2923,61.1
+MouseBrain_SagPost,mouse brain (sagittal),"cross-species, neural",cross,8.0,paste2,0,763.04,5.57,809.88,1205.94,137.0,2924,72.04
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,0.0,sutura,0,5488.59,20.105,5489.86,8732.0,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,1.0,sutura,0,5491.82,20.117,5489.87,8741.45,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,2.0,sutura,0,5474.66,20.054,5482.01,8750.41,273.0,3615,0.08
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,3.0,sutura,0,5479.62,20.072,5478.4,8749.78,273.0,3615,0.12
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,4.0,sutura,0,5502.34,20.155,5476.93,8740.92,273.0,3615,0.1
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,6.0,sutura,0,5470.88,20.04,5462.43,8746.0,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,8.0,sutura,0,5507.95,20.176,5501.87,8746.74,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,0.0,sutura,1,5474.31,20.052,5489.94,8727.52,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,1.0,sutura,1,5475.68,20.057,5489.72,8731.16,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,2.0,sutura,1,5469.35,20.034,5486.31,8720.09,273.0,3615,0.11
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,3.0,sutura,1,5479.63,20.072,5488.18,8719.13,273.0,3615,0.1
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,4.0,sutura,1,5487.32,20.1,5494.34,8721.65,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,6.0,sutura,1,5477.27,20.063,5491.86,8715.66,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,8.0,sutura,1,5481.73,20.08,5492.6,8733.67,273.0,3615,0.08
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,0.0,sutura,2,5488.59,20.105,5492.76,8738.39,273.0,3615,0.11
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,1.0,sutura,2,5489.85,20.109,5491.94,8740.67,273.0,3615,0.1
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,2.0,sutura,2,5462.23,20.008,5486.27,8745.4,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,3.0,sutura,2,5447.93,19.956,5484.71,8743.7,273.0,3615,0.08
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,4.0,sutura,2,5443.23,19.939,5480.7,8742.8,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,6.0,sutura,2,5456.61,19.988,5492.94,8734.06,273.0,3615,0.09
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,8.0,sutura,2,5501.3,20.151,5516.52,8735.84,273.0,3615,0.11
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,0.0,paste2,0,947.14,3.469,1040.74,1834.73,273.0,3592,145.46
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,4.0,paste2,0,985.35,3.609,1135.77,2069.26,273.0,3589,147.02
+BreastCancer_BlockA,human breast cancer,"cross-tissue, non-neural",cross,8.0,paste2,0,1081.96,3.963,1300.31,2457.6,273.0,3595,166.79
