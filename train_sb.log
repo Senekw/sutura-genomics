@@ -1,0 +1,7 @@
+frozen basis: genes=33538 dim=50
+  Br5292  [TRAIN   ] ref=4226 mov=4384 pitch=137 bridge=95%
+  Br5595  [TRAIN   ] ref=3661 mov=3498 pitch=137 bridge=96%
+  Br8100  [HELD-OUT] ref=3639 mov=3673 pitch=137 bridge=95%
+  ep  0 L=21.187 | med pitch@sev0/4/8: Br5292[20.3/20.4/20.4]  Br5595[17.8/17.8/17.8]  Br8100[21.2/21.2/21.2]
+  ep  5 L=8.238 | med pitch@sev0/4/8: Br5292[7.9/7.9/8.1]  Br5595[6.2/6.2/6.7]  Br8100[11.0/11.0/11.5]
+  ep 10 L=5.867 | med pitch@sev0/4/8: Br5292[6.7/6.8/7.0]  Br5595[8.9/8.9/9.0]  Br8100[9.8/9.8/10.9]
