@@ -1,0 +1,13 @@
+loaded arca_cross.pt: trained 151507/151508 pca_dim=50 hidden=64 layers=3
+
+=== DLPFC_Br5595 (human DLPFC (cortex); cross-donor, same tissue) ===
+    A=3661 B=3498 pitch=137px bridge=96%
+    sutura seed0: s0=16.3p s1=16.3p s2=16.3p s3=16.2p s4=16.3p s6=16.6p s8=16.9p
+    sutura seed1: s0=16.3p s1=16.3p s2=16.3p s3=16.2p s4=16.2p s6=16.3p s8=16.3p
+    sutura seed2: s0=16.3p s1=16.3p s2=16.3p s3=16.3p s4=16.3p s6=16.3p s8=16.3p
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
