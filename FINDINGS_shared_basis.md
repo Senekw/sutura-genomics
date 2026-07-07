@@ -82,8 +82,11 @@ being fixed exactly as diagnosed.
   *supervised training*," not "never seen in any form." To test whether that inflates
   the held-out number, we refit the basis on **train donors only** (Br5292 + Br5595,
   no Br8100), retrained from scratch, and re-evaluated Br8100:
-  **held-out Br8100 median = ⟨STRICT⟩ pitch** (`results/shared_basis_trainonly.npz`,
-  `results/arca_shared_basis_trainonly.pt`). ⟨STRICT_INTERP⟩
+  **held-out Br8100 median = 9.58 pitch** (`results/shared_basis_trainonly.npz`,
+  `results/arca_shared_basis_trainonly.pt`) — statistically identical to the primary
+  9.59. Excluding Br8100 from the basis changes nothing, so the held-out signal is
+  **genuine, not basis leakage**: pooled DLPFC expression already spans the axes the
+  held-out donor needs. (In-distribution also holds: 1.32 pitch.)
 
 ## Bottom line
 

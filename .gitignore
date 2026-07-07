@@ -18,3 +18,5 @@ data/
 # Transient run logs at repo root (results/*.log are intentionally tracked)
 /err.log
 /sweep_run.log
+/train_sb.log
+/train_sb_strict.log
