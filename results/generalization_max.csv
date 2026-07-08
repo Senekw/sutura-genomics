@@ -5,3 +5,4 @@ baseline_2donor,svd,1,2,False,0.0,False,0.0,0.0,Br5595,Br5292+Br8100,1.278,10.56
 baseline_2donor,svd,1,2,False,0.0,False,0.0,0.0,Br8100,Br5292+Br5595,1.156,9.714,3.46,False,2,50,577.3
 diversity_2donor_2pair,svd,2,2,False,0.0,False,0.0,0.0,Br5292,Br5595+Br8100,1.978,9.855,5.28,False,4,50,587.2
 diversity_2donor_2pair,svd,2,2,False,0.0,False,0.0,0.0,Br5595,Br5292+Br8100,2.248,9.007,4.35,False,4,50,559.6
+diversity_2donor_2pair,svd,2,2,False,0.0,False,0.0,0.0,Br8100,Br5292+Br5595,2.136,8.421,3.46,False,4,50,472.8
