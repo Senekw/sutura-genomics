@@ -11,3 +11,4 @@
 
 === diversity_2donor_2pair ===
   [diversity_2donor_2pair] hold-out Br5292: in-dist=1.978 held-out=9.855 (PASTE2 5.28)  587s
+  [diversity_2donor_2pair] hold-out Br5595: in-dist=2.248 held-out=9.007 (PASTE2 4.35)  560s
