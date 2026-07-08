@@ -1,4 +1,4 @@
-"""Smoke harness for ARCA cross model: per-epoch loss + val logging -> PNG.
+"""Smoke harness for Sutura cross model: per-epoch loss + val logging -> PNG.
 
 Reuses train_cross internals so it exercises the SAME model/data path as the
 real run; it just records train loss and val reg-error every epoch and plots
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 from scipy.spatial import cKDTree
 
-from train_cross import (ARCACrossNet, cross_features, array_bridge,
+from train_cross import (SuturaCrossNet, cross_features, array_bridge,
                          graph_tensors, DATA_DIR, RESULTS_DIR)
 from warp_slice import apply_warp
 from scoring import registration_error_stats
@@ -45,7 +45,7 @@ def main():
 
     Z_A, Z_B = cross_features(A, B0, PCA, SEED)
     gt_A, have = array_bridge(A, B0)
-    model = ARCACrossNet(PCA, 64, 3, 64)
+    model = SuturaCrossNet(PCA, 64, 3, 64)
     opt = torch.optim.Adam(model.parameters(), lr=LR)
 
     ga = graph_tensors(a_coords, Z_A, KNN, pitch)
@@ -100,12 +100,12 @@ def main():
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
     ax1.plot(hist["epoch"], hist["train_loss"], "o-", color="tab:blue")
     ax1.set_xlabel("epoch"); ax1.set_ylabel("train loss (pitch units)")
-    ax1.set_title("ARCA cross — training loss"); ax1.grid(alpha=0.3)
+    ax1.set_title("Sutura cross — training loss"); ax1.grid(alpha=0.3)
     for sv in VAL_SEV:
         ax2.plot(hist["epoch"], hist[f"val_sev{int(sv)}"], "o-",
                  label=f"sev {sv:g}" + (" (tear)" if sv > 0 else ""))
     ax2.set_xlabel("epoch"); ax2.set_ylabel("val reg-err median (px)")
-    ax2.set_title("ARCA cross — val registration error")
+    ax2.set_title("Sutura cross — val registration error")
     ax2.legend(); ax2.grid(alpha=0.3)
     fig.tight_layout()
     png = RESULTS_DIR / "arca_cross_smoke_loss.png"

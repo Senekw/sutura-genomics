@@ -1,4 +1,4 @@
-# ARCA — graph-based deep learning for non-rigid tissue alignment
+# Sutura — graph-based deep learning for non-rigid tissue alignment
 # Install with:  pip install -r requirements.txt
 #
 # The line below points pip at PyTorch's CPU wheel index so `torch` resolves

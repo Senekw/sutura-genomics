@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import anndata as ad
-from train_cross import (ARCACrossNet, cross_features, array_bridge,
+from train_cross import (SuturaCrossNet, cross_features, array_bridge,
                          graph_tensors)
 from warp_slice import apply_warp
 from scoring import registration_error_stats
@@ -57,7 +57,7 @@ def load_pair(ref_id, smp_id):
 
 def arca_curve(P, ckpt_path):
     """[A] Reproduce Sutura tear curve from a checkpoint."""
-    model = ARCACrossNet(PCA_DIM, 64, 3, 64)
+    model = SuturaCrossNet(PCA_DIM, 64, 3, 64)
     ck = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     model.load_state_dict(ck["state_dict"])
     model.eval()

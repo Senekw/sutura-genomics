@@ -26,7 +26,7 @@ import anndata as ad
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from train_cross import ARCACrossNet
+from train_cross import SuturaCrossNet
 from train_cross_loo import (fit_shared_basis, build_pair, eval_curve,
                              parse_pairs, assert_same_genes)
 
@@ -65,7 +65,7 @@ def load_fold(ckpt_stem):
 
     project = fit_shared_basis(train_slices, pca_dim, seed, feature_mode=mode)
     test = build_pair(test_ref, test_smp, project, knn)
-    model = ARCACrossNet(pca_dim, a["hidden"], a["layers"], a["attn_dim"])
+    model = SuturaCrossNet(pca_dim, a["hidden"], a["layers"], a["attn_dim"])
     model.load_state_dict(ck["state_dict"]); model.eval()
     eval_sev = [float(x) for x in a["eval_severities"].split(",")]
     return model, test, eval_sev, knn, mode

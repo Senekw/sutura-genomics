@@ -1,9 +1,9 @@
-"""Combine the completed sweep CSVs into one headline figure for ARCA.
+"""Combine the completed sweep CSVs into one headline figure for Sutura.
 
 Left  : registration error (barycentric median, px) vs warp severity for the
         three alpha=0.1 regimes (smooth / tear / self), plus tear at alpha=0.5.
 Right : layer-label transfer accuracy vs severity for the same.
-This is the axes ARCA's curve will later overlay onto.
+This is the axes Sutura's curve will later overlay onto.
 """
 from __future__ import annotations
 import csv

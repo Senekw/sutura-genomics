@@ -1,4 +1,4 @@
-# ARCA full deformation sweep — runs the three approved regimes sequentially
+# Sutura full deformation sweep — runs the three approved regimes sequentially
 # (pca dissimilarity, full spots). Run AFTER the baseline finishes to avoid
 # memory contention. Logs to results/.
 $py = "$PSScriptRoot\.venv\Scripts\python.exe"

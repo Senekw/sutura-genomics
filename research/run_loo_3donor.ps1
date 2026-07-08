@@ -1,5 +1,5 @@
 # ============================================================================
-# ARCA — 3-donor leave-one-out, run end-to-end and unattended.
+# Sutura — 3-donor leave-one-out, run end-to-end and unattended.
 #
 # Fixes the single-donor LOO generalization failure (RESUME.md 2026-06-22) by
 # training the shared encoder on TWO donors and evaluating on the held-out third,
@@ -40,7 +40,7 @@ $folds = @(
 )
 $modes = @("global", "perslice")
 
-Log "=== ARCA 3-donor LOO START ==="
+Log "=== Sutura 3-donor LOO START ==="
 $failures = 0
 
 foreach ($mode in $modes) {
@@ -71,6 +71,6 @@ Log "RUN PASTE2 baseline on subj3 ($S3), tear, pca/s0.99/alpha0.1"
 if ($LASTEXITCODE -ne 0) { Log "  !! PASTE2 subj3 FAILED (exit $LASTEXITCODE)"; $failures++ }
 else { Log "  ok PASTE2 subj3" }
 
-Log "=== ARCA 3-donor LOO COMPLETE ($failures failures) ==="
+Log "=== Sutura 3-donor LOO COMPLETE ($failures failures) ==="
 "3-donor LOO finished at {0} with {1} failures." -f (Get-Date -Format "u"), $failures `
     | Out-File -FilePath $done -Encoding utf8
