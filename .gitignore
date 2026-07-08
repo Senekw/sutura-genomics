@@ -27,3 +27,4 @@ data/
 # Backend runtime job storage / uploads / outputs (regenerated per request)
 backend/_jobs/
 backend/_e2e_download.h5ad
+/genmax.log

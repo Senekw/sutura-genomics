@@ -6,3 +6,8 @@ baseline_2donor,svd,1,2,False,0.0,False,0.0,0.0,Br8100,Br5292+Br5595,1.156,9.714
 diversity_2donor_2pair,svd,2,2,False,0.0,False,0.0,0.0,Br5292,Br5595+Br8100,1.978,9.855,5.28,False,4,50,587.2
 diversity_2donor_2pair,svd,2,2,False,0.0,False,0.0,0.0,Br5595,Br5292+Br8100,2.248,9.007,4.35,False,4,50,559.6
 diversity_2donor_2pair,svd,2,2,False,0.0,False,0.0,0.0,Br8100,Br5292+Br5595,2.136,8.421,3.46,False,4,50,472.8
+augment_reg,svd,2,2,True,0.0001,True,0.0,0.0,Br5292,Br5595+Br8100,3.147,8.527,5.28,False,4,60,411.1
+augment_reg,svd,2,2,True,0.0001,True,0.0,0.0,Br5595,Br5292+Br8100,3.17,7.826,4.35,False,4,60,454.9
+augment_reg,svd,2,2,True,0.0001,True,0.0,0.0,Br8100,Br5292+Br5595,3.423,8.44,3.46,False,4,60,563.0
+hvg_features,hvg,2,2,True,0.0001,True,0.0,0.0,Br8100,Br5292+Br5595,3.358,9.432,3.46,False,4,60,698.2
+contrastive_spatial,svd,2,2,True,0.0001,True,0.2,0.1,Br8100,Br5292+Br5595,3.32,9.028,3.46,False,4,60,871.7
