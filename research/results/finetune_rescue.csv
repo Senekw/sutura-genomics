@@ -1,0 +1,85 @@
+dataset,severity,method,median_error,seed
+Breast_Block_A_S2_heldout,0.0,Sutura zero-shot,5806.17,0
+Breast_Block_A_S2_heldout,0.0,Sutura fine-tuned,5449.5,0
+Breast_Block_A_S2_heldout,0.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,0.0,Sutura zero-shot,5780.57,9999
+Breast_Block_A_S2_heldout,0.0,Sutura fine-tuned,5448.59,9999
+Breast_Block_A_S2_heldout,0.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,0.0,Sutura zero-shot,5811.49,10000
+Breast_Block_A_S2_heldout,0.0,Sutura fine-tuned,5426.76,10000
+Breast_Block_A_S2_heldout,0.0,PASTE2,0.0,10000
+Breast_Block_A_S2_heldout,1.0,Sutura zero-shot,5807.99,0
+Breast_Block_A_S2_heldout,1.0,Sutura fine-tuned,5427.54,0
+Breast_Block_A_S2_heldout,1.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,1.0,Sutura zero-shot,5816.06,9999
+Breast_Block_A_S2_heldout,1.0,Sutura fine-tuned,5435.8,9999
+Breast_Block_A_S2_heldout,1.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,1.0,Sutura zero-shot,5789.61,10000
+Breast_Block_A_S2_heldout,1.0,Sutura fine-tuned,5414.96,10000
+Breast_Block_A_S2_heldout,1.0,PASTE2,0.0,10000
+Breast_Block_A_S2_heldout,2.0,Sutura zero-shot,5786.54,0
+Breast_Block_A_S2_heldout,2.0,Sutura fine-tuned,5413.42,0
+Breast_Block_A_S2_heldout,2.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,2.0,Sutura zero-shot,5812.7,9999
+Breast_Block_A_S2_heldout,2.0,Sutura fine-tuned,5413.3,9999
+Breast_Block_A_S2_heldout,2.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,2.0,Sutura zero-shot,5752.21,10000
+Breast_Block_A_S2_heldout,2.0,Sutura fine-tuned,5414.82,10000
+Breast_Block_A_S2_heldout,2.0,PASTE2,0.0,10000
+Breast_Block_A_S2_heldout,3.0,Sutura zero-shot,5777.63,0
+Breast_Block_A_S2_heldout,3.0,Sutura fine-tuned,5441.38,0
+Breast_Block_A_S2_heldout,3.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,3.0,Sutura zero-shot,5798.73,9999
+Breast_Block_A_S2_heldout,3.0,Sutura fine-tuned,5404.66,9999
+Breast_Block_A_S2_heldout,3.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,3.0,Sutura zero-shot,5766.57,10000
+Breast_Block_A_S2_heldout,3.0,Sutura fine-tuned,5413.71,10000
+Breast_Block_A_S2_heldout,3.0,PASTE2,0.0,10000
+Breast_Block_A_S2_heldout,4.0,Sutura zero-shot,5789.37,0
+Breast_Block_A_S2_heldout,4.0,Sutura fine-tuned,5426.17,0
+Breast_Block_A_S2_heldout,4.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,4.0,Sutura zero-shot,5800.17,9999
+Breast_Block_A_S2_heldout,4.0,Sutura fine-tuned,5396.25,9999
+Breast_Block_A_S2_heldout,4.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,4.0,Sutura zero-shot,5768.05,10000
+Breast_Block_A_S2_heldout,4.0,Sutura fine-tuned,5413.63,10000
+Breast_Block_A_S2_heldout,4.0,PASTE2,0.0,10000
+Breast_Block_A_S2_heldout,6.0,Sutura zero-shot,5784.42,0
+Breast_Block_A_S2_heldout,6.0,Sutura fine-tuned,5444.43,0
+Breast_Block_A_S2_heldout,6.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,6.0,Sutura zero-shot,5803.38,9999
+Breast_Block_A_S2_heldout,6.0,Sutura fine-tuned,5410.65,9999
+Breast_Block_A_S2_heldout,6.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,6.0,Sutura zero-shot,5754.52,10000
+Breast_Block_A_S2_heldout,6.0,Sutura fine-tuned,5444.46,10000
+Breast_Block_A_S2_heldout,6.0,PASTE2,0.0,10000
+Breast_Block_A_S2_heldout,8.0,Sutura zero-shot,5796.56,0
+Breast_Block_A_S2_heldout,8.0,Sutura fine-tuned,5527.42,0
+Breast_Block_A_S2_heldout,8.0,PASTE2,0.0,0
+Breast_Block_A_S2_heldout,8.0,Sutura zero-shot,5850.35,9999
+Breast_Block_A_S2_heldout,8.0,Sutura fine-tuned,5420.35,9999
+Breast_Block_A_S2_heldout,8.0,PASTE2,0.0,9999
+Breast_Block_A_S2_heldout,8.0,Sutura zero-shot,5760.51,10000
+Breast_Block_A_S2_heldout,8.0,Sutura fine-tuned,5425.81,10000
+Breast_Block_A_S2_heldout,8.0,PASTE2,0.0,10000
+Breast_Block_A_S1_insample,0.0,Sutura fine-tuned (in-set),208.51,0
+Breast_Block_A_S1_insample,0.0,Sutura fine-tuned (in-set),208.76,9999
+Breast_Block_A_S1_insample,0.0,Sutura fine-tuned (in-set),207.42,10000
+Breast_Block_A_S1_insample,1.0,Sutura fine-tuned (in-set),218.02,0
+Breast_Block_A_S1_insample,1.0,Sutura fine-tuned (in-set),221.47,9999
+Breast_Block_A_S1_insample,1.0,Sutura fine-tuned (in-set),210.84,10000
+Breast_Block_A_S1_insample,2.0,Sutura fine-tuned (in-set),226.13,0
+Breast_Block_A_S1_insample,2.0,Sutura fine-tuned (in-set),219.1,9999
+Breast_Block_A_S1_insample,2.0,Sutura fine-tuned (in-set),217.26,10000
+Breast_Block_A_S1_insample,3.0,Sutura fine-tuned (in-set),225.45,0
+Breast_Block_A_S1_insample,3.0,Sutura fine-tuned (in-set),222.89,9999
+Breast_Block_A_S1_insample,3.0,Sutura fine-tuned (in-set),218.75,10000
+Breast_Block_A_S1_insample,4.0,Sutura fine-tuned (in-set),227.5,0
+Breast_Block_A_S1_insample,4.0,Sutura fine-tuned (in-set),225.31,9999
+Breast_Block_A_S1_insample,4.0,Sutura fine-tuned (in-set),228.28,10000
+Breast_Block_A_S1_insample,6.0,Sutura fine-tuned (in-set),245.06,0
+Breast_Block_A_S1_insample,6.0,Sutura fine-tuned (in-set),232.2,9999
+Breast_Block_A_S1_insample,6.0,Sutura fine-tuned (in-set),236.32,10000
+Breast_Block_A_S1_insample,8.0,Sutura fine-tuned (in-set),271.28,0
+Breast_Block_A_S1_insample,8.0,Sutura fine-tuned (in-set),247.14,9999
+Breast_Block_A_S1_insample,8.0,Sutura fine-tuned (in-set),236.97,10000

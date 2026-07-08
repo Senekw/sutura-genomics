@@ -1,0 +1,64 @@
+dataset,severity,method,median_error,seed
+Breast_Cancer_Block_A_S1,0.0,Sutura,5249.56,0
+Breast_Cancer_Block_A_S1,0.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,0.0,No-op (unaligned),0.0,0
+Breast_Cancer_Block_A_S1,0.0,Sutura,5245.4,9999
+Breast_Cancer_Block_A_S1,0.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,0.0,No-op (unaligned),0.0,9999
+Breast_Cancer_Block_A_S1,0.0,Sutura,5259.62,10000
+Breast_Cancer_Block_A_S1,0.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,0.0,No-op (unaligned),0.0,10000
+Breast_Cancer_Block_A_S1,1.0,Sutura,5249.52,0
+Breast_Cancer_Block_A_S1,1.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,1.0,No-op (unaligned),229.64,0
+Breast_Cancer_Block_A_S1,1.0,Sutura,5293.21,9999
+Breast_Cancer_Block_A_S1,1.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,1.0,No-op (unaligned),205.71,9999
+Breast_Cancer_Block_A_S1,1.0,Sutura,5254.65,10000
+Breast_Cancer_Block_A_S1,1.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,1.0,No-op (unaligned),163.89,10000
+Breast_Cancer_Block_A_S1,2.0,Sutura,5243.01,0
+Breast_Cancer_Block_A_S1,2.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,2.0,No-op (unaligned),459.28,0
+Breast_Cancer_Block_A_S1,2.0,Sutura,5281.81,9999
+Breast_Cancer_Block_A_S1,2.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,2.0,No-op (unaligned),411.41,9999
+Breast_Cancer_Block_A_S1,2.0,Sutura,5251.9,10000
+Breast_Cancer_Block_A_S1,2.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,2.0,No-op (unaligned),327.79,10000
+Breast_Cancer_Block_A_S1,3.0,Sutura,5256.0,0
+Breast_Cancer_Block_A_S1,3.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,3.0,No-op (unaligned),688.92,0
+Breast_Cancer_Block_A_S1,3.0,Sutura,5270.83,9999
+Breast_Cancer_Block_A_S1,3.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,3.0,No-op (unaligned),617.12,9999
+Breast_Cancer_Block_A_S1,3.0,Sutura,5255.76,10000
+Breast_Cancer_Block_A_S1,3.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,3.0,No-op (unaligned),491.68,10000
+Breast_Cancer_Block_A_S1,4.0,Sutura,5274.29,0
+Breast_Cancer_Block_A_S1,4.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,4.0,No-op (unaligned),918.55,0
+Breast_Cancer_Block_A_S1,4.0,Sutura,5280.08,9999
+Breast_Cancer_Block_A_S1,4.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,4.0,No-op (unaligned),822.83,9999
+Breast_Cancer_Block_A_S1,4.0,Sutura,5251.53,10000
+Breast_Cancer_Block_A_S1,4.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,4.0,No-op (unaligned),655.57,10000
+Breast_Cancer_Block_A_S1,6.0,Sutura,5336.27,0
+Breast_Cancer_Block_A_S1,6.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,6.0,No-op (unaligned),1377.83,0
+Breast_Cancer_Block_A_S1,6.0,Sutura,5295.58,9999
+Breast_Cancer_Block_A_S1,6.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,6.0,No-op (unaligned),1234.24,9999
+Breast_Cancer_Block_A_S1,6.0,Sutura,5239.42,10000
+Breast_Cancer_Block_A_S1,6.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,6.0,No-op (unaligned),983.36,10000
+Breast_Cancer_Block_A_S1,8.0,Sutura,5331.52,0
+Breast_Cancer_Block_A_S1,8.0,PASTE2,0.0,0
+Breast_Cancer_Block_A_S1,8.0,No-op (unaligned),1837.11,0
+Breast_Cancer_Block_A_S1,8.0,Sutura,5290.64,9999
+Breast_Cancer_Block_A_S1,8.0,PASTE2,0.0,9999
+Breast_Cancer_Block_A_S1,8.0,No-op (unaligned),1645.65,9999
+Breast_Cancer_Block_A_S1,8.0,Sutura,5253.33,10000
+Breast_Cancer_Block_A_S1,8.0,PASTE2,0.0,10000
+Breast_Cancer_Block_A_S1,8.0,No-op (unaligned),1311.15,10000
