@@ -1,2 +1,6 @@
 
 === baseline_1donor ===
+  [baseline_1donor] hold-out Br8100: in-dist=0.725 held-out=10.996 (PASTE2 3.46)  499s
+  [baseline_1donor] LODO mean held-out = 11.00 pitch
+
+=== baseline_2donor ===

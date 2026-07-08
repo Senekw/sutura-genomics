@@ -1,0 +1,2 @@
+config,feature,pairs_per_donor,n_train_donors,augment,weight_decay,early_stop,contrastive,spatial,held_out_donor,train_donors,in_dist_error,held_out_error,paste2_error,beats_paste2,n_train_pairs,epochs,seconds
+baseline_1donor,svd,1,1,False,0.0,False,0.0,0.0,Br8100,Br5292,0.725,10.996,3.46,False,1,50,499.0
