@@ -5,3 +5,4 @@
 
 === baseline_2donor ===
   [baseline_2donor] hold-out Br5292: in-dist=1.07 held-out=9.188 (PASTE2 5.28)  459s
+  [baseline_2donor] hold-out Br5595: in-dist=1.278 held-out=10.563 (PASTE2 4.35)  448s
