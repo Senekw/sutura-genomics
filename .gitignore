@@ -20,3 +20,4 @@ data/
 /sweep_run.log
 /train_sb.log
 /train_sb_strict.log
+/train_bc.log
