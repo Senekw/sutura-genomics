@@ -2,3 +2,4 @@ config,feature,pairs_per_donor,n_train_donors,augment,weight_decay,early_stop,co
 baseline_1donor,svd,1,1,False,0.0,False,0.0,0.0,Br8100,Br5292,0.725,10.996,3.46,False,1,50,499.0
 baseline_2donor,svd,1,2,False,0.0,False,0.0,0.0,Br5292,Br5595+Br8100,1.07,9.188,5.28,False,2,50,458.6
 baseline_2donor,svd,1,2,False,0.0,False,0.0,0.0,Br5595,Br5292+Br8100,1.278,10.563,4.35,False,2,50,447.8
+baseline_2donor,svd,1,2,False,0.0,False,0.0,0.0,Br8100,Br5292+Br5595,1.156,9.714,3.46,False,2,50,577.3
