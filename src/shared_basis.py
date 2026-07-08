@@ -45,16 +45,24 @@ BASIS_SLICES = [
 
 
 def lognorm_matrix(adata: ad.AnnData, genes: np.ndarray) -> np.ndarray:
-    """Reindex to `genes`, library-normalize to 1e4, log1p. Returns dense (n,G)."""
-    idx = adata.var_names.get_indexer(genes)
-    if (idx < 0).any():
-        raise ValueError("section is missing basis genes; cannot transform")
+    """Align expression to the basis gene order, ZERO-FILLING any basis gene the
+    section does not carry, then library-normalize to 1e4 and log1p. Returns dense
+    (n, G). For a section with the full panel (e.g. DLPFC) this is exact; for a
+    partial-overlap panel the missing genes contribute 0 (the standard treatment
+    of an unmeasured gene), so a frozen basis can still be applied transform-only."""
+    gpos = {g: j for j, g in enumerate(adata.var_names)}
+    keep = [(bi, gpos[g]) for bi, g in enumerate(genes) if g in gpos]
     X = adata.X
-    X = X.tocsc()[:, idx] if issparse(X) else np.asarray(X, np.float32)[:, idx]
-    X = np.asarray(X.todense(), np.float32) if issparse(X) else X
-    counts = X.sum(1, keepdims=True)
+    Xc = X.tocsc() if issparse(X) else np.asarray(X, np.float32)
+    M = np.zeros((adata.n_obs, len(genes)), np.float32)
+    if keep:
+        bcols = [b for b, _ in keep]
+        scols = [s for _, s in keep]
+        sub = Xc[:, scols].toarray() if issparse(Xc) else Xc[:, scols]
+        M[:, bcols] = sub
+    counts = M.sum(1, keepdims=True)
     counts[counts == 0] = 1.0
-    return np.log1p(X * (1e4 / counts)).astype(np.float32)
+    return np.log1p(M * (1e4 / counts)).astype(np.float32)
 
 
 def fit_basis(slices, dim=50, seed=0) -> dict:
