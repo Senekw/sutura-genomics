@@ -1,0 +1,37 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #070b16; color: #e8eefc;
+  font: 15px/1.5 -apple-system, Segoe UI, Roboto, sans-serif; }
+.align-wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+h1 { font-size: 26px; margin: 0 0 6px; }
+.sub { color: #9fb0d0; margin: 0 0 24px; }
+.dropzone { border: 2px dashed #2b3b60; border-radius: 14px; padding: 44px 20px;
+  text-align: center; cursor: pointer; transition: .15s; background: #0b1224; }
+.dropzone.drag { border-color: #5ac8fa; background: #0e1830; }
+.dropzone ul { list-style: none; padding: 0; margin: 0; }
+.dropzone li { color: #cfe0ff; }
+.btn { display: inline-block; border: none; border-radius: 10px; padding: 11px 18px;
+  font-weight: 600; cursor: pointer; margin: 16px 8px 0 0; text-decoration: none; }
+.btn.primary { background: #2f7cf6; color: #fff; }
+.btn.primary:disabled { background: #2a3550; color: #7f8db0; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: #9fb0d0; border: 1px solid #2b3b60; }
+.err { margin-top: 16px; background: #2a1420; border: 1px solid #7a2e46;
+  color: #ffc0cf; padding: 12px 14px; border-radius: 10px; }
+.progress { margin-top: 24px; }
+.bar { height: 8px; background: #16203a; border-radius: 6px; overflow: hidden; }
+.fill { height: 100%; background: linear-gradient(90deg,#2f7cf6,#5ac8fa); transition: width .4s; }
+.stage { margin-top: 10px; color: #9fb0d0; font-variant-numeric: tabular-nums; }
+.hint { color: #6b7aa0; font-size: 13px; }
+.result { margin-top: 24px; }
+.method-banner { border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
+  display: flex; flex-direction: column; gap: 4px; }
+.method-banner.sutura { background: #0d2438; border: 1px solid #1f6feb; }
+.method-banner.paste2 { background: #2a1c0d; border: 1px solid #b8791f; }
+.method-banner strong { font-size: 17px; }
+.method-banner span { color: #cfe0ff; }
+.viewer { height: 360px; border-radius: 12px; overflow: hidden; background: #070b16;
+  border: 1px solid #16203a; }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; margin: 16px 0; }
+.metrics div { display: flex; justify-content: space-between; border-bottom: 1px solid #16203a;
+  padding: 6px 0; }
+.metrics .k { color: #9fb0d0; } .metrics .v { font-weight: 600; }

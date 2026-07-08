@@ -1,0 +1,4 @@
+dataset,tissue,adapt_mode,gene_overlap,adapt_applicable,sutura_zeroshot,sutura_adapted,paste2,best_method,best_error,adapt_seconds,adapt_epochs,adapt_beats_paste2,severity,seed
+Br8100,human DLPFC,cross,1.0,True,9.448,6.741,3.394,paste2,3.394,136.6,30,False,4.0,0
+mouse,mouse brain,self,0.001,False,,,5.421,paste2,5.421,0.0,0,False,4.0,0
+breast,human breast cancer,self,0.872,True,26.853,7.918,3.609,paste2,3.609,175.0,30,False,4.0,0

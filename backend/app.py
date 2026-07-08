@@ -107,7 +107,7 @@ async def align(files: list[UploadFile] = File(...)):
             raise HTTPException(422, f"{s.name}: {err}")
 
     _write_status(job_id, status="queued", stage="queued", progress=0,
-                  n_files=len(saved), filenames=[f.name for f in files])
+                  n_files=len(saved), filenames=[f.filename for f in files])
     _executor.submit(_run_job, job_id, [str(s) for s in saved])
     return {"job_id": job_id, "status": "queued"}
 
