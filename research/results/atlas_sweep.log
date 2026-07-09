@@ -14,3 +14,6 @@
 [17:37:43]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=19.064 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [38s]
 [17:37:43] --- Parent_Visium_Human_Cerebellum (human cerebellum) ---
 [17:37:43]     downloading 10x sample Parent_Visium_Human_Cerebellum ...
+[17:44:57]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=25.86 adapted=2.592 paste2=2.653 -> chosen=sutura_adapted(2.592) best=sutura_adapted(2.592) [434s]
+[17:44:57] --- Parent_Visium_Human_SpinalCord (human spinal cord) ---
+[17:44:57]     downloading 10x sample Parent_Visium_Human_SpinalCord ...
