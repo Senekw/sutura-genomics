@@ -32,3 +32,6 @@
 [18:09:09]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=22.462 adapted=2.239 paste2=1.003 -> chosen=paste2(1.003) best=paste2(1.003) [259s]
 [18:09:09] --- Targeted_Visium_Human_Cerebellum_Neuroscience (human cerebellum (targeted panel)) ---
 [18:09:09]     downloading 10x sample Targeted_Visium_Human_Cerebellum_Neuroscience ...
+[18:09:56]   route=paste2 conf=0.02 overlap=0.035 | zeroshot=25.698 adapted=None paste2=3.619 -> chosen=paste2(3.619) best=paste2(3.619) [47s]
+[18:09:56] --- Targeted_Visium_Human_SpinalCord_Neuroscience (human spinal cord (targeted panel)) ---
+[18:09:56]     downloading 10x sample Targeted_Visium_Human_SpinalCord_Neuroscience ...
