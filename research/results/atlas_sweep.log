@@ -20,3 +20,6 @@
 [17:48:42]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=16.611 adapted=1.017 paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [225s]
 [17:48:42] --- Parent_Visium_Human_Glioblastoma (human glioblastoma) ---
 [17:48:42]     downloading 10x sample Parent_Visium_Human_Glioblastoma ...
+[17:53:33]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.132 adapted=1.783 paste2=1.006 -> chosen=paste2(1.006) best=paste2(1.006) [290s]
+[17:53:33] --- Parent_Visium_Human_BreastCancer (human breast cancer) ---
+[17:53:33]     downloading 10x sample Parent_Visium_Human_BreastCancer ...
