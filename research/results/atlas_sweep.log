@@ -8,3 +8,6 @@
 [17:36:23]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=24.188 adapted=3.246 paste2=2.017 -> chosen=paste2(2.017) best=paste2(2.017) [357s]
 [17:36:23] --- V1_Mouse_Kidney (mouse kidney) ---
 [17:36:23]     downloading 10x sample V1_Mouse_Kidney ...
+[17:37:05]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=13.958 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [42s]
+[17:37:05] --- V1_Adult_Mouse_Brain (mouse brain (whole)) ---
+[17:37:05]     downloading 10x sample V1_Adult_Mouse_Brain ...
