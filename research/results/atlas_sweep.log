@@ -35,3 +35,6 @@
 [18:09:56]   route=paste2 conf=0.02 overlap=0.035 | zeroshot=25.698 adapted=None paste2=3.619 -> chosen=paste2(3.619) best=paste2(3.619) [47s]
 [18:09:56] --- Targeted_Visium_Human_SpinalCord_Neuroscience (human spinal cord (targeted panel)) ---
 [18:09:56]     downloading 10x sample Targeted_Visium_Human_SpinalCord_Neuroscience ...
+[18:10:27]   route=paste2 conf=0.02 overlap=0.035 | zeroshot=19.263 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [31s]
+[18:10:27] --- Targeted_Visium_Human_Glioblastoma_Pan_Cancer (human glioblastoma (targeted panel)) ---
+[18:10:27]     downloading 10x sample Targeted_Visium_Human_Glioblastoma_Pan_Cancer ...
