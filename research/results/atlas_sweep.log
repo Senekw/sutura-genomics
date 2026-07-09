@@ -5,3 +5,6 @@
 [17:30:26] running 16 of 25 datasets: ['V1_Human_Heart', 'V1_Mouse_Kidney', 'V1_Adult_Mouse_Brain', 'Parent_Visium_Human_Cerebellum', 'Parent_Visium_Human_SpinalCord', 'Parent_Visium_Human_Glioblastoma', 'Parent_Visium_Human_BreastCancer', 'Parent_Visium_Human_OvarianCancer', 'Parent_Visium_Human_ColorectalCancer', 'Targeted_Visium_Human_Cerebellum_Neuroscience', 'Targeted_Visium_Human_SpinalCord_Neuroscience', 'Targeted_Visium_Human_Glioblastoma_Pan_Cancer', 'Targeted_Visium_Human_BreastCancer_Immunology', 'Targeted_Visium_Human_OvarianCancer_Pan_Cancer', 'Targeted_Visium_Human_OvarianCancer_Immunology', 'Targeted_Visium_Human_ColorectalCancer_GeneSignature']
 [17:30:26] --- V1_Human_Heart (human heart) ---
 [17:30:28]     downloading 10x sample V1_Human_Heart ...
+[17:36:23]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=24.188 adapted=3.246 paste2=2.017 -> chosen=paste2(2.017) best=paste2(2.017) [357s]
+[17:36:23] --- V1_Mouse_Kidney (mouse kidney) ---
+[17:36:23]     downloading 10x sample V1_Mouse_Kidney ...
