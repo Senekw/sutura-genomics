@@ -5,3 +5,23 @@
 [08:53:47] --- DLPFC_Br5292 (human DLPFC) ---
 [09:00:34]   route=sutura conf=0.922 overlap=1.0 | zeroshot=1.409 adapted=8.196 paste2=5.597 -> chosen=sutura_zeroshot(1.409) best=sutura_zeroshot(1.409) [408s]
 [09:00:34] --- DLPFC_Br5595 (human DLPFC) ---
+[09:06:13]   route=sutura conf=0.902 overlap=1.0 | zeroshot=1.19 adapted=9.192 paste2=5.597 -> chosen=sutura_zeroshot(1.19) best=sutura_zeroshot(1.19) [339s]
+[09:06:13] --- DLPFC_Br8100 (human DLPFC) ---
+[09:10:56]   route=paste2 conf=0.032 overlap=1.0 | zeroshot=9.448 adapted=6.741 paste2=3.491 -> chosen=paste2(3.491) best=paste2(3.491) [282s]
+[09:10:56] --- breast_block_a (human breast cancer) ---
+[09:16:24]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=26.853 adapted=7.918 paste2=4.014 -> chosen=paste2(4.014) best=paste2(4.014) [328s]
+[09:16:24] --- mouse_sagittal_post (mouse brain) ---
+[09:16:50]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=20.853 adapted=None paste2=6.041 -> chosen=paste2(6.041) best=paste2(6.041) [26s]
+[09:16:50] --- mouse_sagittal_ant (mouse brain) ---
+[09:16:50]     downloading 10x sample V1_Mouse_Brain_Sagittal_Anterior ...
+[09:16:57]     downloading 10x sample V1_Mouse_Brain_Sagittal_Anterior_Section_2 ...
+[09:17:29]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=18.277 adapted=None paste2=5.329 -> chosen=paste2(5.329) best=paste2(5.329) [40s]
+[09:17:29] --- human_brain_cbl (human brain (cerebellum)) ---
+[09:17:29]     downloading 10x sample V1_Human_Brain_Section_1 ...
+[09:17:36]     downloading 10x sample V1_Human_Brain_Section_2 ...
+[09:24:49]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=27.664 adapted=16.745 paste2=4.363 -> chosen=paste2(4.363) best=paste2(4.363) [440s]
+[09:24:49] --- mouse_coronal (mouse brain (coronal)) ---
+[09:24:49]     downloading 10x sample V1_Adult_Mouse_Brain_Coronal_Section_1 ...
+[09:24:56]     downloading 10x sample V1_Adult_Mouse_Brain_Coronal_Section_2 ...
+[09:25:29]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=19.232 adapted=None paste2=2.655 -> chosen=paste2(2.655) best=paste2(2.655) [39s]
+[09:25:29] === done: wrote atlas_sweep.csv (8 rows) ===
