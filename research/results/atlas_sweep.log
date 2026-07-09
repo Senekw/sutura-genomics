@@ -11,3 +11,6 @@
 [17:37:05]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=13.958 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [42s]
 [17:37:05] --- V1_Adult_Mouse_Brain (mouse brain (whole)) ---
 [17:37:05]     downloading 10x sample V1_Adult_Mouse_Brain ...
+[17:37:43]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=19.064 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [38s]
+[17:37:43] --- Parent_Visium_Human_Cerebellum (human cerebellum) ---
+[17:37:43]     downloading 10x sample Parent_Visium_Human_Cerebellum ...
