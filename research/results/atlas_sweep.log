@@ -3,3 +3,5 @@
 [08:53:34] building Projector (frozen DLPFC basis + training-donor distribution) ...
 [08:53:47] running 8 datasets: ['DLPFC_Br5292', 'DLPFC_Br5595', 'DLPFC_Br8100', 'breast_block_a', 'mouse_sagittal_post', 'mouse_sagittal_ant', 'human_brain_cbl', 'mouse_coronal']
 [08:53:47] --- DLPFC_Br5292 (human DLPFC) ---
+[09:00:34]   route=sutura conf=0.922 overlap=1.0 | zeroshot=1.409 adapted=8.196 paste2=5.597 -> chosen=sutura_zeroshot(1.409) best=sutura_zeroshot(1.409) [408s]
+[09:00:34] --- DLPFC_Br5595 (human DLPFC) ---
