@@ -44,3 +44,6 @@
 [18:11:33]   route=paste2 conf=0.02 overlap=0.031 | zeroshot=22.565 adapted=None paste2=2.65 -> chosen=paste2(2.65) best=paste2(2.65) [35s]
 [18:11:33] --- Targeted_Visium_Human_OvarianCancer_Pan_Cancer (human ovarian cancer (targeted panel)) ---
 [18:11:33]     downloading 10x sample Targeted_Visium_Human_OvarianCancer_Pan_Cancer ...
+[18:12:10]   route=paste2 conf=0.02 overlap=0.037 | zeroshot=22.031 adapted=None paste2=1.735 -> chosen=paste2(1.735) best=paste2(1.735) [36s]
+[18:12:10] --- Targeted_Visium_Human_OvarianCancer_Immunology (human ovarian cancer (targeted immuno)) ---
+[18:12:10]     downloading 10x sample Targeted_Visium_Human_OvarianCancer_Immunology ...
