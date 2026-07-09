@@ -1,52 +1,8 @@
-[17:30:14] === atlas sweep start ===
-[17:30:14] logged 3 skipped source classes -> atlas_sweep_skipped.csv
-[17:30:14] building Projector (frozen DLPFC basis + training-donor distribution) ...
-[17:30:26] resuming: 9 datasets already in CSV -> skipping them
-[17:30:26] running 16 of 25 datasets: ['V1_Human_Heart', 'V1_Mouse_Kidney', 'V1_Adult_Mouse_Brain', 'Parent_Visium_Human_Cerebellum', 'Parent_Visium_Human_SpinalCord', 'Parent_Visium_Human_Glioblastoma', 'Parent_Visium_Human_BreastCancer', 'Parent_Visium_Human_OvarianCancer', 'Parent_Visium_Human_ColorectalCancer', 'Targeted_Visium_Human_Cerebellum_Neuroscience', 'Targeted_Visium_Human_SpinalCord_Neuroscience', 'Targeted_Visium_Human_Glioblastoma_Pan_Cancer', 'Targeted_Visium_Human_BreastCancer_Immunology', 'Targeted_Visium_Human_OvarianCancer_Pan_Cancer', 'Targeted_Visium_Human_OvarianCancer_Immunology', 'Targeted_Visium_Human_ColorectalCancer_GeneSignature']
-[17:30:26] --- V1_Human_Heart (human heart) ---
-[17:30:28]     downloading 10x sample V1_Human_Heart ...
-[17:36:23]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=24.188 adapted=3.246 paste2=2.017 -> chosen=paste2(2.017) best=paste2(2.017) [357s]
-[17:36:23] --- V1_Mouse_Kidney (mouse kidney) ---
-[17:36:23]     downloading 10x sample V1_Mouse_Kidney ...
-[17:37:05]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=13.958 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [42s]
-[17:37:05] --- V1_Adult_Mouse_Brain (mouse brain (whole)) ---
-[17:37:05]     downloading 10x sample V1_Adult_Mouse_Brain ...
-[17:37:43]   route=paste2 conf=0.02 overlap=0.001 | zeroshot=19.064 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [38s]
-[17:37:43] --- Parent_Visium_Human_Cerebellum (human cerebellum) ---
-[17:37:43]     downloading 10x sample Parent_Visium_Human_Cerebellum ...
-[17:44:57]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=25.86 adapted=2.592 paste2=2.653 -> chosen=sutura_adapted(2.592) best=sutura_adapted(2.592) [434s]
-[17:44:57] --- Parent_Visium_Human_SpinalCord (human spinal cord) ---
-[17:44:57]     downloading 10x sample Parent_Visium_Human_SpinalCord ...
-[17:48:42]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=16.611 adapted=1.017 paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [225s]
-[17:48:42] --- Parent_Visium_Human_Glioblastoma (human glioblastoma) ---
-[17:48:42]     downloading 10x sample Parent_Visium_Human_Glioblastoma ...
-[17:53:33]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.132 adapted=1.783 paste2=1.006 -> chosen=paste2(1.006) best=paste2(1.006) [290s]
-[17:53:33] --- Parent_Visium_Human_BreastCancer (human breast cancer) ---
-[17:53:33]     downloading 10x sample Parent_Visium_Human_BreastCancer ...
-[17:59:57]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.588 adapted=3.732 paste2=2.0 -> chosen=paste2(2.0) best=paste2(2.0) [384s]
-[17:59:57] --- Parent_Visium_Human_OvarianCancer (human ovarian cancer) ---
-[17:59:57]     downloading 10x sample Parent_Visium_Human_OvarianCancer ...
-[18:04:50]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.487 adapted=4.392 paste2=1.005 -> chosen=paste2(1.005) best=paste2(1.005) [293s]
-[18:04:50] --- Parent_Visium_Human_ColorectalCancer (human colorectal cancer) ---
-[18:04:50]     downloading 10x sample Parent_Visium_Human_ColorectalCancer ...
-[18:09:09]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=22.462 adapted=2.239 paste2=1.003 -> chosen=paste2(1.003) best=paste2(1.003) [259s]
-[18:09:09] --- Targeted_Visium_Human_Cerebellum_Neuroscience (human cerebellum (targeted panel)) ---
-[18:09:09]     downloading 10x sample Targeted_Visium_Human_Cerebellum_Neuroscience ...
-[18:09:56]   route=paste2 conf=0.02 overlap=0.035 | zeroshot=25.698 adapted=None paste2=3.619 -> chosen=paste2(3.619) best=paste2(3.619) [47s]
-[18:09:56] --- Targeted_Visium_Human_SpinalCord_Neuroscience (human spinal cord (targeted panel)) ---
-[18:09:56]     downloading 10x sample Targeted_Visium_Human_SpinalCord_Neuroscience ...
-[18:10:27]   route=paste2 conf=0.02 overlap=0.035 | zeroshot=19.263 adapted=None paste2=0.0 -> chosen=paste2(0.0) best=paste2(0.0) [31s]
-[18:10:27] --- Targeted_Visium_Human_Glioblastoma_Pan_Cancer (human glioblastoma (targeted panel)) ---
-[18:10:27]     downloading 10x sample Targeted_Visium_Human_Glioblastoma_Pan_Cancer ...
-[18:10:58]   route=paste2 conf=0.02 overlap=0.037 | zeroshot=21.504 adapted=None paste2=1.006 -> chosen=paste2(1.006) best=paste2(1.006) [31s]
-[18:10:58] --- Targeted_Visium_Human_BreastCancer_Immunology (human breast cancer (targeted panel)) ---
-[18:10:58]     downloading 10x sample Targeted_Visium_Human_BreastCancer_Immunology ...
-[18:11:33]   route=paste2 conf=0.02 overlap=0.031 | zeroshot=22.565 adapted=None paste2=2.65 -> chosen=paste2(2.65) best=paste2(2.65) [35s]
-[18:11:33] --- Targeted_Visium_Human_OvarianCancer_Pan_Cancer (human ovarian cancer (targeted panel)) ---
-[18:11:33]     downloading 10x sample Targeted_Visium_Human_OvarianCancer_Pan_Cancer ...
-[18:12:10]   route=paste2 conf=0.02 overlap=0.037 | zeroshot=22.031 adapted=None paste2=1.735 -> chosen=paste2(1.735) best=paste2(1.735) [36s]
-[18:12:10] --- Targeted_Visium_Human_OvarianCancer_Immunology (human ovarian cancer (targeted immuno)) ---
-[18:12:10]     downloading 10x sample Targeted_Visium_Human_OvarianCancer_Immunology ...
-[18:12:39]   route=paste2 conf=0.02 overlap=0.031 | zeroshot=20.911 adapted=None paste2=1.735 -> chosen=paste2(1.735) best=paste2(1.735) [29s]
-[18:12:39] --- Targeted_Visium_Human_ColorectalCancer_GeneSignature (human colorectal cancer (targeted panel)) ---
-[18:12:39]     downloading 10x sample Targeted_Visium_Human_ColorectalCancer_GeneSignature ...
+[18:21:04] === atlas sweep start ===
+[18:21:04] logged 3 skipped source classes -> atlas_sweep_skipped.csv
+[18:21:04] building Projector (frozen DLPFC basis + training-donor distribution) ...
+[18:21:17] resuming: 24 datasets already in CSV -> skipping them
+[18:21:17] running 1 of 1 datasets: ['V1_Human_Lymph_Node']
+[18:21:17] --- V1_Human_Lymph_Node (human lymph node) ---
+[18:27:54]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=21.992 adapted=8.581 paste2=1.744 -> chosen=paste2(1.744) best=paste2(1.744) [397s]
+[18:27:54] === done: wrote atlas_sweep.csv (25 rows) ===
