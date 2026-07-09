@@ -26,3 +26,6 @@
 [17:59:57]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.588 adapted=3.732 paste2=2.0 -> chosen=paste2(2.0) best=paste2(2.0) [384s]
 [17:59:57] --- Parent_Visium_Human_OvarianCancer (human ovarian cancer) ---
 [17:59:57]     downloading 10x sample Parent_Visium_Human_OvarianCancer ...
+[18:04:50]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.487 adapted=4.392 paste2=1.005 -> chosen=paste2(1.005) best=paste2(1.005) [293s]
+[18:04:50] --- Parent_Visium_Human_ColorectalCancer (human colorectal cancer) ---
+[18:04:50]     downloading 10x sample Parent_Visium_Human_ColorectalCancer ...
