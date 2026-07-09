@@ -96,6 +96,16 @@ def V(sample_id):  # 10x visium_sge download
     return {"kind": "10x", "sample_id": sample_id}
 
 
+def SELF(sample_id, tissue, expected="off-distribution"):
+    """A single 10x section as a self-alignment datapoint: aligned to a synthetically
+    warped copy of itself (mov == ref). No serial partner needed, so this covers every
+    single-section tissue in the 10x catalog. The distribution-check / routing map is
+    valid per tissue; error is self-warp recovery (easier than true serial pairs -> the
+    mode column marks it so the two are not conflated)."""
+    return dict(name=sample_id, tissue=tissue, platform="Visium", expected=expected,
+                source="10x", mode="self", ref=V(sample_id), mov=V(sample_id), extra=[])
+
+
 REGISTRY = [
     # ---- in-distribution: DLPFC (spatialLIBD), one pair per donor + siblings ----
     dict(name="DLPFC_Br5292", tissue="human DLPFC", platform="Visium",
@@ -131,21 +141,38 @@ REGISTRY = [
          expected="off-distribution", source="10x",
          ref=V("V1_Adult_Mouse_Brain_Coronal_Section_1"),
          mov=V("V1_Adult_Mouse_Brain_Coronal_Section_2"), extra=[]),
+    # ---- every remaining 10x public Visium tissue, as self-alignment datapoints ----
+    # whole-transcriptome single sections
+    SELF("V1_Human_Heart", "human heart"),
+    SELF("V1_Human_Lymph_Node", "human lymph node"),
+    SELF("V1_Mouse_Kidney", "mouse kidney"),
+    SELF("V1_Adult_Mouse_Brain", "mouse brain (whole)"),
+    SELF("Parent_Visium_Human_Cerebellum", "human cerebellum"),
+    SELF("Parent_Visium_Human_SpinalCord", "human spinal cord"),
+    SELF("Parent_Visium_Human_Glioblastoma", "human glioblastoma"),
+    SELF("Parent_Visium_Human_BreastCancer", "human breast cancer"),
+    SELF("Parent_Visium_Human_OvarianCancer", "human ovarian cancer"),
+    SELF("Parent_Visium_Human_ColorectalCancer", "human colorectal cancer"),
+    # targeted gene-panel sections (~1k genes -> low overlap; a gene-gate stress test)
+    SELF("Targeted_Visium_Human_Cerebellum_Neuroscience", "human cerebellum (targeted panel)"),
+    SELF("Targeted_Visium_Human_SpinalCord_Neuroscience", "human spinal cord (targeted panel)"),
+    SELF("Targeted_Visium_Human_Glioblastoma_Pan_Cancer", "human glioblastoma (targeted panel)"),
+    SELF("Targeted_Visium_Human_BreastCancer_Immunology", "human breast cancer (targeted panel)"),
+    SELF("Targeted_Visium_Human_OvarianCancer_Pan_Cancer", "human ovarian cancer (targeted panel)"),
+    SELF("Targeted_Visium_Human_OvarianCancer_Immunology", "human ovarian cancer (targeted immuno)"),
+    SELF("Targeted_Visium_Human_ColorectalCancer_GeneSignature", "human colorectal cancer (targeted panel)"),
 ]
 
-# sources we deliberately skip, with the reason (logged for the findings)
+# sources we deliberately skip, with the reason (logged for the findings). The 10x
+# single-section tissues that were previously skipped are now COVERED via self-alignment
+# (see SELF() entries above); what remains skipped is non-Visium / no-array-grid data.
 SKIPS = [
-    ("V1_Human_Heart", "single section only - no >=2 array-aligned serial sections"),
-    ("V1_Human_Lymph_Node", "single section only - no serial pair"),
-    ("V1_Mouse_Kidney", "single section only - no serial pair"),
-    ("V1_Adult_Mouse_Brain", "single section only - no serial pair"),
-    ("Parent/Targeted_Visium_* (cerebellum/spinal/glioblastoma/breast/ovarian/colorectal)",
-     "same physical section run with two gene panels - not adjacent serial sections"),
-    ("squidpy visium_hne_adata / visium_fluo_adata", "single section - no serial pair"),
+    ("squidpy visium_hne_adata / visium_fluo_adata",
+     "single mouse-brain section - already represented by V1_Adult_Mouse_Brain (self-align)"),
     ("squidpy slideseqv2 / merfish / seqfish / imc / four_i / mibitof",
      "no Visium array grid (array_row/array_col) - array-bridge GT not derivable"),
     ("GEO spatial series (generic)",
-     "no standardized array-aligned serial pair via direct download - bespoke per-series format"),
+     "no standardized array-aligned pair via direct download - bespoke per-series format"),
 ]
 
 
@@ -254,7 +281,7 @@ def run_paste2(A, B, cap=PASTE2_CAP):
 # --------------------------------------------------------------------------- #
 # per-dataset
 # --------------------------------------------------------------------------- #
-COLS = ["name", "tissue", "platform", "source", "expected_class",
+COLS = ["name", "tissue", "platform", "source", "mode", "expected_class",
         "n_spots_ref", "n_spots_mov", "gene_overlap", "maha",
         "in_dist_confidence", "in_distribution", "route", "gt_coverage", "error_type",
         "sutura_zeroshot", "sutura_adapted", "paste2",
@@ -329,7 +356,8 @@ def run_dataset(spec, ctx, args):
         notes.append(f"zero-shot no bridge GT; footprint proxy={round(zs_proxy,3)}")
     return {
         "name": name, "tissue": spec["tissue"], "platform": spec["platform"],
-        "source": spec["source"], "expected_class": spec["expected"],
+        "source": spec["source"], "mode": spec.get("mode", "serial"),
+        "expected_class": spec["expected"],
         "n_spots_ref": A.n_obs, "n_spots_mov": B.n_obs,
         "gene_overlap": overlap, "maha": dcheck["maha"],
         "in_dist_confidence": dcheck["confidence"], "in_distribution": in_dist,
@@ -402,10 +430,19 @@ def main():
 
     names = [n.strip() for n in args.only.split(",") if n.strip()]
     specs = [s for s in REGISTRY if not names or s["name"] in names]
-    log(f"running {len(specs)} datasets: {[s['name'] for s in specs]}")
 
+    # resume: keep datasets already in the CSV (deterministic), only run the rest
     rows = []
-    for spec in specs:
+    done = set()
+    if CSVP.exists():
+        for r in csv.DictReader(open(CSVP, encoding="utf-8")):
+            r.setdefault("mode", "serial")   # backfill for pre-mode rows (all serial)
+            rows.append(r); done.add(r["name"])
+        log(f"resuming: {len(done)} datasets already in CSV -> skipping them")
+    todo = [s for s in specs if s["name"] not in done]
+    log(f"running {len(todo)} of {len(specs)} datasets: {[s['name'] for s in todo]}")
+
+    for spec in todo:
         t0 = time.time()
         log(f"--- {spec['name']} ({spec['tissue']}) ---")
         try:

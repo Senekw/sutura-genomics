@@ -1,9 +1,4 @@
 source,skip_reason
-V1_Human_Heart,single section only - no >=2 array-aligned serial sections
-V1_Human_Lymph_Node,single section only - no serial pair
-V1_Mouse_Kidney,single section only - no serial pair
-V1_Adult_Mouse_Brain,single section only - no serial pair
-Parent/Targeted_Visium_* (cerebellum/spinal/glioblastoma/breast/ovarian/colorectal),same physical section run with two gene panels - not adjacent serial sections
-squidpy visium_hne_adata / visium_fluo_adata,single section - no serial pair
+squidpy visium_hne_adata / visium_fluo_adata,single mouse-brain section - already represented by V1_Adult_Mouse_Brain (self-align)
 squidpy slideseqv2 / merfish / seqfish / imc / four_i / mibitof,no Visium array grid (array_row/array_col) - array-bridge GT not derivable
-GEO spatial series (generic),no standardized array-aligned serial pair via direct download - bespoke per-series format
+GEO spatial series (generic),no standardized array-aligned pair via direct download - bespoke per-series format
