@@ -29,3 +29,6 @@
 [18:04:50]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=23.487 adapted=4.392 paste2=1.005 -> chosen=paste2(1.005) best=paste2(1.005) [293s]
 [18:04:50] --- Parent_Visium_Human_ColorectalCancer (human colorectal cancer) ---
 [18:04:50]     downloading 10x sample Parent_Visium_Human_ColorectalCancer ...
+[18:09:09]   route=paste2 conf=0.0 overlap=0.952 | zeroshot=22.462 adapted=2.239 paste2=1.003 -> chosen=paste2(1.003) best=paste2(1.003) [259s]
+[18:09:09] --- Targeted_Visium_Human_Cerebellum_Neuroscience (human cerebellum (targeted panel)) ---
+[18:09:09]     downloading 10x sample Targeted_Visium_Human_Cerebellum_Neuroscience ...
