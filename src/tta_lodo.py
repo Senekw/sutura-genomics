@@ -73,6 +73,7 @@ TTA_TEARP = 0.5
 TTA_PATIENCE = 4
 TTA_VAL_SEVS = (2.0, 6.0)
 TTA_VAL_SEED = 777
+MODE = "self"   # "self" (synthetic self-warps of held-out ref) | "sibling" (2nd pair GT)
 
 CSV_FIELDS = ["held_out_donor", "train_donors", "held_out_notta", "held_out_tta",
               "delta_tta", "paste2_error", "svd_ref_heldout", "tta_beats_paste2",
@@ -182,6 +183,63 @@ def tta_self_adapt(model, pair, seed=0):
     return model, steps_used
 
 
+def tta_sibling_adapt(model, adapt_pair, seed=0):
+    """Weakly-supervised TTA on the held-out donor's SECOND (disjoint) section pair,
+    using its real array-bridge correspondence (autoadapt.py `cross` mode). The
+    SCORING pair (donor's first pair) is never touched, so no scoring leakage - only
+    a different pair of the same donor provides adaptation signal. Returns
+    (adapted_model, steps_used)."""
+    rng = np.random.default_rng(seed)
+    torch.manual_seed(seed)
+    opt = torch.optim.Adam(model.parameters(), lr=TTA_LR)
+    gt_norm = adapt_pair["gt_norm"]
+    mask = adapt_pair["mask"]
+
+    def val_err(sevs, vseed):
+        model.eval()
+        errs = []
+        for sv in sevs:
+            w, _ = apply_warp(adapt_pair["B"], sv, seed=vseed, tear=True)
+            gb = graph_tensors(np.asarray(w.obsm["spatial"], float), adapt_pair["Z_B"],
+                               adapt_pair["knn"], adapt_pair["pitch"])
+            with torch.no_grad():
+                pred = model(adapt_pair["ga"], gb, adapt_pair["a_norm"]) * adapt_pair["pitch"]
+            errs.append(registration_error_stats(pred.numpy(), adapt_pair["gt"],
+                        mask=adapt_pair["have"])["median"] / adapt_pair["pitch"])
+        return float(np.mean(errs))
+
+    best_val = val_err(TTA_VAL_SEVS, TTA_VAL_SEED)
+    best_state = {k: t.clone() for k, t in model.state_dict().items()}
+    bad = 0
+    steps_used = 0
+    for epoch in range(TTA_EPOCHS):
+        model.train()
+        for _ in range(TTA_STEPS):
+            sv = float(rng.uniform(0, TTA_MAXSEV))
+            w, _ = apply_warp(adapt_pair["B"], sv, seed=int(rng.integers(1, 99999)),
+                              tear=bool(rng.random() < TTA_TEARP))
+            gb = graph_tensors(np.asarray(w.obsm["spatial"], float), adapt_pair["Z_B"],
+                               adapt_pair["knn"], adapt_pair["pitch"])
+            opt.zero_grad()
+            pred = model(adapt_pair["ga"], gb, adapt_pair["a_norm"])
+            loss = (pred - gt_norm)[mask].norm(dim=1).mean()
+            loss.backward()
+            opt.step()
+            steps_used += 1
+        if epoch % 2 == 0 or epoch == TTA_EPOCHS - 1:
+            v = val_err(TTA_VAL_SEVS, TTA_VAL_SEED)
+            if v < best_val - 1e-3:
+                best_val = v
+                best_state = {k: t.clone() for k, t in model.state_dict().items()}
+                bad = 0
+            else:
+                bad += 1
+                if bad >= TTA_PATIENCE:
+                    break
+    model.load_state_dict(best_state)
+    return model, steps_used
+
+
 # --------------------------------------------------------------------------- #
 def run_fold(ho):
     """Train the base aligner (reuse gm.train_fold unchanged, captured via
@@ -220,7 +278,12 @@ def run_fold(ho):
 
     # Adapt a COPY so the no-TTA number stays the base model's.
     tta_model = copy.deepcopy(base_model)
-    tta_model, steps_used = tta_self_adapt(tta_model, ho_pair, seed=0)
+    if MODE == "sibling":
+        # held-out donor's SECOND pair (disjoint from the scoring pair) with real GT
+        adapt_pair = gm.prep_pair(*gm.DONORS[ho][1], basis, gm.HP["knn"])
+        tta_model, steps_used = tta_sibling_adapt(tta_model, adapt_pair, seed=0)
+    else:
+        tta_model, steps_used = tta_self_adapt(tta_model, ho_pair, seed=0)
     tta_err = eval_ho(tta_model, ho_pair)
 
     return dict(in_dist=r["in_dist"], notta=notta, tta=round(tta_err, 3),
@@ -335,14 +398,29 @@ def summarize():
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--plot-only", action="store_true")
+    p.add_argument("--mode", choices=["self", "sibling"], default="self",
+                   help="self: synthetic self-warps of held-out ref (no target GT); "
+                        "sibling: held-out donor's 2nd pair with real GT (weakly sup.)")
+    p.add_argument("--tag", default="", help="output-file suffix")
     args = p.parse_args()
+
+    global MODE, CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
+    MODE = args.mode
+    if args.tag:
+        t = args.tag
+        CSV_PATH = OUT_DIR / f"tta_lodo_{t}.csv"
+        LOG_PATH = OUT_DIR / f"tta_lodo_{t}.log"
+        PNG_PATH = OUT_DIR / f"tta_lodo_{t}.png"
+        FINDINGS_PATH = ROOT / "research" / f"FINDINGS_tta_lodo_{t}.md"
+        LOCK_PATH = OUT_DIR / f"tta_lodo_{t}.lock"
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     if args.plot_only:
         summarize()
         return
 
     log("=" * 72)
-    log("TTA-LODO run start (self-supervised TTA on held-out donor, SVD features)")
+    log(f"TTA-LODO run start (mode={MODE}, SVD features) out={CSV_PATH.name}")
     log(f"base cfg: augment_reg epochs={CFG.epochs}; TTA epochs={TTA_EPOCHS} "
         f"steps={TTA_STEPS} lr={TTA_LR} patience={TTA_PATIENCE}")
     log(f"PASTE2 refs: {gm.PASTE2} | prior SVD plateau {SVD_REF_HELDOUT}")
