@@ -1,30 +1,30 @@
 # Foundation-model features vs Sutura SVD - cross-donor generalization
 
-_Generated 2026-07-10T15:48:27Z on branch `foundation-features`._
+_Generated 2026-07-10T17:04:04Z on branch `foundation-features`._
 
 **Question.** Sutura's per-fold TruncatedSVD node features plateau at ~9.6 spot-pitches held-out-donor error (PASTE2 ~3.5). Does swapping in a pretrained/self-supervised foundation-model embedding - with the alignment architecture, tear benchmark, LODO protocol, and training recipe (augmentation + weight decay + early stopping) all held fixed - move held-out error toward or below PASTE2?
 
 
-**Headline.** Best embedding = `scvi` at 12.52 pitches held-out (PASTE2 5.28, prior SVD 9.6). It **does NOT help vs the SVD plateau** (moves -2.92 vs the SVD plateau; +7.24 vs PASTE2).
+**Headline.** Best embedding = `svd` at 8.26 pitches held-out (PASTE2 4.36, prior SVD 9.6). It **narrows but does NOT reach PASTE2** (moves +1.34 vs the SVD plateau; +3.90 vs PASTE2).
 
 
 ## Ranked held-out error (mean over LODO folds, lower is better)
 
 | rank | feature | held-out (pitch) | PASTE2 | vs PASTE2 | vs SVD plateau | folds |
 |---|---|---|---|---|---|---|
-| 1 | `scvi` | 12.52 | 5.28 | +7.24 | +2.92 | 1 |
-| 2 | `svd` | 13.69 | 5.28 | +8.41 | +4.09 | 1 |
+| 1 | `svd` | 8.26 | 4.36 | +3.90 | -1.34 | 3 |
 
-Reference lines: prior SVD plateau 9.6, PASTE2 mean 5.28 pitches.
+Reference lines: prior SVD plateau 9.6, PASTE2 mean 4.36 pitches.
 
 
 ## Per-fold detail
 
 | feature | held-out donor | held-out (pitch) | in-dist | PASTE2 | beats PASTE2 | dim | sec | status |
 |---|---|---|---|---|---|---|---|---|
-| `svd` | Br5292 | 13.687 | 8.381 | 5.28 | False | 50 | 114.2 | ok |
-| `scvi` | Br5292 | 12.522 | 7.924 | 5.28 | False | 50 | 80.3 | ok |
+| `svd` | Br5292 | 8.527 | 3.147 | 5.28 | False | 50 | 893.9 | ok |
+| `svd` | Br5595 | 7.826 | 3.17 | 4.35 | False | 50 | 1099.6 | ok |
+| `svd` | Br8100 | 8.44 | 3.423 | 3.46 | False | 50 | 967.0 | ok |
 
 ## Interpretation
 
-No embedding tested meaningfully beat the SVD plateau. The cross-donor gap does NOT appear to be fixable by swapping node features alone - consistent with the atlas-diversity result that the bottleneck is donor count / the alignment prior, not the expression featurizer.
+`svd` narrows the cross-donor gap materially vs the SVD plateau (8.26 vs 9.6) but still trails PASTE2 - the embedding is a better prior, yet not sufficient on its own.

@@ -7,3 +7,9 @@
 [2026-07-10T16:14:41Z] === feature 'svd' ===
 [2026-07-10T16:14:41Z] [svd] available: 
 [2026-07-10T16:29:35Z] [svd] hold-out Br5292: held_out=8.527 in_dist=3.147 (PASTE2 5.28, SVD_ref 9.6) dim=50 893.9s beats_paste2=False
+[2026-07-10T16:47:55Z] [svd] hold-out Br5595: held_out=7.826 in_dist=3.17 (PASTE2 4.35, SVD_ref 9.6) dim=50 1099.6s beats_paste2=False
+[2026-07-10T17:04:02Z] [svd] hold-out Br8100: held_out=8.44 in_dist=3.423 (PASTE2 3.46, SVD_ref 9.6) dim=50 967.0s beats_paste2=False
+[2026-07-10T17:04:04Z] wrote C:\Users\karti\arca\research\results\foundation_features.png
+[2026-07-10T17:04:04Z] wrote C:\Users\karti\arca\research\FINDINGS_foundation_features.md
+[2026-07-10T17:04:04Z] === feature 'scvi' ===
+[2026-07-10T17:04:09Z] [scvi] available: scvi-tools 1.5.0.post1
