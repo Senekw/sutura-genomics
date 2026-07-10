@@ -158,3 +158,4 @@ ValueError: Category 151507 not found in source registry. Cannot transfer setup 
 [2026-07-10T18:29:40Z] [scvi_batch] available: scvi-tools 1.5.0.post1
 [2026-07-10T18:31:58Z] another live instance holds the lock (pid 33396); exiting.
 [2026-07-10T18:52:24Z] [scvi_batch] hold-out Br5292: held_out=7.412 in_dist=2.671 (PASTE2 5.28, SVD_ref 9.6) dim=50 1363.7s beats_paste2=False
+[2026-07-10T19:17:39Z] [scvi_batch] hold-out Br5595: held_out=5.549 in_dist=2.812 (PASTE2 4.35, SVD_ref 9.6) dim=50 1514.9s beats_paste2=False

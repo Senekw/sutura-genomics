@@ -12,3 +12,4 @@ scgpt,,,,,,,9.6,,,,,skipped_unavailable,2026-07-10T18:28:27Z,"no backend importa
 geneformer,,,,,,,9.6,,,,,skipped_unavailable,2026-07-10T18:28:27Z,no backend importable (needs HuggingFace Geneformer model + tokenizer/median-dict download). geneformer: ModuleNotFoundError: No module named 'geneformer'
 uce,,,,,,,9.6,,,,,skipped_unavailable,2026-07-10T18:28:27Z,no backend importable (needs UCE repo + multi-GB protein-embedding + model checkpoint download). uce: ModuleNotFoundError: No module named 'uce' | UCE: ModuleNotFoundError: No module named 'UCE'
 scvi_batch,Br5292,Br5595+Br8100,50,2.671,7.412,5.28,9.6,False,2.132,4,1363.7,ok,2026-07-10T18:52:24Z,scvi-tools 1.5.0.post1
+scvi_batch,Br5595,Br5292+Br8100,50,2.812,5.549,4.35,9.6,False,1.199,4,1514.9,ok,2026-07-10T19:17:39Z,scvi-tools 1.5.0.post1
