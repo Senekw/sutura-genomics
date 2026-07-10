@@ -1,0 +1,5 @@
+[2026-07-10T23:30:10Z] ========================================================================
+[2026-07-10T23:30:10Z] TTA-LODO run start (mode=sibling, SVD features) out=tta_lodo_sibling.csv
+[2026-07-10T23:30:10Z] base cfg: augment_reg epochs=60; TTA epochs=30 steps=12 lr=0.001 patience=4
+[2026-07-10T23:30:10Z] PASTE2 refs: {'Br5292': 5.28, 'Br5595': 4.35, 'Br8100': 3.46} | prior SVD plateau 9.6
+[2026-07-10T23:30:10Z] ========================================================================
