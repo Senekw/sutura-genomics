@@ -1,0 +1,8 @@
+[2026-07-10T19:59:47Z] ========================================================================
+[2026-07-10T19:59:47Z] FOUNDATION-FEATURES run start | features=['svd', 'scvi'] | transductive=True | out=foundation_features_transductive.csv
+[2026-07-10T19:59:47Z] data dir: C:\Users\karti\arca\data
+[2026-07-10T19:59:47Z] config: foundation augment=True wd=0.0001 early_stop=True epochs=60 donors=['Br5292', 'Br5595', 'Br8100'] pairs_per_donor=2
+[2026-07-10T19:59:47Z] PASTE2 held-out refs (pitch): {'Br5292': 5.28, 'Br5595': 4.35, 'Br8100': 3.46}  |  prior SVD plateau 9.6
+[2026-07-10T19:59:47Z] ========================================================================
+[2026-07-10T19:59:47Z] === feature 'svd' ===
+[2026-07-10T19:59:47Z] [svd] available: 
