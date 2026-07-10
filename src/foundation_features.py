@@ -306,6 +306,22 @@ def make_backend(name):
 
 DEFAULT_FEATURES = ["svd", "scvi", "scvi_batch", "scgpt", "geneformer", "uce"]
 
+# Transductive-featurizer ablation: when True, the UNSUPERVISED featurizer (SVD basis
+# or scVI encoder) is fit on the held-out donor's cells too (a legit "target atlas"
+# setup), while the SUPERVISED aligner still trains on the 2 train donors only. Tests
+# whether the cross-donor gap is because the featurizer never saw the held-out donor's
+# expression distribution, vs the aligner being the bottleneck.
+TRANSDUCTIVE = False
+HELDOUT_SLICES = []
+
+
+def _feat_slices(train_slices):
+    """Slices the featurizer is fit on: + held-out donor's slices iff transductive."""
+    if TRANSDUCTIVE and HELDOUT_SLICES:
+        extra = [s for s in HELDOUT_SLICES if s not in set(train_slices)]
+        return list(train_slices) + extra
+    return list(train_slices)
+
 
 def append_row(row):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -330,13 +346,16 @@ def run_feature(name):
     log(f"[{name}] available: {detail}")
 
     def _patch():
-        gm.fit_fold_basis = lambda train_slices, feature, dim, hvg_n: backend.fit(train_slices)
+        gm.fit_fold_basis = lambda train_slices, feature, dim, hvg_n: backend.fit(_feat_slices(train_slices))
         gm.transform = lambda adata, basis: backend.transform(adata, basis)
 
+    global HELDOUT_SLICES
     _patch()
     donors = list(gm.DONORS)
     for ho in donors:
         train_donors = [d for d in donors if d != ho]
+        HELDOUT_SLICES = [s for pr in gm.DONORS[ho][:CFG.pairs_per_donor] for s in pr] \
+            if TRANSDUCTIVE else []
         t0 = time.time()
         try:
             r = gm.train_fold(CFG, train_donors, ho)
@@ -645,7 +664,22 @@ def main():
                    help="comma list from: " + ",".join(DEFAULT_FEATURES))
     p.add_argument("--plot-only", action="store_true",
                    help="regenerate png + findings from the existing csv and exit")
+    p.add_argument("--transductive", action="store_true",
+                   help="fit the unsupervised featurizer on the held-out donor too "
+                        "(supervised aligner still trains on the 2 train donors)")
+    p.add_argument("--tag", default="",
+                   help="suffix for the output files (keeps runs from colliding)")
     args = p.parse_args()
+
+    global CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH, TRANSDUCTIVE
+    TRANSDUCTIVE = args.transductive
+    if args.tag:
+        t = args.tag
+        CSV_PATH = OUT_DIR / f"foundation_features_{t}.csv"
+        LOG_PATH = OUT_DIR / f"foundation_features_{t}.log"
+        PNG_PATH = OUT_DIR / f"foundation_features_{t}.png"
+        FINDINGS_PATH = ROOT / "research" / f"FINDINGS_foundation_features_{t}.md"
+        LOCK_PATH = OUT_DIR / f"foundation_features_{t}.lock"
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     if args.plot_only:
@@ -657,7 +691,8 @@ def main():
 
     feats = [f.strip() for f in args.features.split(",") if f.strip()]
     log("=" * 72)
-    log(f"FOUNDATION-FEATURES run start | features={feats}")
+    log(f"FOUNDATION-FEATURES run start | features={feats} | "
+        f"transductive={TRANSDUCTIVE} | out={CSV_PATH.name}")
     log(f"data dir: {DATA_DIR}")
     log(f"config: {CFG.name} augment={CFG.augment} wd={CFG.weight_decay} "
         f"early_stop={CFG.early_stop} epochs={CFG.epochs} "
