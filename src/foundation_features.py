@@ -229,14 +229,19 @@ class ScviBackend(Backend):
         model = basis["model"]
         sub = self._subset(adata, basis["genes"])
         if basis["batch"]:
-            slice_id = str(adata.obs["sample_id"].iloc[0]) if "sample_id" in adata.obs \
+            sid = str(adata.obs["sample_id"].iloc[0]) if "sample_id" in adata.obs \
                 else "query"
-            sub.obs["slice_batch"] = slice_id
-            train_ids = set(basis["train_slices"])
-            seen = (slice_id in train_ids) or (f"DLPFC_{slice_id}" in train_ids)
-            if seen:
+            train_ids = set(basis["train_slices"])   # e.g. {"DLPFC_151669", ...}
+            # match the EXACT batch label used at training time (train_slices were
+            # "DLPFC_<id>"); a bare sample_id like "151669" is not a registered
+            # category and would raise on transfer.
+            label = (sid if sid in train_ids else
+                     f"DLPFC_{sid}" if f"DLPFC_{sid}" in train_ids else None)
+            if label is not None:                    # seen train donor
+                sub.obs["slice_batch"] = label
                 z = model.get_latent_representation(sub)
-            else:
+            else:                                     # unseen held-out donor
+                sub.obs["slice_batch"] = f"DLPFC_{sid}"
                 scvi.model.SCVI.prepare_query_anndata(sub, model)
                 q = scvi.model.SCVI.load_query_data(sub, model)
                 q.train(max_epochs=40, accelerator="cpu",
