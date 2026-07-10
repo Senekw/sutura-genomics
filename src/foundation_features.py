@@ -527,7 +527,11 @@ def write_findings(rows):
     lines.append("| feature | held-out donor | held-out (pitch) | in-dist | PASTE2 | "
                  "beats PASTE2 | dim | sec | status |")
     lines.append("|---|---|---|---|---|---|---|---|---|")
-    for r in rows:
+    _order = {f: i for i, f in enumerate(DEFAULT_FEATURES)}
+    detail_rows = sorted(_dedup_rows(rows),
+                         key=lambda r: (_order.get(r.get("feature", ""), 99),
+                                        r.get("held_out_donor", "")))
+    for r in detail_rows:
         if r.get("status") == "ok":
             lines.append(
                 f"| `{r['feature']}` | {r['held_out_donor']} | {r['held_out_error']} | "

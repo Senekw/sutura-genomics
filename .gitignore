@@ -35,3 +35,4 @@ research/results/ff.*
 research/results/*.lock
 research/results/*.pid
 research/results/.foundation_pid
+research/results/foundation_features.console.log
