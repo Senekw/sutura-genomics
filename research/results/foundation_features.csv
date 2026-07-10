@@ -7,3 +7,7 @@ scvi,Br5595,Br5292+Br8100,50,2.733,6.981,4.35,9.6,False,2.631,4,1305.4,ok,2026-0
 scvi,Br8100,Br5292+Br5595,50,2.662,7.909,3.46,9.6,False,4.449,4,1335.3,ok,2026-07-10T18:08:11Z,scvi-tools 1.5.0.post1
 scvi_batch,Br5292,Br5595+Br8100,,,,,9.6,,,,379.8,error,2026-07-10T18:14:31Z,ValueError: Category 151669 not found in source registry. Cannot transfer setup without `extend_categories = True`.
 scvi_batch,Br5595,Br5292+Br8100,,,,,9.6,,,,412.9,error,2026-07-10T18:21:24Z,ValueError: Category 151507 not found in source registry. Cannot transfer setup without `extend_categories = True`.
+scvi_batch,Br8100,Br5292+Br5595,,,,,9.6,,,,421.9,error,2026-07-10T18:28:26Z,ValueError: Category 151507 not found in source registry. Cannot transfer setup without `extend_categories = True`.
+scgpt,,,,,,,9.6,,,,,skipped_unavailable,2026-07-10T18:28:27Z,"no backend importable (needs pretrained scGPT checkpoint + gene vocab download, often flash-attn/CUDA). scgpt: ModuleNotFoundError: No module named 'scgpt'"
+geneformer,,,,,,,9.6,,,,,skipped_unavailable,2026-07-10T18:28:27Z,no backend importable (needs HuggingFace Geneformer model + tokenizer/median-dict download). geneformer: ModuleNotFoundError: No module named 'geneformer'
+uce,,,,,,,9.6,,,,,skipped_unavailable,2026-07-10T18:28:27Z,no backend importable (needs UCE repo + multi-GB protein-embedding + model checkpoint download). uce: ModuleNotFoundError: No module named 'uce' | UCE: ModuleNotFoundError: No module named 'UCE'

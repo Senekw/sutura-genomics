@@ -57,3 +57,93 @@ Traceback (most recent call last):
     raise ValueError(
 ValueError: Category 151669 not found in source registry. Cannot transfer setup without `extend_categories = True`.
 
+[2026-07-10T18:21:24Z] [scvi_batch] hold-out Br5595 FAILED after 412.9s: ValueError('Category 151507 not found in source registry. Cannot transfer setup without `extend_categories = True`.')
+Traceback (most recent call last):
+  File "C:\Users\karti\arca\src\foundation_features.py", line 337, in run_feature
+    donors = list(gm.DONORS)
+                ^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\src\generalization_max.py", line 178, in train_fold
+    train_pairs.append(prep_pair(pr[0], pr[1], basis, HP["knn"]))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\src\generalization_max.py", line 131, in prep_pair
+    Z_A = transform(A, basis)
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\src\foundation_features.py", line 329, in <lambda>
+    return
+           
+  File "C:\Users\karti\arca\src\foundation_features.py", line 238, in transform
+    label = (sid if sid in train_ids else
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\torch\utils\_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\model\base\_vaemixin.py", line 321, in get_latent_representation
+    adata = self._validate_anndata(adata)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\model\base\_base_model.py", line 598, in _validate_anndata
+    self._register_manager_for_instance(self.adata_manager.transfer_fields(adata))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\_manager.py", line 288, in transfer_fields
+    new_adata_manager.register_fields(adata_target, self._registry, **kwargs)
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\_manager.py", line 186, in register_fields
+    self._add_field(
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\_manager.py", line 224, in _add_field
+    field_registry[_constants._STATE_REGISTRY_KEY] = field.transfer_field(
+                                                     ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\fields\_dataframe_field.py", line 221, in transfer_field
+    raise ValueError(
+ValueError: Category 151507 not found in source registry. Cannot transfer setup without `extend_categories = True`.
+
+[2026-07-10T18:28:26Z] [scvi_batch] hold-out Br8100 FAILED after 421.9s: ValueError('Category 151507 not found in source registry. Cannot transfer setup without `extend_categories = True`.')
+Traceback (most recent call last):
+  File "C:\Users\karti\arca\src\foundation_features.py", line 337, in run_feature
+    donors = list(gm.DONORS)
+                ^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\src\generalization_max.py", line 178, in train_fold
+    train_pairs.append(prep_pair(pr[0], pr[1], basis, HP["knn"]))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\src\generalization_max.py", line 131, in prep_pair
+    Z_A = transform(A, basis)
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\src\foundation_features.py", line 329, in <lambda>
+    return
+           
+  File "C:\Users\karti\arca\src\foundation_features.py", line 238, in transform
+    label = (sid if sid in train_ids else
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\torch\utils\_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\model\base\_vaemixin.py", line 321, in get_latent_representation
+    adata = self._validate_anndata(adata)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\model\base\_base_model.py", line 598, in _validate_anndata
+    self._register_manager_for_instance(self.adata_manager.transfer_fields(adata))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\_manager.py", line 288, in transfer_fields
+    new_adata_manager.register_fields(adata_target, self._registry, **kwargs)
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\_manager.py", line 186, in register_fields
+    self._add_field(
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\_manager.py", line 224, in _add_field
+    field_registry[_constants._STATE_REGISTRY_KEY] = field.transfer_field(
+                                                     ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karti\arca\.venv\Lib\site-packages\scvi\data\fields\_dataframe_field.py", line 221, in transfer_field
+    raise ValueError(
+ValueError: Category 151507 not found in source registry. Cannot transfer setup without `extend_categories = True`.
+
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\results\foundation_features.png
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\FINDINGS_foundation_features.md
+[2026-07-10T18:28:27Z] === feature 'scgpt' ===
+[2026-07-10T18:28:27Z] [scgpt] SKIP - not available: no backend importable (needs pretrained scGPT checkpoint + gene vocab download, often flash-attn/CUDA). scgpt: ModuleNotFoundError: No module named 'scgpt'
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\results\foundation_features.png
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\FINDINGS_foundation_features.md
+[2026-07-10T18:28:27Z] === feature 'geneformer' ===
+[2026-07-10T18:28:27Z] [geneformer] SKIP - not available: no backend importable (needs HuggingFace Geneformer model + tokenizer/median-dict download). geneformer: ModuleNotFoundError: No module named 'geneformer'
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\results\foundation_features.png
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\FINDINGS_foundation_features.md
+[2026-07-10T18:28:27Z] === feature 'uce' ===
+[2026-07-10T18:28:27Z] [uce] SKIP - not available: no backend importable (needs UCE repo + multi-GB protein-embedding + model checkpoint download). uce: ModuleNotFoundError: No module named 'uce' | UCE: ModuleNotFoundError: No module named 'UCE'
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\results\foundation_features.png
+[2026-07-10T18:28:27Z] wrote C:\Users\karti\arca\research\FINDINGS_foundation_features.md
+[2026-07-10T18:28:27Z] FOUNDATION-FEATURES run complete.
+[2026-07-10T18:28:27Z] DONE

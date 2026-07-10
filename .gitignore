@@ -29,3 +29,9 @@ research/data/
 backend/_jobs/
 backend/_e2e_download.h5ad
 /genmax.log
+
+# foundation-features transient run artifacts (keep csv/png/log + FINDINGS tracked)
+research/results/ff.*
+research/results/*.lock
+research/results/*.pid
+research/results/.foundation_pid
