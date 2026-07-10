@@ -2,3 +2,4 @@ feature,held_out_donor,train_donors,feat_dim,in_dist_error,held_out_error,paste2
 svd,Br5292,Br5595+Br8100,50,3.085,8.783,5.28,9.6,False,3.503,4,1201.5,ok,2026-07-10T20:19:48Z,
 svd,Br5595,Br5292+Br8100,50,3.136,7.905,4.35,9.6,False,3.555,4,1224.9,ok,2026-07-10T20:40:13Z,
 svd,Br8100,Br5292+Br5595,50,3.312,9.784,3.46,9.6,False,6.324,4,1282.0,ok,2026-07-10T21:01:35Z,
+scvi,Br5292,Br5595+Br8100,50,2.827,6.767,5.28,9.6,False,1.487,4,1314.3,ok,2026-07-10T21:23:37Z,scvi-tools 1.5.0.post1
