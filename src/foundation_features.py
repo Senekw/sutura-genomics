@@ -48,7 +48,9 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import atexit
 import csv
+import os
 import sys
 import time
 import traceback
@@ -371,8 +373,26 @@ def _read_rows():
         return list(csv.DictReader(fh))
 
 
+def _dedup_rows(rows):
+    """Multiple runs may append rows for the same (feature, held-out donor); keep
+    the LAST occurrence of each so a concurrent/duplicate launch never inflates the
+    fold count or the mean."""
+    seen = {}
+    for r in rows:
+        key = (r.get("feature", ""), r.get("held_out_donor", ""), r.get("status", ""))
+        seen[key] = r
+    # prefer an 'ok' row over a skipped/error row for the same feature+donor
+    best = {}
+    for (feat, ho, st), r in seen.items():
+        k = (feat, ho)
+        if k not in best or (r.get("status") == "ok" and best[k].get("status") != "ok"):
+            best[k] = r
+    return list(best.values())
+
+
 def _feature_summary(rows):
     from collections import defaultdict
+    rows = _dedup_rows(rows)
     ok = defaultdict(list)
     status = {}
     for r in rows:
@@ -548,6 +568,68 @@ def summarize():
     write_findings(rows)
 
 
+LOCK_PATH = OUT_DIR / "foundation_features.lock"
+
+
+def _pid_alive(pid):
+    if pid <= 0:
+        return False
+    try:
+        if sys.platform.startswith("win"):
+            import ctypes
+            PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+            h = ctypes.windll.kernel32.OpenProcess(
+                PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+            if not h:
+                return False
+            code = ctypes.c_ulong()
+            ok = ctypes.windll.kernel32.GetExitCodeProcess(h, ctypes.byref(code))
+            ctypes.windll.kernel32.CloseHandle(h)
+            return bool(ok) and code.value == 259  # STILL_ACTIVE
+        os.kill(pid, 0)
+        return True
+    except Exception:
+        return False
+
+
+def acquire_lock():
+    """Single-instance guard: if another live instance holds the lock, exit 0.
+    A duplicate/concurrent launch (parallel session, commit-triggered watcher)
+    therefore does no work instead of racing on the shared csv/log."""
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for _ in range(2):
+        try:
+            fd = os.open(str(LOCK_PATH), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, str(os.getpid()).encode("ascii"))
+            os.close(fd)
+            atexit.register(release_lock)
+            return True
+        except FileExistsError:
+            try:
+                other = int(Path(LOCK_PATH).read_text().strip() or "0")
+            except Exception:
+                other = 0
+            if _pid_alive(other) and other != os.getpid():
+                log(f"another live instance holds the lock (pid {other}); exiting.")
+                return False
+            # stale lock -> remove and retry
+            try:
+                LOCK_PATH.unlink()
+            except Exception:
+                pass
+    log("could not acquire lock after retry; exiting to avoid a duplicate run.")
+    return False
+
+
+def release_lock():
+    try:
+        if LOCK_PATH.exists() and \
+           LOCK_PATH.read_text().strip() == str(os.getpid()):
+            LOCK_PATH.unlink()
+    except Exception:
+        pass
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--features", default=",".join(DEFAULT_FEATURES),
@@ -559,6 +641,9 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     if args.plot_only:
         summarize()
+        return
+
+    if not acquire_lock():
         return
 
     feats = [f.strip() for f in args.features.split(",") if f.strip()]
