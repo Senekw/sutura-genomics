@@ -79,10 +79,12 @@ PASTE2 (5.22 vs 3.46) - still a large improvement over every earlier lever.
 
 ## Open follow-ups (not yet run)
 
-- Close **Br8100** specifically: longer / higher-severity self-TTA budget. (Partial-
-  parameter TTA was tested and REFUTED - freezing the encoder underfits, mean 6.39 vs
-  4.47; the encoder adaptation is essential and Br8100 is a genuinely harder donor, not an
-  overfitting artifact.)
+- **Br8100 is not closable by more adaptation** (tested): partial-parameter TTA underfits
+  (6.39 vs 4.47), and doubling the self-TTA budget to 720 steps at max-severity 10 left it
+  at 5.11 (vs 5.22 at the standard budget) - flat. It is a genuinely harder donor, not
+  under-adapted or overfit. The remaining lever for Br8100-class donors is **training-side
+  (more within-tissue donors)**, consistent with the atlas finding, not more inference-time
+  adaptation.
 - More within-tissue donors (the atlas work suggested donor count, not tissue variety, is
   the training-side constraint) combined with scVI+self-TTA at inference.
 - scVI + self-TTA is the current best config; a multi-seed rerun would firm up the 4.47
