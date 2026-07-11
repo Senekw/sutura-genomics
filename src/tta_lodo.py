@@ -406,6 +406,8 @@ def summarize():
 
 
 def main():
+    global MODE, TTA_PARAMS, TTA_EPOCHS, TTA_MAXSEV
+    global CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
     p = argparse.ArgumentParser()
     p.add_argument("--plot-only", action="store_true")
     p.add_argument("--mode", choices=["self", "sibling"], default="self",
@@ -426,8 +428,6 @@ def main():
                    "(default: all 3). e.g. Br8100 to focus on the hard donor")
     args = p.parse_args()
 
-    global MODE, TTA_PARAMS, TTA_EPOCHS, TTA_MAXSEV
-    global CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
     MODE = args.mode
     TTA_PARAMS = args.tta_params
     TTA_EPOCHS = args.tta_epochs
