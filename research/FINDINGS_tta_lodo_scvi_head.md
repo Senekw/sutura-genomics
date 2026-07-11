@@ -1,11 +1,11 @@
 # Test-time adaptation on the held-out donor - LODO tear benchmark
 
-_Generated 2026-07-11T02:43:48Z on branch `foundation-features`._
+_Generated 2026-07-11T03:07:45Z on branch `foundation-features`._
 
 **Question.** The foundation-features experiment showed the cross-donor gap is an ALIGNER problem, not a feature problem. Does adapting the trained aligner to the held-out donor at inference - self-supervised, on the donor's own section geometry, no target correspondence used - close the gap to PASTE2?
 
 
-**Headline.** Self-supervised TTA moves held-out error 7.13 -> 6.04 pitches (PASTE2 4.81). It **narrows the gap but does NOT reach PASTE2** (-1.09 vs no-TTA, +1.22 vs PASTE2; 0/2 folds beat PASTE2).
+**Headline.** Self-supervised TTA moves held-out error 7.39 -> 6.39 pitches (PASTE2 4.36). It **narrows the gap but does NOT reach PASTE2** (-1.00 vs no-TTA, +2.02 vs PASTE2; 0/3 folds beat PASTE2).
 
 
 ## Per-fold
@@ -14,6 +14,7 @@ _Generated 2026-07-11T02:43:48Z on branch `foundation-features`._
 |---|---|---|---|---|---|---|---|
 | Br5292 | 7.277 | 5.956 | -1.321 | 5.28 | False | 2.748 | 360 |
 | Br5595 | 6.981 | 6.121 | -0.86 | 4.35 | False | 2.733 | 360 |
+| Br8100 | 7.909 | 7.081 | -0.828 | 3.46 | False | 2.662 | 360 |
 
 Reference: prior SVD plateau 9.6, inductive SVD no-TTA mean was ~8.26 pitches.
 
