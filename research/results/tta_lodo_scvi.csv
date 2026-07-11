@@ -1,3 +1,4 @@
 held_out_donor,train_donors,held_out_notta,held_out_tta,delta_tta,paste2_error,svd_ref_heldout,tta_beats_paste2,in_dist,tta_steps_used,seconds,status,timestamp,detail
 Br5292,Br5595+Br8100,7.277,4.203,-3.074,5.28,9.6,True,2.748,360,1319.6,ok,2026-07-11T01:02:40Z,
 Br5595,Br5292+Br8100,6.981,3.991,-2.99,4.35,9.6,True,2.733,360,1387.8,ok,2026-07-11T01:25:48Z,
+Br8100,Br5292+Br5595,7.909,5.217,-2.692,3.46,9.6,False,2.662,360,1394.4,ok,2026-07-11T01:49:03Z,

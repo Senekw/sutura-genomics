@@ -9,3 +9,8 @@
 [2026-07-11T01:25:48Z] [Br5595] no-TTA=6.981 +TTA=3.991 (delta -2.99, PASTE2 4.35) steps=360 1387.8s beats_paste2=True
 [2026-07-11T01:25:49Z] wrote C:\Users\karti\arca\research\results\tta_lodo_scvi.png
 [2026-07-11T01:25:49Z] wrote C:\Users\karti\arca\research\FINDINGS_tta_lodo_scvi.md
+[2026-07-11T01:49:03Z] [Br8100] no-TTA=7.909 +TTA=5.217 (delta -2.692, PASTE2 3.46) steps=360 1394.4s beats_paste2=False
+[2026-07-11T01:49:03Z] wrote C:\Users\karti\arca\research\results\tta_lodo_scvi.png
+[2026-07-11T01:49:03Z] wrote C:\Users\karti\arca\research\FINDINGS_tta_lodo_scvi.md
+[2026-07-11T01:49:04Z] TTA-LODO run complete.
+[2026-07-11T01:49:04Z] DONE
