@@ -402,10 +402,22 @@ def main():
                    help="self: synthetic self-warps of held-out ref (no target GT); "
                         "sibling: held-out donor's 2nd pair with real GT (weakly sup.)")
     p.add_argument("--tag", default="", help="output-file suffix")
+    p.add_argument("--features", choices=["svd", "scvi"], default="svd",
+                   help="node featurizer for BOTH base training and TTA (scvi patches "
+                        "generalization_max to use the scVI encoder, testing whether the "
+                        "scVI-features and self-TTA levers compound)")
     args = p.parse_args()
 
     global MODE, CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
     MODE = args.mode
+    if args.features == "scvi":
+        # compose the two working levers: scVI node features + self-TTA. Patch the
+        # reusable harness's featurizer to the scVI backend for every fold; run_fold's
+        # capture + prep_pair + the TTA loop then all operate on scVI features.
+        import foundation_features as ff
+        _sb = ff.ScviBackend(n_latent=gm.HP["pca_dim"], max_epochs=40, batch=False)
+        gm.fit_fold_basis = lambda ts, f, d, h: _sb.fit(ts)
+        gm.transform = lambda a, b: _sb.transform(a, b)
     if args.tag:
         t = args.tag
         CSV_PATH = OUT_DIR / f"tta_lodo_{t}.csv"
@@ -420,7 +432,7 @@ def main():
         return
 
     log("=" * 72)
-    log(f"TTA-LODO run start (mode={MODE}, SVD features) out={CSV_PATH.name}")
+    log(f"TTA-LODO run start (mode={MODE}, features={args.features}) out={CSV_PATH.name}")
     log(f"base cfg: augment_reg epochs={CFG.epochs}; TTA epochs={TTA_EPOCHS} "
         f"steps={TTA_STEPS} lr={TTA_LR} patience={TTA_PATIENCE}")
     log(f"PASTE2 refs: {gm.PASTE2} | prior SVD plateau {SVD_REF_HELDOUT}")
