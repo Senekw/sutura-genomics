@@ -418,11 +418,20 @@ def main():
                         "scVI-features and self-TTA levers compound)")
     p.add_argument("--tta-params", choices=["all", "head"], default="all",
                    help="head freezes the shared encoder and adapts only the refine head")
+    p.add_argument("--tta-epochs", type=int, default=TTA_EPOCHS,
+                   help="TTA adaptation epochs (x steps/epoch); raise to adapt harder")
+    p.add_argument("--tta-max-sev", type=float, default=TTA_MAXSEV,
+                   help="max synthetic-tear severity during TTA")
+    p.add_argument("--donors", default="", help="comma list of held-out donors to run "
+                   "(default: all 3). e.g. Br8100 to focus on the hard donor")
     args = p.parse_args()
 
-    global MODE, TTA_PARAMS, CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
+    global MODE, TTA_PARAMS, TTA_EPOCHS, TTA_MAXSEV
+    global CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
     MODE = args.mode
     TTA_PARAMS = args.tta_params
+    TTA_EPOCHS = args.tta_epochs
+    TTA_MAXSEV = args.tta_max_sev
     if args.features == "scvi":
         # compose the two working levers: scVI node features + self-TTA. Patch the
         # reusable harness's featurizer to the scVI backend for every fold; run_fold's
@@ -452,7 +461,8 @@ def main():
     log(f"PASTE2 refs: {gm.PASTE2} | prior SVD plateau {SVD_REF_HELDOUT}")
     log("=" * 72)
 
-    for ho in list(gm.DONORS):
+    folds = [d.strip() for d in args.donors.split(",") if d.strip()] or list(gm.DONORS)
+    for ho in folds:
         t0 = time.time()
         try:
             r = run_fold(ho)
