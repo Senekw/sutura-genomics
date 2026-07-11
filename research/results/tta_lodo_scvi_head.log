@@ -3,3 +3,6 @@
 [2026-07-11T01:54:45Z] base cfg: augment_reg epochs=60; TTA epochs=30 steps=12 lr=0.001 patience=4
 [2026-07-11T01:54:45Z] PASTE2 refs: {'Br5292': 5.28, 'Br5595': 4.35, 'Br8100': 3.46} | prior SVD plateau 9.6
 [2026-07-11T01:54:45Z] ========================================================================
+[2026-07-11T02:19:36Z] [Br5292] no-TTA=7.277 +TTA=5.956 (delta -1.321, PASTE2 5.28) steps=360 1491.3s beats_paste2=False
+[2026-07-11T02:19:36Z] wrote C:\Users\karti\arca\research\results\tta_lodo_scvi_head.png
+[2026-07-11T02:19:36Z] wrote C:\Users\karti\arca\research\FINDINGS_tta_lodo_scvi_head.md
