@@ -24,6 +24,7 @@ aligner does **not transfer across donors**: held-out mean **~8.3 pitches** (~1.
 | 4 | self-supervised TTA on SVD features (target's own geometry) | 5.66 | +1.29 | 1/3 | strong |
 | 5 | sibling-supervised TTA (donor's 2nd pair, real GT) | 7.79 | +3.43 | 0/3 | worse than #4 |
 | 6 | **scVI features + self-supervised TTA (composed)** | **4.47** | **+0.11** | **2/3** | **WINNER (PASTE2 parity)** |
+| 7 | scVI + self-TTA, head-only (encoder frozen) | 6.39 | +2.03 | 0/3 | ablation: full-param is essential |
 
 ¹ from the earlier `atlas-train` experiment (cross-tissue diversity does not close the gap).
 
@@ -78,9 +79,10 @@ PASTE2 (5.22 vs 3.46) - still a large improvement over every earlier lever.
 
 ## Open follow-ups (not yet run)
 
-- Close **Br8100** specifically: longer / higher-severity self-TTA budget, or
-  partial-parameter TTA (adapt only the refine head / a LoRA-style subset) to curb
-  overfitting on small held-out sections.
+- Close **Br8100** specifically: longer / higher-severity self-TTA budget. (Partial-
+  parameter TTA was tested and REFUTED - freezing the encoder underfits, mean 6.39 vs
+  4.47; the encoder adaptation is essential and Br8100 is a genuinely harder donor, not an
+  overfitting artifact.)
 - More within-tissue donors (the atlas work suggested donor count, not tissue variety, is
   the training-side constraint) combined with scVI+self-TTA at inference.
 - scVI + self-TTA is the current best config; a multi-seed rerun would firm up the 4.47
