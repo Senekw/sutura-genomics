@@ -74,6 +74,16 @@ TTA_PATIENCE = 4
 TTA_VAL_SEVS = (2.0, 6.0)
 TTA_VAL_SEED = 777
 MODE = "self"   # "self" (synthetic self-warps of held-out ref) | "sibling" (2nd pair GT)
+TTA_PARAMS = "all"   # "all" params | "head" (freeze shared encoder, adapt refine head only)
+
+
+def _tta_params(model):
+    """Params to optimize during TTA. 'head' freezes the shared GNN encoder + attention
+    and adapts only the deformation-residual head - less capacity to overfit a single
+    held-out section, the hypothesized failure mode on the hard donor."""
+    if TTA_PARAMS == "head":
+        return list(model.head.parameters())
+    return list(model.parameters())
 
 CSV_FIELDS = ["held_out_donor", "train_donors", "held_out_notta", "held_out_tta",
               "delta_tta", "paste2_error", "svd_ref_heldout", "tta_beats_paste2",
@@ -147,7 +157,7 @@ def tta_self_adapt(model, pair, seed=0):
     self-recon val. Returns (adapted_model, steps_used)."""
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
-    opt = torch.optim.Adam(model.parameters(), lr=TTA_LR)
+    opt = torch.optim.Adam(_tta_params(model), lr=TTA_LR)
     coords = pair["coords"]
     pitch = pair["pitch"]
     gt_self = torch.from_numpy((coords / pitch).astype(np.float32))  # every A spot -> itself
@@ -191,7 +201,7 @@ def tta_sibling_adapt(model, adapt_pair, seed=0):
     (adapted_model, steps_used)."""
     rng = np.random.default_rng(seed)
     torch.manual_seed(seed)
-    opt = torch.optim.Adam(model.parameters(), lr=TTA_LR)
+    opt = torch.optim.Adam(_tta_params(model), lr=TTA_LR)
     gt_norm = adapt_pair["gt_norm"]
     mask = adapt_pair["mask"]
 
@@ -406,10 +416,13 @@ def main():
                    help="node featurizer for BOTH base training and TTA (scvi patches "
                         "generalization_max to use the scVI encoder, testing whether the "
                         "scVI-features and self-TTA levers compound)")
+    p.add_argument("--tta-params", choices=["all", "head"], default="all",
+                   help="head freezes the shared encoder and adapts only the refine head")
     args = p.parse_args()
 
-    global MODE, CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
+    global MODE, TTA_PARAMS, CSV_PATH, LOG_PATH, PNG_PATH, FINDINGS_PATH, LOCK_PATH
     MODE = args.mode
+    TTA_PARAMS = args.tta_params
     if args.features == "scvi":
         # compose the two working levers: scVI node features + self-TTA. Patch the
         # reusable harness's featurizer to the scVI backend for every fold; run_fold's
@@ -432,7 +445,8 @@ def main():
         return
 
     log("=" * 72)
-    log(f"TTA-LODO run start (mode={MODE}, features={args.features}) out={CSV_PATH.name}")
+    log(f"TTA-LODO run start (mode={MODE}, features={args.features}, "
+        f"tta_params={TTA_PARAMS}) out={CSV_PATH.name}")
     log(f"base cfg: augment_reg epochs={CFG.epochs}; TTA epochs={TTA_EPOCHS} "
         f"steps={TTA_STEPS} lr={TTA_LR} patience={TTA_PATIENCE}")
     log(f"PASTE2 refs: {gm.PASTE2} | prior SVD plateau {SVD_REF_HELDOUT}")
