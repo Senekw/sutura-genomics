@@ -21,8 +21,9 @@ aligner does **not transfer across donors**: held-out mean **~8.3 pitches** (~1.
 | 2 | foundation embeddings — scVI+batch (scArches) | **6.95** | +2.58 | 0/9 | marginal |
 | 3 | transductive featurizer (SVD) | 8.82 | worse | 0/6 | no |
 | 3 | transductive featurizer (scVI) | 7.67 | +3.31 | 0/6 | no |
-| 4 | **self-supervised TTA** (target's own geometry) | **5.66** | **+1.29** | **1/3** | **WINNER** |
+| 4 | self-supervised TTA on SVD features (target's own geometry) | 5.66 | +1.29 | 1/3 | strong |
 | 5 | sibling-supervised TTA (donor's 2nd pair, real GT) | 7.79 | +3.43 | 0/3 | worse than #4 |
+| 6 | **scVI features + self-supervised TTA (composed)** | **4.47** | **+0.11** | **2/3** | **WINNER (PASTE2 parity)** |
 
 ¹ from the earlier `atlas-train` experiment (cross-tissue diversity does not close the gap).
 
@@ -32,8 +33,14 @@ are not on PyPI). Logged and skipped.
 
 ## The one finding
 
-**The cross-donor gap is an ALIGNER problem, not a feature problem — and it is
-addressable at deploy time.**
+**The cross-donor gap is closed to PASTE2 parity by composing a learned featurizer with
+deploy-time self-adaptation — it was an ALIGNER problem all along, and the fix lives at
+inference, not in the features alone.**
+
+Progression, held-out mean: SVD **8.26** -> scVI features **7.39** -> self-TTA **5.66** ->
+**scVI + self-TTA 4.47** (PASTE2 **4.36**), beating PASTE2 on 2/3 donors (Br5292
+7.28->4.20 vs 5.28; Br5595 6.98->3.99 vs 4.35). Only the hardest donor Br8100 remains above
+PASTE2 (5.22 vs 3.46) - still a large improvement over every earlier lever.
 
 - Every *feature-side* lever failed to close it: better learned embeddings (scVI) help
   only ~16% and never beat PASTE2; even a *transductive* featurizer that sees the
@@ -42,8 +49,11 @@ addressable at deploy time.**
 - The *aligner-side* lever worked: **self-supervised test-time adaptation** — at
   inference, adapt the trained aligner to the held-out donor's OWN section geometry via
   synthetic tears (self-GT, no target correspondence) — cuts held-out error **8.26 -> 5.66
-  (~31%)**, beats PASTE2 on Br5292 (8.53->4.63 vs 5.28) and reaches near-parity on Br5595
-  (5.06 vs 4.35). The hardest donor Br8100 improves (8.44->7.27) but stays ~2x PASTE2.
+  (~31%)**, beats PASTE2 on Br5292 and reaches near-parity on Br5595.
+- **The two working levers COMPOUND.** scVI features (better base, 7.39) + self-TTA lands
+  at **4.47 mean — PASTE2 parity — beating PASTE2 on 2/3 donors.** A better featurizer
+  gives self-TTA a better starting point, and adaptation does the rest. So the featurizer
+  is not useless; it is just insufficient *without* deploy-time adaptation.
 - **More/real supervision is not better.** Sibling-supervised TTA (real GT from the
   donor's *other* section pair) mean 7.79 — worse than self-TTA and it *hurt* on Br5595
   (7.83->8.92). The right adaptation signal is the target section's own multi-severity
@@ -52,31 +62,35 @@ addressable at deploy time.**
 
 ## Product / research implications
 
-1. **Deploy self-TTA for new-donor inputs.** A short unsupervised adaptation on the
-   incoming section's own geometry recovers ~a third of the gap and can match or beat
-   PASTE2 on typical donors — with no target labels. This is the first thing that has
-   moved the needle; it belongs in the off-distribution path (cf. `autoadapt.py`, which
-   already implements the mechanism but had never been evaluated on this LODO protocol).
-2. **Keep routing the hardest inputs to PASTE2.** Self-TTA does not yet uniformly beat
-   PASTE2 (Br8100 remains ~2x). A keep-best-of {zero-shot, self-TTA, PASTE2} router stays
-   the safe product policy.
-3. **Stop chasing the featurizer.** Foundation embeddings and transductive features are
-   dead ends for this gap; effort is better spent on the aligner's inductive bias and
-   deploy-time adaptation.
+1. **Deploy scVI-features + self-TTA for new-donor inputs.** Train the aligner on scVI
+   node features, and at inference run a short unsupervised self-adaptation on the
+   incoming section's own geometry (no target labels). This reaches PASTE2 parity on
+   average and beats it on typical donors — the first configuration to do so. It belongs
+   in the off-distribution path (cf. `autoadapt.py`, which implements the TTA mechanism
+   but had never been evaluated on this LODO protocol, nor composed with scVI features).
+2. **Keep a keep-best router for the hardest inputs.** The composition does not yet
+   uniformly beat PASTE2 (Br8100 5.22 vs 3.46). keep-best-of {zero-shot, scVI+self-TTA,
+   PASTE2} stays the safe product policy while Br8100-class donors are worked on.
+3. **The featurizer matters only in combination.** Foundation embeddings and transductive
+   features are dead ends *on their own*, but scVI's better base is what let self-TTA
+   reach parity — so the lever is (better features) x (deploy-time adaptation), not either
+   alone.
 
 ## Open follow-ups (not yet run)
 
-- Longer / higher-severity self-TTA budget — can Br8100 be pushed below PASTE2?
-- Stack self-TTA on top of scVI features (each helped separately; do they compound?).
-- Partial-parameter TTA (adapt only the refine head / a LoRA-style subset) to reduce
+- Close **Br8100** specifically: longer / higher-severity self-TTA budget, or
+  partial-parameter TTA (adapt only the refine head / a LoRA-style subset) to curb
   overfitting on small held-out sections.
-- More within-tissue donors (the atlas work suggested donor count, not tissue variety,
-  is the training-side constraint) combined with self-TTA at inference.
+- More within-tissue donors (the atlas work suggested donor count, not tissue variety, is
+  the training-side constraint) combined with scVI+self-TTA at inference.
+- scVI + self-TTA is the current best config; a multi-seed rerun would firm up the 4.47
+  vs 4.36 near-tie.
 
 ## Artifacts (all on branch `foundation-features`)
 
 - `research/results/foundation_features.{csv,png,log}` + `research/FINDINGS_foundation_features.md` — levers 2 (inductive).
 - `research/results/foundation_features_transductive.{csv,png,log}` + `..._transductive.md` — lever 3.
-- `research/results/tta_lodo.{csv,png,log}` + `research/FINDINGS_tta_lodo.md` — lever 4 (self-TTA, the winner).
-- `research/results/tta_lodo_sibling.{csv,png,log}` + `..._sibling.md` — lever 5.
-- Code: `src/foundation_features.py`, `src/tta_lodo.py` (reuse `generalization_max.py`'s LODO harness unchanged).
+- `research/results/tta_lodo.{csv,png,log}` + `research/FINDINGS_tta_lodo.md` — lever 4 (self-TTA on SVD features).
+- `research/results/tta_lodo_sibling.{csv,png,log}` + `..._sibling.md` — lever 5 (sibling-supervised TTA).
+- `research/results/tta_lodo_scvi.{csv,png,log}` + `..._scvi.md` — lever 6 (scVI + self-TTA, the winner).
+- Code: `src/foundation_features.py`, `src/tta_lodo.py` (reuse `generalization_max.py`'s LODO harness unchanged; `tta_lodo.py` supports `--mode {self,sibling}` and `--features {svd,scvi}`).
