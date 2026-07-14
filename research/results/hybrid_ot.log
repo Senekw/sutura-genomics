@@ -1,0 +1,4 @@
+[2026-07-14 05:30:49] === hybrid_ot START (12 cells) mode=perslice epochs=100 steps=24 ===
+[2026-07-14 05:32:19] pure_ot S1: median(pitch) sev-mean=13.14  (89s)
+[2026-07-14 05:32:35] pure_ot S2: median(pitch) sev-mean=11.83  (17s)
+[2026-07-14 05:32:53] pure_ot S3: median(pitch) sev-mean=11.94  (17s)
