@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import PrivacyPolicyModal from "@/components/ui/privacy-policy-modal";
 import { Logo } from "@/components/logo";
-import { supabase } from "@/lib/supabase";
 
 interface FormState {
   fullName: string;
@@ -84,30 +83,12 @@ export default function DemoPage() {
       return;
     }
 
-    // 1) Save the lead to Supabase (the source of truth).
-    const { error } = await supabase.from("demo_requests").insert({
-      full_name: v.fullName.trim(),
-      email: v.email.trim(),
-      company: v.company.trim(),
-      role: v.role.trim() || null,
-      company_size: v.size,
-      looking_for: v.looking.trim(),
-      source: v.source.trim() || null,
-    });
-
-    if (error) {
-      setSubmitting(false);
-      console.error("demo_requests insert failed:", error);
-      setSubmitError(
-        "Something went wrong saving your request. Please email us directly at suturagenomics@gmail.com."
-      );
-      return;
-    }
-
-    // 2) Best-effort email notification via Web3Forms. Never block success on
-    //    this — the lead is already saved in Supabase if the email fails.
+    // Deliver the lead by email via Web3Forms. This is the only required path:
+    // each submission is emailed to the address the access key is registered to.
+    // (The form previously wrote to a Supabase project first; that project was
+    // removed, which broke every submission, so email is now the source of truth.)
     try {
-      await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,8 +107,17 @@ export default function DemoPage() {
           source: v.source.trim() || "Not provided",
         }),
       });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || "Email delivery failed");
+      }
     } catch (err) {
-      console.error("web3forms email failed (lead is still saved):", err);
+      setSubmitting(false);
+      console.error("web3forms submit failed:", err);
+      setSubmitError(
+        "Something went wrong sending your request. Please email us directly at suturagenomics@gmail.com."
+      );
+      return;
     }
 
     setSubmitting(false);
