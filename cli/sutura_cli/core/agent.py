@@ -14,8 +14,8 @@ from . import engine, reporting, tools
 from .bundle import Bundle
 from .config import Config
 from .context import WorkContext
-from .events import (AgentMessage, BundleWritten, EventSink, Note, StepFinished,
-                     StepStarted)
+from .events import (AgentMessage, BundleWritten, EventSink, Note, PairResult,
+                     StepFinished, StepStarted)
 from .llm import (Reply, ToolRequest, WorkflowRequest, _extract_path,
                   select_backend)
 from .reconstruct import build_pointcloud
@@ -181,6 +181,14 @@ class Session:
 
     # ------------------------------------------------------------------ #
     def _record_pair(self, index, ref, mov, result, post_qc, pdir):
+        # compact, structured row for the UI (pair -> method/why -> error -> qc)
+        self.sink.emit(PairResult(
+            ref=ref.name, mov=mov.name, method_label=result["method_label"],
+            score=result["score"], metric=result["metric"],
+            has_ground_truth=result["has_ground_truth"],
+            verdict=(post_qc or {}).get("verdict", "?"),
+            in_distribution=result["in_distribution"],
+            mahalanobis=result["mahalanobis"], reason=result.get("reason", "")))
         self._results[index] = {**result, "_ref_id": ref.id, "_mov_id": mov.id}
         rel = (pdir / "aligned.h5ad").relative_to(self.bundle.root).as_posix()
         self.bundle.add_pair({

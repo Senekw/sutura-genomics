@@ -140,3 +140,15 @@ Built the **viewer app** — a local, display-only companion under `app/` (entry
 4. **Global reconstruction:** the multi-section stack is honest pairwise composition; a true simultaneous solve (GPSA-style) is the natural v2 for long chains.
 5. **App polish for SF:** wire the app's optional Ollama chat end-to-end in-browser; add a per-layer breakdown chart; consider packaging `sutura`+`sutura-app` as one installer.
 6. **Cloud backend** untested (no key) — smoke-test CloudBackend once a key is available.
+
+## TUI visual redesign (2026-07-16, post-overnight) — DONE
+User feedback: the Textual TUI was cluttered — branding top-right, backend buried in scroll, a 35-section load dumped a wall of text, no separation between stages, per-pair results as repeated multi-line blocks. Redesigned the *presentation* only (functionality identical):
+- **Top-left fixed header** (`Brand` widget): `◗ SUTURA` + a second line with the active backend/model — e.g. `ollama · llama3.2:3b · local, no data egress` (backend now selected eagerly at mount in a worker, so it shows immediately instead of scrolling past).
+- **Collapsed load summary:** `load_data` no longer lists every section; it emits `loaded 35 section(s) · 3,400–4,900 spots each` (names shown only for ≤4). Fixed in `tools.py` so console benefits too.
+- **Stage separation:** each stage (Load / QC / Alignment / 3D reconstruction / Report) is a left-aligned `Rule` divider with the stage name, so the eye parses what happened where.
+- **Compact per-pair table:** new `PairResult` event (emitted from `agent._record_pair`) carries structured pair data; the renderer prints one aligned row per pair — `pair → method → error → routing(in/off·maha, the "why") → qc` — under a single column header, instead of multi-line routing+align+post-QC blocks. Method labels shortened (Sutura / Sutura·adapt / PASTE2); per-pair step chrome routed to the status bar.
+- **Calmer completion card:** no longer re-lists every pair (the stream table already did); shows counts + methods + bundle path.
+- Applied the same treatment to the headless console renderer (`render.py`) for consistency. New `tui_screenshot.svg`.
+- Tests: `test_tui.py` updated for `Brand`/`_backend_line`/`_short_method`; 44 fast tests pass.
+- Files: `cli/sutura_cli/tui/app.py`, `cli/sutura_cli/render.py`, `cli/sutura_cli/core/events.py` (+PairResult), `cli/sutura_cli/core/agent.py`, `cli/sutura_cli/core/tools.py`, `cli/tests/test_tui.py`, `cli/docs/tui_screenshot.svg`.
+- Both branches pushed to `Senekw/sutura-genomics` (not `biostartup`); `main`/website untouched. `sutura-app` merged to carry the redesign.
