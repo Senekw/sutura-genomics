@@ -110,5 +110,33 @@ Built the **viewer app** — a local, display-only companion under `app/` (entry
 - **Browser screenshot:** the Claude-in-Chrome extension is offline this session, so I could not capture a live in-browser screenshot of the viewer. Rendering is verified indirectly (API serves valid data for all 4 real bundles, all assets 200, `node --check` passes on the frontend JS). Providing a self-contained Artifact preview as visual confirmation instead.
 - **Xenium (unchanged):** no Xenium data on disk; squidpy 1.6.6 has no `xenium` reader. Implemented as detect + actionable error (convert Xenium → .h5ad, point Sutura at it) per the "clear message" option. Real Xenium ingest deferred until a sample + reader are available.
 
-## Recommendations for next / for Codex
-- TBD (updated at end).
+## FINAL SUMMARY (all 9 items complete)
+
+**Branches:** `sutura-cli` = baseline + items 1-7 (commits ca460a5 → ddd3e9a). `sutura-app` = branched off sutura-cli after item 7, + items 8-9 (59e1571, 32b2247). `main` and `demo/` untouched.
+
+**What got done**
+1. Local Ollama planner (llama3.2:3b), no API key — full NL→plan→execute loop for all core intents; closed-vocabulary validation + rule fallback keeps even 1B models honest; new query tools (metrics/worst/explain_routing); 3 real sessions logged.
+2. Off-distribution path proven on Br8100 + breast: correct off-dist routing, auto-adapt runs, PASTE2 kept, honest candidate breakdown everywhere.
+3. Robust loaders: actionable errors for every failure mode (missing path, wrong obsm keys w/ auto-recovery, empty section, mismatched panels, single-section, non-adjacent, Space Ranger, Xenium), per-pair resilience.
+4. Coherent multi-section reconstruction: similarity-transform chaining into one frame, honest exact-vs-pairwise labelling; proven on a 4-section chain.
+5. Demo-grade streaming UX: banner, clean steps, method-and-why routing, completion card (console + TUI), Windows-UTF-8 fix.
+6. Comprehensive tests: 46 fast + 4 engine e2e (in/off-dist + 4-chain) + integration; local-LLM test hits the real model.
+7. Docs: README (NL command table, local-model quickstart, transcript), ARCHITECTURE.md, updated BUNDLE_SCHEMA.md.
+8. Viewer app v1 (sutura-app): stdlib server + vanilla/three.js SPA reading the bundle schema — run list, 3D reconstruction (colour by layer/section/method), per-pair method+why+metrics+QC, method-comparison from candidates, grounded chatbot (shows PASTE2 comparison honestly, refuses to re-run). 10 app tests pass.
+9. Integration test: CLI aligns real data → bundle → app reads/displays/serves/answers. Documented in app/docs/INTEGRATION.md.
+
+**What's proven** (real runs tonight): in-dist Sutura 1.29 spot-pitch; Br8100 PASTE2 2.82 (adapt 9.53→8.03); breast PASTE2 3.47 (adapt 26.9→7.77); 4-chain composed (centroids cluster <180px); local model plans 7/7 intents; app serves all 4 real bundles; CLI→app integration test green. ~60 tests total.
+
+**What's open / not done**
+- **Xenium** ingest: no data + no reader in this env → implemented as detect + actionable convert-to-.h5ad error. Real ingest needs a sample + a squidpy/Xenium reader.
+- **Browser screenshot** of the served app: Chrome extension offline all session. Rendering verified via API + valid-JS + assets; a self-contained Artifact preview of a real bundle was published as visual confirmation.
+- **"Panel too different → PASTE2 direct (no adapt)"** branch is coded + unit-tested but not exercised on real data (breast still shares 95% genes); would need a targeted/Xenium panel (<50% overlap).
+- Neither branch pushed (per no-push-unless-asked). LF→CRLF warnings are cosmetic.
+
+**Recommended next (for Rushil / Codex)**
+1. **Push both branches** and open PRs (sutura-cli first, then sutura-app on top).
+2. **See the app live:** `sutura -H "align ./demo_data and reconstruct in 3D"` then `sutura-app` — confirm the 3D viewer in a real browser (the one thing I couldn't do headless).
+3. **Xenium:** grab a public 10x Xenium sample + wire a real reader (squidpy version bump or manual cell_feature_matrix + cells parquet loader) to replace the actionable-error stub.
+4. **Global reconstruction:** the multi-section stack is honest pairwise composition; a true simultaneous solve (GPSA-style) is the natural v2 for long chains.
+5. **App polish for SF:** wire the app's optional Ollama chat end-to-end in-browser; add a per-layer breakdown chart; consider packaging `sutura`+`sutura-app` as one installer.
+6. **Cloud backend** untested (no key) — smoke-test CloudBackend once a key is available.
