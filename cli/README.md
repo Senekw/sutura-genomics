@@ -40,6 +40,20 @@ frozen shared basis). Install it into the same environment as that engine:
 This installs the `sutura` entry point. The engine repo is auto-detected from the
 install location; override it any time with `SUTURA_REPO=/path/to/repo`.
 
+### Run from any terminal (Windows) — no venv activation
+
+The `pip` entry points live under `.venv\Scripts`, so they only resolve when the
+venv is activated. To make `sutura` (and `sutura-app`) launch from **any** new
+terminal with zero activation, run the installer once — it drops `.cmd` launchers
+on your user PATH that wrap the venv's entry points:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File cli\scripts\install-windows.ps1
+```
+
+Then open a **new** terminal and just type `sutura`. (Re-runnable; it also adds
+the launcher directory to your user PATH if it isn't already there.)
+
 ### Local model (no API key)
 
 The planner runs on a local model by default when one is available. Install Ollama
