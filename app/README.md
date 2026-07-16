@@ -10,11 +10,30 @@ what the CLI produced, and it is honest about which method produced each result.
 
 ```bash
 .venv/Scripts/python.exe -m pip install -e app
-sutura-app                     # opens http://127.0.0.1:8787 in your browser
+sutura-app                     # opens the result viewer at http://127.0.0.1:8787
 sutura-app --port 9000 --no-browser
 ```
 
 Point it at a different store with `SUTURA_HOME` (default `~/.sutura`).
+
+## Live mode — watch an alignment happen
+
+Run a real alignment and watch it live in the browser as each stage streams in:
+
+```bash
+sutura-app live "align the sections in ./data and reconstruct in 3D"
+# or from the CLI itself:
+sutura --live "align the sections in ./data and reconstruct in 3D"
+```
+
+This starts the local server, opens `/live`, and streams the **real** pipeline over
+Server-Sent Events: sections load → routing decides per pair → the moving spots
+**animate from their torn positions into the aligned positions** (the actual
+computed coordinates) → the 3D volume builds up → it ends on the finished rotating
+reconstruction with the **real metrics and honest method labels**. The animation
+is a presentation of the real result — final positions and metrics come from the
+actual pipeline, never fabricated. The display-only viewer (finished bundles) is
+still there at `/`.
 
 ## What it shows
 

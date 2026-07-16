@@ -232,14 +232,22 @@ class Session:
 
     # ------------------------------------------------------------------ #
     def _record_pair(self, index, ref, mov, result, post_qc, pdir):
-        # compact, structured row for the UI (pair -> method/why -> error -> qc)
+        # compact, structured row for the UI (pair -> method/why -> error -> qc);
+        # coords are attached for the live web view (TUI/console ignore them).
+        try:
+            mov_orig = mov.adata.obsm["spatial"] if mov is not None else None
+        except Exception:
+            mov_orig = None
         self.sink.emit(PairResult(
             ref=ref.name, mov=mov.name, method_label=result["method_label"],
             score=result["score"], metric=result["metric"],
             has_ground_truth=result["has_ground_truth"],
             verdict=(post_qc or {}).get("verdict", "?"),
             in_distribution=result["in_distribution"],
-            mahalanobis=result["mahalanobis"], reason=result.get("reason", "")))
+            mahalanobis=result["mahalanobis"], reason=result.get("reason", ""),
+            ref_coords=result.get("ref_coords"), mov_coords=mov_orig,
+            aligned_coords=result.get("aligned_coords"),
+            ref_layers=result.get("ref_layers"), mov_layers=result.get("mov_layers")))
         self._results[index] = {**result, "_ref_id": ref.id, "_mov_id": mov.id}
         rel = (pdir / "aligned.h5ad").relative_to(self.bundle.root).as_posix()
         self.bundle.add_pair({

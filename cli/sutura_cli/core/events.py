@@ -67,6 +67,14 @@ class PairResult(Event):
     in_distribution: bool | None = None
     mahalanobis: float | None = None
     reason: str = ""
+    # optional geometry for the live web view's before->after animation; the TUI
+    # and console ignore these. ref = reference spots, mov = moving spots BEFORE
+    # alignment (torn), aligned = the SAME moving spots AFTER (real output).
+    ref_coords: object = None
+    mov_coords: object = None
+    aligned_coords: object = None
+    ref_layers: object = None
+    mov_layers: object = None
     kind: str = field(default="pair_result", init=False)
 
 

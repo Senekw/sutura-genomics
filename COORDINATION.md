@@ -166,9 +166,18 @@ Purely UX/visual (functionality identical):
 - Tests: +9 (mode toggle, ASCII logo, `_named_target` file/folder resolution, manual-decline reads nothing, auto no-prompt). 49 fast tests pass.
 - Files: `cli/sutura_cli/tui/app.py`, `cli/sutura_cli/core/agent.py`, `cli/sutura_cli/render.py`, `cli/sutura_cli/cli.py`, `cli/tests/test_tui.py`, `cli/tests/test_loaders.py`, `cli/docs/tui_screenshot.svg`.
 
-## Still open (from the latest multi-part request)
-- **App live-progress mode (sutura-app):** stream CLI pipeline stages to the browser (SSE/WS), animate load → routing → before/after spot motion → 3D build-up → rotating volume with real metrics. Not started; buildable on sutura-app. Purple/black/white to match.
-- **Website (Senekw main / suturagenomics.bio):** requested login gate (beta-tester → SGYC1234/spatialbioSGYC) + working chatbot. BLOCKED on decisions: reverses the earlier "don't touch website"; it's the branch-protected production site (needs Senekw review, can't self-merge); hardcoding creds is client-visible; a real Ollama chatbot can't run on a static deploy (would be scripted/hardcoded responses). Awaiting user direction.
+## App live-progress mode (sutura-app) — DONE
+Stream the REAL CLI pipeline to the browser and animate it; display-only viewer kept.
+- **Server (SSE):** `sutura_app/live.py` = `LiveHub` (thread-safe pub/sub with replayable history) + `serialize()` (core events → small JSON; per-pair geometry downsampled to ~1600 pts, keeping mov/aligned index-matched) + `LiveSink` + `run_live()`. `server.py` adds `GET /live`, `GET /api/live/stream` (SSE), `GET /api/live/state`, and `serve_live()` + a `live` subcommand.
+- **Entry points:** `sutura-app live "<instruction>"` OR `sutura --live "<instruction>"` (CLI delegates to the app). Starts the server, opens `/live`, runs the real alignment (auto mode), streams every stage.
+- **Live page** (`static/live.{html,css,js}`, purple/black/white, vanilla canvas): left stage timeline (load→QC→routing→align→post-QC→3D→report) lighting up; center canvas animates the **before→after**: reference spots static, moving spots lerp from their **torn** coords to their **aligned** coords (the real computed output) over ~2.2s per pair; right panel builds the honest per-pair list (method + error + qc + in/off-dist); on done it fetches the composed reconstruction and ends on the **rotating real 3D volume** + summary metrics. **Never fabricated** — geometry & metrics are the real pipeline output.
+- **To add coords for the animation:** `events.PairResult` gained optional `ref/mov/aligned_coords` + layers (TUI/console ignore them); `agent._record_pair` populates them.
+- **Verified end-to-end:** captured a real run (3 DLPFC sections → 2 pairs): events {start, 20 stage, 17 progress, 2 routing, 2 pair w/ real geom 2192 & 2395 pts, done, end}; methods honest (Sutura 1.29, PASTE2 6.67 retry); 13,399-pt 3D volume. SSE endpoints serve 200; SSE frames deliver. Published a self-contained **Artifact** replaying the real stream (browser ext offline, so no live screenshot).
+- Tests: `app/tests/test_live.py` (hub replay, serialize stage/routing/pair-with-geom/pair-without). 63 fast tests pass (cli + app).
+- Files: `app/sutura_app/live.py` (new), `app/sutura_app/server.py`, `app/sutura_app/static/live.{html,css,js}` (new), `cli/sutura_cli/core/events.py`, `cli/sutura_cli/core/agent.py`, `cli/sutura_cli/cli.py` (--live), `app/README.md`, `app/tests/test_live.py`.
+
+## Still open
+- **Website (Senekw main / suturagenomics.bio):** decisions received — build on a branch, don't deploy; chatbot = rule-based grounded (no key, no server). User pointed at **Deep Chat** (`deep-chat` web component) — plan: use `<deep-chat>` with a client-side `handler` returning honest answers grounded in the run data (keyless, serverless), and/or its `webModel` (browser-hosted LLM). Login gate: beta-tester → SGYC1234/spatialbioSGYC (client-side, matches existing demo-cred pattern). NOT started.
 
 ## Recommendations for next / for Codex
 - TBD (updated at end).

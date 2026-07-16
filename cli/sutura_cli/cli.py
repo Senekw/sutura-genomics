@@ -24,6 +24,9 @@ def _build_parser() -> argparse.ArgumentParser:
                    help='natural-language task, e.g. "align ./data and reconstruct in 3D"')
     p.add_argument("-H", "--headless", action="store_true",
                    help="run without the TUI, streaming steps to stdout")
+    p.add_argument("--live", action="store_true",
+                   help="run the alignment and watch it live in the browser "
+                        "(opens the Sutura app; requires the sutura-app package)")
     p.add_argument("--backend", default=None,
                    choices=["auto", "cloud", "ollama", "rule"],
                    help="LLM backend for the agent loop (default: auto)")
@@ -61,6 +64,19 @@ def run_headless(instruction: str, cfg: Config) -> int:
 def main(argv=None) -> int:
     args = _build_parser().parse_args(argv)
     cfg = _load_config(args)
+
+    if args.live:
+        if not args.instruction:
+            print("error: --live needs an instruction, e.g. "
+                  'sutura --live "align ./data and reconstruct in 3D"', file=sys.stderr)
+            return 2
+        try:
+            from sutura_app.server import serve_live      # companion viewer app
+        except Exception:
+            print("live mode needs the Sutura app: pip install -e app  (then "
+                  "retry, or run:  sutura-app live \"...\")", file=sys.stderr)
+            return 1
+        return serve_live(args.instruction)
 
     if args.headless:
         if not args.instruction:

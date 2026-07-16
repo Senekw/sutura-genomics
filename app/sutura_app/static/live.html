@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sutura — live alignment</title>
+  <link rel="stylesheet" href="/live.css" />
+  <link rel="icon" href="/logo.jpg" />
+</head>
+<body>
+  <aside id="timeline">
+    <div class="brand">
+      <img src="/logo.jpg" alt="Sutura" />
+      <div>
+        <div class="n">SUTURA</div>
+        <div class="s">live alignment</div>
+      </div>
+    </div>
+    <div id="stages"></div>
+    <div class="tl-foot">running locally · your data never leaves this machine</div>
+  </aside>
+
+  <main id="center">
+    <div id="head">
+      <h1 id="title">Waiting for the alignment to start…</h1>
+      <div class="instr" id="instr"></div>
+    </div>
+    <div id="stagewrap">
+      <canvas id="stage"></canvas>
+      <div id="caption"></div>
+    </div>
+    <div id="legend"></div>
+  </main>
+
+  <aside id="side">
+    <h2>Pairs <span class="honest">honest labelling</span></h2>
+    <div id="pairs"></div>
+    <div id="summary" class="hidden"></div>
+  </aside>
+
+  <script src="/live.js"></script>
+</body>
+</html>

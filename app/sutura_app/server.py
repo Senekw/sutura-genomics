@@ -16,16 +16,22 @@ from __future__ import annotations
 import argparse
 import json
 import mimetypes
+import queue
+import threading
+import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 from . import __version__, chat, store
+from .live import LiveHub, run_live
 
 STATIC = Path(__file__).parent / "static"
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("application/wasm", ".wasm")
+
+HUB = LiveHub()          # shared live-progress event bus
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -63,11 +69,43 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass   # quiet
 
+    # --- server-sent events for the live view -------------------------- #
+    def _sse(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        q = HUB.subscribe()
+        try:
+            while True:
+                try:
+                    msg = q.get(timeout=15)
+                except queue.Empty:
+                    self.wfile.write(b": ping\n\n")
+                    self.wfile.flush()
+                    continue
+                payload = json.dumps(msg, default=str)
+                self.wfile.write(f"data: {payload}\n\n".encode("utf-8"))
+                self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass
+        finally:
+            HUB.unsubscribe(q)
+
     # --- routing ------------------------------------------------------- #
     def do_GET(self):
         path = unquote(urlparse(self.path).path)
         if path in ("/", "/index.html"):
             self._send_file(STATIC / "index.html")
+        elif path == "/live":
+            self._send_file(STATIC / "live.html")
+        elif path == "/api/live/stream":
+            self._sse()
+        elif path == "/api/live/state":
+            self._send_json({"running": HUB.running,
+                             "history_len": len(HUB.history)})
         elif path == "/api/runs":
             self._send_json({"runs": store.list_runs(),
                              "store": str(store.results_dir())})
@@ -123,14 +161,58 @@ def serve(host="127.0.0.1", port=8787, open_browser=True):
         httpd.server_close()
 
 
+def serve_live(instruction: str, host="127.0.0.1", port=8787,
+               open_browser=True) -> int:
+    """Run a REAL alignment and stream it live to the browser, then keep serving
+    so the finished 3D view stays interactive."""
+    try:
+        import sys
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+    if not instruction:
+        print("usage: sutura-app live \"align ./data and reconstruct in 3D\"")
+        return 2
+    httpd = ThreadingHTTPServer((host, port), Handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    url = f"http://{host}:{port}/live"
+    print(f"Sutura live  ->  {url}")
+    print(f"streaming a real alignment; nothing leaves this machine.")
+    if open_browser:
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
+    time.sleep(1.0)                       # let the browser connect first
+    from sutura_cli.core.config import Config
+    run_live(instruction, Config.load(), HUB)
+    print(f"alignment complete — view at {url}  (Ctrl-C to stop)")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nstopped.")
+    finally:
+        httpd.server_close()
+    return 0
+
+
 def main(argv=None) -> int:
-    p = argparse.ArgumentParser(prog="sutura-app",
-                                description="Local Sutura result viewer (display-only).")
+    p = argparse.ArgumentParser(
+        prog="sutura-app",
+        description="Local Sutura viewer + live alignment view (display-only).")
+    p.add_argument("cmd", nargs="*",
+                   help='"live \"<instruction>\"" to run + watch a live '
+                        "alignment; omit to open the result viewer")
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8787)
     p.add_argument("--no-browser", action="store_true")
     p.add_argument("--version", action="version", version=f"sutura-app {__version__}")
     args = p.parse_args(argv)
+    if args.cmd and args.cmd[0] == "live":
+        instruction = " ".join(args.cmd[1:]).strip()
+        return serve_live(instruction, args.host, args.port,
+                          open_browser=not args.no_browser)
     serve(args.host, args.port, open_browser=not args.no_browser)
     return 0
 
