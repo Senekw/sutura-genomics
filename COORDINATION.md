@@ -16,7 +16,7 @@
 | # | Item | Status |
 |---|------|--------|
 | 1 | Local LLM backend (no key) | DONE (commit pending) |
-| 2 | Off-distribution path, honest | pending |
+| 2 | Off-distribution path, honest | DONE (commit pending) |
 | 3 | Robust loaders + error handling | pending |
 | 4 | Multi-section (>2) reconstruction | pending |
 | 5 | Polished streaming UX | pending |
@@ -40,8 +40,17 @@ Full CLI skeleton committed: TUI (Textual), agent loop, 6 tools wrapping the eng
 - Tests: +11 unit tests (query intents, alias/method normalization, off-vocab & type-conflict fallback). 19 fast tests pass.
 - Files: `cli/sutura_cli/core/llm.py`, `cli/sutura_cli/core/agent.py`, `cli/tests/test_units.py`, `cli/docs/example_sessions.md`.
 
+### Item 2 — DONE
+- Ran the full flow on TWO off-distribution datasets, both routed correctly and honestly, no crashes:
+  - **Br8100** (DLPFC 151673/674, same panel, maha 4.77): off-dist → auto-adapt ran (Sutura zero-shot 9.53 → adapted 8.03), **PASTE2 kept (2.82 spot-pitch)**.
+  - **Breast** (V1 Block A s1/s2, maha 20.4, 95% overlap): off-dist → auto-adapt ran (Sutura zero-shot 26.9 → adapted 7.77), **PASTE2 kept (3.47 spot-pitch)**. GT available for both (array-bridge).
+- Auto-adapt path exercised & honestly labelled on both: bundle `candidates` field records every method's score + `auto_adapt_epochs`, `reason` says "auto-adapt ran; kept the best of [...]", report shows a **Methods-compared breakdown** with the kept method marked. Honest story confirmed: auto-adapt helps a lot off-distribution but PASTE2 still wins → matches our claim.
+- **Fixed a labelling bug:** the routing preview used to say flatly "PASTE2" for off-dist; now says "off-distribution: auto-adapt Sutura vs PASTE2, keep best" (or "PASTE2 (gene panel too different to adapt the model)" when overlap < 50%). Honest in streamed output, routing.json, and report.
+- Note: breast shares 95% of the basis genes, so the "panel too different → PASTE2 direct, no adapt" branch isn't hit by breast; it would need a targeted/Xenium panel (<50% overlap). Logic is in place and unit-covered; not exercised on real data tonight.
+- Files: `cli/sutura_cli/core/tools.py` (honest routing preview), `cli/sutura_cli/core/reporting.py` (candidate breakdown), `cli/tests/test_units.py` (+2). 20 fast tests pass.
+
 ## Open blockers
-- (none yet)
+- **Xenium:** no Xenium data on disk, and squidpy 1.6.6 in this venv has no `xenium` reader. Item 3 will implement detection + a clear actionable error (convert to .h5ad) rather than real Xenium ingest. Logged, moving on per rules.
 
 ## Recommendations for next / for Codex
 - TBD (updated at end).

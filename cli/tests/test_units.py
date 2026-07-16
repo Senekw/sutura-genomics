@@ -95,6 +95,26 @@ def test_finalize_type_conflict_prefers_rule():
     assert d.args.get("method") == "sutura"
 
 
+def test_report_candidate_breakdown_off_distribution():
+    from sutura_cli.core.reporting import _candidate_lines
+    # a real off-distribution record (Br8100): auto-adapt ran, PASTE2 kept
+    p = {"has_ground_truth": True,
+         "candidates": [["auto_adapt_epochs", 30], ["sutura_zeroshot", 9.53],
+                        ["sutura_adapted", 8.03], ["paste2", 2.82]]}
+    lines = "\n".join(_candidate_lines(p))
+    assert "auto-adapt" in lines and "30 epochs" in lines
+    assert "Sutura (auto-adapted): 8.03" in lines
+    assert "PASTE2: 2.82" in lines and "<- kept" in lines
+    # the kept marker is on PASTE2 (lowest error), not on Sutura
+    assert "PASTE2: 2.82 spot-pitch error  <- kept" in lines
+
+
+def test_report_no_candidate_breakdown_for_single_method():
+    from sutura_cli.core.reporting import _candidate_lines
+    assert _candidate_lines({"has_ground_truth": True,
+                             "candidates": [["sutura", 1.29]]}) == []
+
+
 def test_reconstruct_stacks_sections():
     pairs = [{
         "ref_name": "A", "mov_name": "B",

@@ -182,7 +182,15 @@ def distribution_check(ctx: WorkContext, sink: EventSink, ref_id: str,
     cfg = orch.OrchestratorConfig()
     proj = _projector(ctx)
     d = orch.distribution_check(ref.adata, mov.adata, proj, cfg)
-    method = "Sutura (graph model)" if d["in_distribution"] else "PASTE2"
+    # Honest preview of what will run. Off-distribution is NOT simply "PASTE2":
+    # the orchestrator tries auto-adapted Sutura vs PASTE2 and keeps the best
+    # (unless the gene panel is too different to adapt the model at all).
+    if d["in_distribution"]:
+        method = "Sutura (graph model)"
+    elif d["gene_overlap"] >= cfg.min_gene_overlap:
+        method = "off-distribution: auto-adapt Sutura vs PASTE2, keep best"
+    else:
+        method = "PASTE2 (gene panel too different to adapt the model)"
     sink.emit(RoutingDecision(
         pair=f"{ref.name} -> {mov.name}", method=method, reason=d["reason"],
         in_distribution=bool(d["in_distribution"]),

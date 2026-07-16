@@ -9,10 +9,35 @@ from .bundle import Bundle
 from .events import EventSink, StepFinished, StepStarted
 
 
+_CAND_LABEL = {
+    "sutura": "Sutura (graph model)", "sutura_zeroshot": "Sutura (zero-shot)",
+    "sutura_adapted": "Sutura (auto-adapted)", "paste2": "PASTE2",
+}
+
+
 def _fmt_score(p: dict) -> str:
     if p.get("has_ground_truth"):
         return f"{p['score']:.2f} spot-pitch median error (measured vs ground truth)"
     return f"{p['score']:.2f} footprint coverage (no ground truth; proxy)"
+
+
+def _candidate_lines(p: dict) -> list[str]:
+    """Honest breakdown of the methods the orchestrator compared for a pair."""
+    cands = p.get("candidates") or []
+    methods = [(n, v) for n, v in cands if n in _CAND_LABEL]
+    epochs = next((v for n, v in cands if n == "auto_adapt_epochs"), None)
+    if len(methods) < 2:      # nothing to compare (in-distribution single method)
+        return []
+    lower_better = p.get("has_ground_truth", True)
+    best = (min if lower_better else max)(methods, key=lambda kv: kv[1])[0]
+    unit = "spot-pitch error" if lower_better else "coverage"
+    out = ["- **Methods compared** (best kept):"]
+    if epochs is not None:
+        out.append(f"    - auto-adapt fine-tuned the model for {epochs} epochs on your data")
+    for name, val in methods:
+        mark = "  <- kept" if name == best else ""
+        out.append(f"    - {_CAND_LABEL[name]}: {val:.2f} {unit}{mark}")
+    return out
 
 
 def build_report_md(bundle: Bundle) -> str:
@@ -41,6 +66,7 @@ def build_report_md(bundle: Bundle) -> str:
         L.append(f"- **Method:** {p['method_label']}")
         L.append(f"- **Why:** {p.get('reason','')}")
         L.append(f"- **Result:** {_fmt_score(p)}")
+        L.extend(_candidate_lines(p))
         if p.get("in_distribution") is not None:
             L.append(f"- **Routing:** "
                      f"{'in-distribution' if p['in_distribution'] else 'off-distribution'}"
