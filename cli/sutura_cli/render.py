@@ -13,12 +13,34 @@ from rich.table import Table
 from rich.text import Text
 
 from . import __version__
-from .core.events import (AgentMessage, BundleWritten, Note, RoutingDecision,
-                          StepFinished, StepProgress, StepStarted)
+from .core.events import (AgentMessage, BundleWritten, Note, PairResult,
+                          RoutingDecision, StepFinished, StepProgress,
+                          StepStarted)
+
+_QUIET_PREFIXES = ("route", "align:", "postqc:")
+
+
+def _short_method(m: str) -> str:
+    if not m:
+        return "?"
+    if "adapt" in m:
+        return "Sutura·adapt"
+    if "zero-shot" in m:
+        return "Sutura·zs"
+    if "sutura" in m.lower() or "graph" in m.lower():
+        return "Sutura"
+    if "paste" in m.lower():
+        return "PASTE2"
+    return m[:12]
+
+
+def _fit(s: str, w: int) -> str:
+    return s if len(s) <= w else s[: w - 1] + "…"
 
 ACCENT = "#a78bfa"     # lavender, matching the Sutura mark
 ACCENT2 = "#6ee7ff"    # cyan highlight
 DIM = "grey62"
+_RULE = "#34344a"      # dim stage divider
 
 
 def make_console() -> Console:
@@ -61,39 +83,72 @@ class ConsoleSink:
         self.console = console or make_console()
         self.show_progress = show_progress
         self._last_pct: dict[str, int] = {}
+        self._pairs_open = False
+
+    def _stage(self, title: str):
+        self.console.print()
+        self.console.rule(f"[bold {ACCENT}] {title} ", characters="─",
+                          style=_RULE, align="left")
+
+    def _open_pairs(self):
+        self._stage("Alignment")
+        self.console.print(f"  [{DIM}]{'pair':<27}{'method':<13}{'error':>7}  "
+                           f"{'routing':<11}qc[/{DIM}]")
+        self._pairs_open = True
 
     def emit(self, ev) -> None:
         c = self.console
-        # routing has its own dedicated line; suppress its generic step chrome
-        if getattr(ev, "step_id", "").startswith("route"):
-            if isinstance(ev, (StepStarted, StepFinished, StepProgress)):
-                return
+        sid = getattr(ev, "step_id", "")
+        # per-pair chrome is folded into the compact table
+        if sid.startswith(_QUIET_PREFIXES):
+            if isinstance(ev, StepProgress) and self.show_progress:
+                last = self._last_pct.get(sid, -1)
+                if ev.pct >= last + 33 or ev.pct >= 100:
+                    self._last_pct[sid] = ev.pct
+                    c.print(f"    [{DIM}]· {ev.message} … {ev.pct}%[/{DIM}]")
+            return
 
         if isinstance(ev, StepStarted):
-            det = f"  [{DIM}]{ev.detail}[/{DIM}]" if ev.detail else ""
-            c.print(f"  [bold]{ev.title}[/bold]{det}")
+            self._stage(ev.title)
         elif isinstance(ev, StepProgress):
             if not self.show_progress:
                 return
-            last = self._last_pct.get(ev.step_id, -1)
+            last = self._last_pct.get(sid, -1)
             if ev.pct >= last + 25 or ev.pct >= 100:
-                self._last_pct[ev.step_id] = ev.pct
-                c.print(f"      [{DIM}]· {ev.message} … {ev.pct}%[/{DIM}]")
+                self._last_pct[sid] = ev.pct
+                c.print(f"    [{DIM}]· {ev.message} … {ev.pct}%[/{DIM}]")
         elif isinstance(ev, RoutingDecision):
-            tag = ("[green]in-distribution[/green]" if ev.in_distribution
-                   else f"[{ACCENT}]off-distribution[/{ACCENT}]")
-            c.print(f"  [bold]Routing[/bold]  [{DIM}]{ev.pair}[/{DIM}]")
-            c.print(f"      [{ACCENT2}]→ {ev.method}[/{ACCENT2}]   {tag} "
-                    f"[{DIM}]· Mahalanobis {ev.mahalanobis:.2f} · gene overlap "
-                    f"{int(ev.gene_overlap*100)}%[/{DIM}]")
+            pass                       # folded into the pair row
+        elif isinstance(ev, PairResult):
+            if not self._pairs_open:
+                self._open_pairs()
+            pair = f"{_fit(ev.ref + ' → ' + ev.mov, 26):<27}"
+            method = f"{_short_method(ev.method_label):<13}"
+            err = f"{(f'{ev.score:.2f}' if ev.has_ground_truth else f'{ev.score:.2f}c'):>7}"
+            if ev.in_distribution is None:
+                route = "forced"
+            else:
+                tag = "in" if ev.in_distribution else "off"
+                route = (f"{tag}·{ev.mahalanobis:.1f}"
+                         if ev.mahalanobis is not None else tag)
+            route = f"{route:<11}"
+            qc = (f"[green]{ev.verdict}[/green]" if ev.verdict == "pass"
+                  else f"[yellow]{ev.verdict}[/yellow]")
+            c.print(f"  {pair}[{ACCENT}]{method}[/{ACCENT}]{err}  "
+                    f"[{DIM}]{route}[/{DIM}]{qc}")
         elif isinstance(ev, StepFinished):
             c.print(f"  {_ICON.get(ev.status, '✔')} [white]{ev.summary}[/white]")
         elif isinstance(ev, Note):
             colour = {"warn": "yellow", "error": "red"}.get(ev.level, DIM)
-            c.print(f"      [{colour}]{ev.text}[/{colour}]")
+            c.print(f"    [{colour}]{ev.text}[/{colour}]")
         elif isinstance(ev, AgentMessage):
-            c.print(f"\n[{ACCENT2}]{ev.text}[/{ACCENT2}]\n")
+            if ev.text.lower().startswith("on it:"):
+                c.print(f"[{DIM}]{ev.text.splitlines()[0]}[/{DIM}]")
+            else:
+                c.print(f"\n[{ACCENT2}]{ev.text}[/{ACCENT2}]\n")
         elif isinstance(ev, BundleWritten):
+            self._pairs_open = False
+            c.print()
             self._completion(ev.summary)
 
     def _completion(self, s: dict) -> None:
@@ -105,20 +160,12 @@ class ConsoleSink:
 
 
 def completion_panel(s: dict):
-    """Build the 'Run complete' summary card (shared by console + TUI). Returns a
-    rich Panel, or None if there is nothing to summarise."""
+    """Build the compact 'Run complete' summary card (shared by console + TUI).
+    Per-pair detail already streamed above as the Alignment table, so the card
+    stays a calm summary: counts, methods used, and where the bundle went.
+    Returns a rich Panel, or None if there is nothing to summarise."""
     if not s or not s.get("pairs"):
         return None
-    tbl = Table(box=box.SIMPLE_HEAD, expand=False, pad_edge=False, show_edge=False)
-    tbl.add_column("Pair", style="white")
-    tbl.add_column("Method", style=ACCENT)
-    tbl.add_column("Result", style="white")
-    tbl.add_column("QC", style=DIM)
-    for p in s["pairs"]:
-        score = (f"{p['score']:.2f} spot-pitch err" if p.get("has_ground_truth")
-                 else f"{p['score']:.2f} coverage")
-        tbl.add_row(f"{p['ref']} → {p['mov']}", p["method_label"], score,
-                    p.get("verdict") or "-")
     comp = ""
     if s.get("composition") == "pairwise_composition":
         comp = f"  [{DIM}](pairwise composition)[/{DIM}]"
@@ -126,12 +173,15 @@ def completion_panel(s: dict):
     head.append("✓ Run complete", style="bold green")
     head.append(f"   {s['job_id']}", style=DIM)
     meta = Text.from_markup(
-        f"[{DIM}]sections[/{DIM}] {s['n_sections']}   "
-        f"[{DIM}]pairs[/{DIM}] {s['n_pairs']}   "
-        f"[{DIM}]3D points[/{DIM}] {s.get('n_points', 0)}{comp}")
+        f"[{DIM}]sections[/{DIM}] {s['n_sections']}    "
+        f"[{DIM}]pairs[/{DIM}] {s['n_pairs']}    "
+        f"[{DIM}]3D points[/{DIM}] {s.get('n_points', 0):,}{comp}")
+    methods = Text.from_markup(
+        f"[{DIM}]methods[/{DIM}] " +
+        "  ".join(f"[{ACCENT}]{m}[/{ACCENT}]" for m in s.get("methods", [])))
     foot = Text.from_markup(
         f"[{DIM}]bundle[/{DIM}] {s['path']}\n"
         f"[{ACCENT2}]▶ open in the Sutura app to view the 3D model[/{ACCENT2}]")
-    body = Group(meta, Text(""), tbl, Text(""), foot)
+    body = Group(meta, methods, Text(""), foot)
     return Panel(body, title=head, title_align="left", box=box.ROUNDED,
                  border_style="green", padding=(0, 2), expand=False)

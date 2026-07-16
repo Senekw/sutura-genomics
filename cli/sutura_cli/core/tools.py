@@ -215,10 +215,15 @@ def load_data(ctx: WorkContext, sink: EventSink, path: str) -> dict:
         raise LoaderError(
             "No sections could be loaded:\n  - " + "\n  - ".join(warnings))
 
+    # compact summary: don't dump 35 section names inline
+    spots = [s["n_spots"] for s in loaded]
+    if len(loaded) <= 4:
+        detail = ", ".join(f"{s['name']} ({s['n_spots']:,})" for s in loaded)
+    else:
+        detail = f"{min(spots):,}–{max(spots):,} spots each"
     sink.emit(StepFinished(
         step_id=sid, status="warn" if warnings else "ok",
-        summary=f"{len(loaded)} section(s): " +
-                ", ".join(f"{s['name']} ({s['n_spots']} spots)" for s in loaded)))
+        summary=f"loaded {len(loaded)} section(s) · {detail}"))
     return {"sections": loaded, "warnings": warnings}
 
 

@@ -54,6 +54,23 @@ class RoutingDecision(Event):
 
 
 @dataclass
+class PairResult(Event):
+    """One finished pair, ready to render as a compact table row: pair, method
+    (and why), error, QC verdict. Emitted after a pair's post-QC completes."""
+    ref: str
+    mov: str
+    method_label: str
+    score: float
+    metric: str
+    has_ground_truth: bool
+    verdict: str
+    in_distribution: bool | None = None
+    mahalanobis: float | None = None
+    reason: str = ""
+    kind: str = field(default="pair_result", init=False)
+
+
+@dataclass
 class Note(Event):
     text: str
     level: str = "info"          # info | warn | error
