@@ -51,6 +51,12 @@ class Session:
                 return self._realign(**decision.args)
             if decision.name == "report":
                 return self._report_only()
+            if decision.name == "metrics":
+                return self._metrics()
+            if decision.name == "worst":
+                return self._worst()
+            if decision.name == "explain_routing":
+                return self._explain_routing(**decision.args)
             self.sink.emit(Note(text=f"unknown tool {decision.name!r}", level="warn"))
             return self.bundle
         if isinstance(decision, Reply):
@@ -207,4 +213,84 @@ class Session:
         self.bundle.write()
         self.sink.emit(AgentMessage(text=f"Report refreshed: "
                                     f"{self.bundle.root / 'report.md'}"))
+        return self.bundle
+
+    # --- read-only queries over the current job (no re-run) ------------- #
+    def _no_job(self) -> bool:
+        if self.bundle is None or not self.bundle.pairs:
+            self.sink.emit(AgentMessage(
+                text="No alignment job yet - run one first, e.g. "
+                     '"align the sections in ./data and reconstruct in 3D".'))
+            return True
+        return False
+
+    @staticmethod
+    def _score_txt(p: dict) -> str:
+        if p.get("has_ground_truth"):
+            return f"{p['score']:.2f} spot-pitch median error (measured vs ground truth)"
+        return f"{p['score']:.2f} footprint coverage (proxy; no ground truth)"
+
+    def _metrics(self) -> Bundle:
+        if self._no_job():
+            return self.bundle
+        lines = [f"Metrics for job {self.bundle.job_id} "
+                 f"({len(self.bundle.pairs)} pair(s)):"]
+        for p in self.bundle.pairs:
+            pq = (p.get("post_qc") or {}).get("verdict", "?")
+            lines.append(f"  - {p['ref']} -> {p['mov']}: {p['method_label']} | "
+                         f"{self._score_txt(p)} | post-QC: {pq}")
+        self.sink.emit(AgentMessage(text="\n".join(lines)))
+        return self.bundle
+
+    def _worst(self) -> Bundle:
+        if self._no_job():
+            return self.bundle
+
+        def badness(p):
+            # higher = worse. error: bigger is worse; coverage: smaller is worse.
+            return p["score"] if p.get("has_ground_truth") else -p["score"]
+
+        ordered = sorted(self.bundle.pairs, key=badness, reverse=True)
+        worst, best = ordered[0], ordered[-1]
+        msg = [f"Worst-aligned pair: {worst['ref']} -> {worst['mov']} "
+               f"({worst['method_label']}, {self._score_txt(worst)})."]
+        if best is not worst:
+            msg.append(f"Best-aligned pair: {best['ref']} -> {best['mov']} "
+                       f"({best['method_label']}, {self._score_txt(best)}).")
+        if not worst.get("has_ground_truth"):
+            msg.append("Note: no ground truth for these pairs, so 'worst' is by "
+                       "footprint-coverage proxy, not measured error.")
+        self.sink.emit(AgentMessage(text=" ".join(msg)))
+        return self.bundle
+
+    def _explain_routing(self, section: str | None = None) -> Bundle:
+        if self._no_job():
+            return self.bundle
+        pairs = self.bundle.pairs
+        if section is not None:
+            tgt = self.ctx.resolve(section)
+            sel = [p for p in pairs
+                   if (tgt and tgt.name in (p["ref"], p["mov"]))
+                   or section in (p["ref"], p["mov"])]
+            pairs = sel or pairs
+        lines = ["Routing decisions (why each method was chosen):"]
+        for p in pairs:
+            if p.get("in_distribution") is None:
+                lines.append(f"  - {p['ref']} -> {p['mov']}: {p['method_label']} "
+                             f"was forced by you (routing bypassed).")
+                continue
+            maha, thr = p.get("mahalanobis"), 2.5
+            overlap = p.get("gene_overlap")
+            if p["in_distribution"]:
+                why = (f"in-distribution for the pretrained Sutura model "
+                       f"(Mahalanobis {maha:.2f} < {thr}); the graph model is most "
+                       f"accurate here, so Sutura was used.")
+            else:
+                why = (f"off-distribution (Mahalanobis {maha:.2f} >= {thr}"
+                       + (f", gene overlap {int(overlap*100)}%" if overlap is not None else "")
+                       + "); the pretrained model is not trusted here, so the "
+                       "orchestrator kept the best of auto-adapted Sutura and PASTE2.")
+            lines.append(f"  - {p['ref']} -> {p['mov']}: routed to "
+                         f"{p['method_label']} because it is {why}")
+        self.sink.emit(AgentMessage(text="\n".join(lines)))
         return self.bundle
