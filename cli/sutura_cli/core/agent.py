@@ -154,23 +154,48 @@ class Session:
         })
 
     def _reconstruct(self):
+        idxs = sorted(self._results)
+        # reconstruct the contiguous chain from the first successful pair; a gap
+        # (a skipped pair) breaks frame composition, so stop the stack there
+        chain = [idxs[0]]
+        for i in idxs[1:]:
+            if i == chain[-1] + 1:
+                chain.append(i)
+            else:
+                break
+        dropped = [i for i in idxs if i not in chain]
+
         pairs = []
-        for i in sorted(self._results):
+        for i in chain:
             r = self._results[i]
+            mov = self.ctx.resolve(r["_mov_id"])
+            mov_coords = (mov.adata.obsm["spatial"] if mov is not None else None)
             pairs.append({
                 "ref_name": r["ref_name"], "mov_name": r["mov_name"],
                 "ref_coords": r["ref_coords"], "aligned_coords": r["aligned_coords"],
+                "mov_coords": mov_coords,
                 "ref_layers": r.get("ref_layers"), "mov_layers": r.get("mov_layers"),
                 "pitch": r.get("_pitch"), "method": r["method_label"],
             })
         sid = "reconstruct"
+        detail = ("stacking aligned sections" if len(chain) == 1
+                  else f"composing {len(chain)}-pair chain into one frame")
         self.sink.emit(StepStarted(step_id=sid, title="3D reconstruction",
-                                   detail="stacking aligned sections"))
+                                   detail=detail))
         rec = build_pointcloud(pairs)
+        if dropped:
+            gap = (f"{len(dropped)} downstream pair(s) omitted from the 3D stack: "
+                   f"a pair failed and broke the chain composition")
+            rec["note"] += f"; {gap}"
+            rec["dropped_pairs"] = dropped
+            self.bundle.warnings.append(gap)
+            self.sink.emit(Note(text=gap, level="warn"))
         self.bundle.reconstruction = rec
+        comp = "" if rec.get("composition") == "exact_single_reference" \
+            else f" ({rec.get('composition')})"
         self.sink.emit(StepFinished(
             step_id=sid, status="ok",
-            summary=f"{rec['n_sections']} sections, {rec['n_points']} points"))
+            summary=f"{rec['n_sections']} sections, {rec['n_points']} points{comp}"))
 
     def _finalise(self) -> Bundle:
         root = self.bundle.write()

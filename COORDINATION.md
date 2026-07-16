@@ -18,7 +18,7 @@
 | 1 | Local LLM backend (no key) | DONE (commit pending) |
 | 2 | Off-distribution path, honest | DONE (commit pending) |
 | 3 | Robust loaders + error handling | DONE (commit pending) |
-| 4 | Multi-section (>2) reconstruction | pending |
+| 4 | Multi-section (>2) reconstruction | DONE (commit pending) |
 | 5 | Polished streaming UX | pending |
 | 6 | Comprehensive tests | pending |
 | 7 | Documentation | pending |
@@ -61,6 +61,14 @@ Hardened `tools.py` + `agent.py` so every realistic failure mode yields a helpfu
 - **Space Ranger:** validates spatial/ subfolder + readable matrix with targeted messages.
 - **Xenium:** detected and rejected with an actionable message (convert to .h5ad) — see blocker below.
 - Tests: new `cli/tests/test_loaders.py` (12 tests: spatial recovery, missing/empty path, empty h5ad, zero-gene guard, single-section). 32 fast tests pass.
+
+### Item 4 — DONE
+- Rewrote `reconstruct.py` to compose a multi-section chain into ONE reference frame. Pairwise alignment puts section k+1 into section k's frame; we fit a **similarity transform (Umeyama: rotation + uniform scale + translation)** per pair from the moving section's original coords → its aligned coords, then chain those transforms back to the first section's frame. 2 sections (1 pair) stays exact.
+- **Honest labelling:** reconstruction records `composition` = `exact_single_reference` (2 sections) or `pairwise_composition` (>2), with a note that it is NOT a global simultaneous solve (unlike GPSA), plus `global_frame`. Streamed step and report say so.
+- **Gap handling:** if a pair was skipped (item-3 resilience), the chain composition breaks there; we reconstruct the contiguous run from the first pair and record `dropped_pairs` + a warning rather than mis-stacking.
+- **Proven on a real 4-section DLPFC chain** (Br5292 151507-510): 4 sections / 3 pairs / 18033 points. All four section centroids cluster within ~180 px in the common frame (6634-6817 x, 4953-5058 y) — composition works. z = 0/137/274/411 (pitch spacing). Methods honestly mixed: Sutura (1.29) then PASTE2/PASTE2 (post-QC retries at 6.67/4.35, since DLPFC 3rd/4th slices are farther apart — real orchestrator behavior).
+- Tests: composition unit test recovers a known chained similarity to atol 0.05; 2-section-exact asserted. 33 fast tests pass.
+- Files: `cli/sutura_cli/core/reconstruct.py`, `cli/sutura_cli/core/agent.py`, `cli/tests/test_units.py`.
 
 ## Open blockers
 - **Xenium (unchanged):** no Xenium data on disk; squidpy 1.6.6 has no `xenium` reader. Implemented as detect + actionable error (convert Xenium → .h5ad, point Sutura at it) per the "clear message" option. Real Xenium ingest deferred until a sample + reader are available.

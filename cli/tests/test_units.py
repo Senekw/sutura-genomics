@@ -129,5 +129,45 @@ def test_reconstruct_stacks_sections():
     assert rec["z_spacing"] == 2.0
     assert rec["sections"][0]["z"] == 0.0
     assert rec["sections"][1]["z"] == 2.0
+    assert rec["composition"] == "exact_single_reference"   # 2 sections = exact
     # every point carries [x, y, z, section_index, layer]
     assert all(len(p) == 5 for p in rec["points"])
+
+
+def _sim(angle_deg, scale, tx, ty):
+    import numpy as np
+    a = np.deg2rad(angle_deg)
+    R = np.array([[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]]) * scale
+    return lambda P: (np.asarray(P, float) @ R.T) + np.array([tx, ty])
+
+
+def test_reconstruct_chain_composes_to_global_frame():
+    """A 3-section chain: section 2 is aligned into section 1's frame, which is
+    itself rotated/translated from section 0. Composition must land section 2 in
+    section 0's (global) frame."""
+    import numpy as np
+    rng = np.random.RandomState(1)
+    s0 = rng.rand(30, 2) * 100                      # frame 0 (global)
+    s1_orig = rng.rand(25, 2) * 100                 # section 1 in its own frame
+    s2_orig = rng.rand(20, 2) * 100                 # section 2 in its own frame
+    S10 = _sim(30, 1.0, 12, -5)                     # frame1 -> frame0
+    S21 = _sim(-15, 1.0, -8, 20)                    # frame2 -> frame1
+    aligned1 = S10(s1_orig)                         # section1 placed in frame0
+    aligned2 = S21(s2_orig)                         # section2 placed in frame1
+
+    pairs = [
+        {"ref_name": "s0", "mov_name": "s1", "ref_coords": s0.tolist(),
+         "aligned_coords": aligned1.tolist(), "mov_coords": s1_orig.tolist(),
+         "pitch": 1.0, "method": "Sutura"},
+        {"ref_name": "s1", "mov_name": "s2", "ref_coords": s1_orig.tolist(),
+         "aligned_coords": aligned2.tolist(), "mov_coords": s2_orig.tolist(),
+         "pitch": 1.0, "method": "Sutura"},
+    ]
+    rec = build_pointcloud(pairs)
+    assert rec["n_sections"] == 3
+    assert rec["composition"] == "pairwise_composition"
+    # section 2's placed points should equal S10(S21(s2_orig)) = S10(aligned2)
+    expected = S10(aligned2)
+    placed = np.array([[p[0], p[1]] for p in rec["points"] if p[3] == 2])
+    assert placed.shape == expected.shape
+    assert np.allclose(placed, expected, atol=0.05)
