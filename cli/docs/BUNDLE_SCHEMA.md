@@ -90,28 +90,61 @@ labelling: `method_label` is exactly what ran; `reason` explains the routing;
                "candidates": [["sutura", 3.0]],
                "aligned_file": "alignment/pair_00__.../aligned.h5ad",
                "post_qc": { "verdict": "pass", "neighbor_consistency": 0.86,
-                            "footprint_coverage": 0.97, "basis": "..." } } ] }
+                            "footprint_coverage": 0.97, "basis": "...",
+                            "adjacency_warning": "..." } } ] }   // warning present
+                                                                 // only if coverage < 0.4
 ```
+
+For an **off-distribution** pair, `candidates` lists every method the orchestrator
+compared and `reason` explains the routing, e.g.:
+```jsonc
+{ "method": "paste2", "method_label": "PASTE2", "in_distribution": false,
+  "mahalanobis": 4.77, "gene_overlap": 1.0,
+  "reason": "off-distribution (Mahalanobis 4.77, gene overlap 100%); auto-adapt ran; kept the best of [...]",
+  "candidates": [ ["auto_adapt_epochs", 30], ["sutura_zeroshot", 9.53],
+                  ["sutura_adapted", 8.03], ["paste2", 2.82] ] }
+```
+
+If **every** pair fails to align, the bundle is still written with
+`metadata.status = "failed"` and the failures listed in `metadata.warnings` — an
+honest record of what was attempted.
 `metric` is either `median_error_pitch` (lower is better; requires ground truth,
 e.g. Visium array coordinates) or `footprint_coverage` (0-1, higher is better;
 used when no ground truth is derivable).
 
 ### `reconstruction.json`
-A serial-section z-stack. `z` encodes section order (in-plane alignment is the
-orchestrator's output); it is not measured depth.
+A serial-section z-stack. `z` encodes section order (a fixed slice spacing), not
+measured depth. `composition` is honest about how the volume was assembled:
+
+- `exact_single_reference` — 2 sections (1 pair); the moving section is already in
+  the reference frame, so the stack is exact.
+- `pairwise_composition` — >2 sections; each pair is aligned into its neighbour's
+  frame, then chained into the first section's (`global_frame`) frame via a
+  per-pair **similarity transform** (rotation + uniform scale + translation). This
+  is NOT a global simultaneous solve (unlike GPSA); it is labelled as such.
+
 ```jsonc
 { "kind": "serial_section_zstack",
-  "note": "z encodes section order (pairwise-to-neighbour alignment); ...",
+  "composition": "pairwise_composition",     // or "exact_single_reference"
+  "global_frame": "DLPFC_151507",            // the frame all sections are placed in
+  "note": "pairwise composition: per-pair similarity transforms chained ...",
   "z_spacing": 137.0, "pitch": 137.0,
-  "n_sections": 2, "n_points": 7278,
+  "n_sections": 4, "n_points": 18033,
   "bounds": { "min": [x,y,z], "max": [x,y,z] },
+  "dropped_pairs": [ ],                       // present only if a pair failed and
+                                              // broke the chain (see status=failed)
   "sections": [ { "index": 0, "name": "DLPFC_151507", "z": 0.0,
-                  "n_points": 3639, "method": "reference" },
+                  "n_points": 4226, "method": "reference" },
                 { "index": 1, "name": "DLPFC_151508", "z": 137.0,
-                  "n_points": 3639, "method": "Sutura (graph model)" } ],
+                  "n_points": 4384, "method": "Sutura" },
+                { "index": 2, "name": "DLPFC_151509", "z": 274.0,
+                  "n_points": 4789, "method": "PASTE2" } ],
   "point_fields": ["x", "y", "z", "section_index", "layer"],
   "points": [ [ 1234.5, 987.6, 0.0, 0, "Layer3" ], ... ] }
 ```
+
+`section.method` is the method that produced that section's in-plane alignment
+(`"reference"` for section 0), so the viewer can honestly colour/label per slice.
 
 ### `alignment/<pair>/aligned.h5ad`
 The moving section as AnnData. Alignment lives in:

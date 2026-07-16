@@ -21,7 +21,7 @@
 | 4 | Multi-section (>2) reconstruction | DONE (commit pending) |
 | 5 | Polished streaming UX | DONE (commit pending) |
 | 6 | Comprehensive tests | DONE (commit pending) |
-| 7 | Documentation | pending |
+| 7 | Documentation | DONE (commit pending) |
 | 8 | Viewer app v1 (sutura-app) | pending |
 | 9 | End-to-end integration test | pending |
 
@@ -83,6 +83,13 @@ Comprehensive suite, all green (real coverage, not token tests):
 - **Fast (46 tests, no engine):** `test_units.py` (planner intents incl. new query tools, `_finalize` off-vocab + type-conflict fallback, method/alias normalization, reconstruction similarity-composition to atol 0.05, report candidate breakdown), `test_loaders.py` (18: spatial recovery from obsm aliases/obs pairs, missing/empty path, empty h5ad, zero-gene guard, Space Ranger detect + missing-spatial, Xenium actionable error, single-section message), `test_tui.py` (Textual composes/quits), `test_llm_ollama.py` (the **real local model** plans all 8 core intents + never emits out-of-vocabulary — skips if no Ollama).
 - **Engine e2e (`test_e2e.py`, auto-skip if data absent):** in-dist full loop + valid bundle; forced-PASTE2 follow-up; **off-distribution** (Br8100: asserts off-dist routing, auto-adapt candidates recorded, honest PASTE2 label, streamed off-dist); **4-section chain** (asserts pairwise_composition, global_frame, z ordering, and that section centroids cluster < 1000px in one frame). Both slow engine tests pass (20m50s).
 - Files: `cli/tests/test_llm_ollama.py` (new), `cli/tests/test_loaders.py`, `cli/tests/test_e2e.py`.
+
+### Item 7 — DONE
+- **README** rewritten: local-model-no-key emphasis (`ollama pull llama3.2:3b`), a full **natural-language command table** (align / redo / switch / metrics / worst / explain-routing / report / help), backend selection + env vars, a polished demo transcript (banner → steps → routing → completion card), robustness summary, and links to the schema/architecture/sessions docs.
+- **`docs/ARCHITECTURE.md`** (new): the 4-layer design (LLM backends → agent loop → tools → engine), the metadata-only contract, the event/sink rendering split, and a **step-by-step "how to add a new tool"** guide (stays extensible without touching alignment code).
+- **`docs/BUNDLE_SCHEMA.md`** updated: reconstruction `composition` (exact_single_reference | pairwise_composition) + `global_frame` + `dropped_pairs`, per-section `method`, off-distribution `candidates`/`reason` example, `post_qc.adjacency_warning`, and `status="failed"` semantics.
+- **`docs/example_sessions.md`** (from item 1): real local-model sessions kept as the clean demo transcript.
+- Files: `cli/README.md`, `cli/docs/ARCHITECTURE.md` (new), `cli/docs/BUNDLE_SCHEMA.md`.
 
 ## Open blockers
 - **Xenium (unchanged):** no Xenium data on disk; squidpy 1.6.6 has no `xenium` reader. Implemented as detect + actionable error (convert Xenium → .h5ad, point Sutura at it) per the "clear message" option. Real Xenium ingest deferred until a sample + reader are available.
