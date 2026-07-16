@@ -45,13 +45,11 @@ def _load_config(args) -> Config:
 
 
 def run_headless(instruction: str, cfg: Config) -> int:
-    from .render import banner
+    from .render import ACCENT2, banner
     sink = ConsoleSink()
-    session = Session(cfg, sink)
-    model = getattr(session.backend, "model", None)
-    who = f"{session.backend.name}" + (f" ({model})" if model else "")
-    banner(sink.console, f"backend: {who}  ·  store: {cfg.store}  ·  no data egress")
-    sink.console.print(f"[#6ee7ff]▸[/#6ee7ff] [italic]{instruction}[/italic]\n")
+    session = Session(cfg, sink)          # backend chosen silently; model hidden
+    banner(sink.console, "local · no data egress")
+    sink.console.print(f"[{ACCENT2}]▸[/{ACCENT2}] [italic]{instruction}[/italic]\n")
     try:
         session.handle(instruction)
     except Exception as e:

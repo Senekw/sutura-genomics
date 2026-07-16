@@ -212,3 +212,55 @@ def test_awaiting_path_nonpath_reply_falls_through(tmp_path, monkeypatch):
     assert session._awaiting_path is False
     msgs = " ".join(e.text for e in session.sink.of_kind("agent_message"))
     assert "build a 3D reconstruction" in msgs
+
+
+# --- name-a-file-and-go: resolve a bare name against the current folder ---- #
+def test_named_target_resolves_folder_in_cwd(tmp_path, monkeypatch):
+    d = tmp_path / "my_sections"; d.mkdir()
+    _adata().write_h5ad(d / "a.h5ad")
+    monkeypatch.chdir(tmp_path)
+    session = _session(tmp_path)
+    got = session._named_target("please use my_sections and align them", str(tmp_path))
+    assert got is not None and got.endswith("my_sections")
+
+
+def test_named_target_resolves_file_in_cwd(tmp_path, monkeypatch):
+    _adata().write_h5ad(tmp_path / "breast.h5ad")
+    monkeypatch.chdir(tmp_path)
+    session = _session(tmp_path)
+    got = session._named_target("the file is breast.h5ad", str(tmp_path))
+    assert got is not None and got.endswith("breast.h5ad")
+
+
+def test_named_target_none_when_no_match(tmp_path):
+    session = _session(tmp_path)
+    assert session._named_target("align these sections in 3D", str(tmp_path)) is None
+
+
+# --- manual mode confirms before file access; auto proceeds --------------- #
+def test_manual_mode_declined_reads_nothing(tmp_path, monkeypatch):
+    d = tmp_path / "data"; d.mkdir()
+    _adata().write_h5ad(d / "a.h5ad")
+    _adata().write_h5ad(d / "b.h5ad")
+    monkeypatch.chdir(d)
+    session = _session(tmp_path)
+    session.mode = "manual"
+    prompts = []
+    session.on_confirm = lambda p: (prompts.append(p), False)[1]   # decline
+    session.handle("align these sections and reconstruct in 3D")
+    assert prompts and "About to read 2 sections" in prompts[0]
+    assert session.bundle is None          # nothing ran
+    msgs = " ".join(e.text for e in session.sink.of_kind("agent_message"))
+    assert "haven't read anything" in msgs
+
+
+def test_auto_mode_does_not_confirm(tmp_path, monkeypatch):
+    d = tmp_path / "data"; d.mkdir()
+    _adata().write_h5ad(d / "only.h5ad")   # single section -> stops before engine
+    monkeypatch.chdir(d)
+    session = _session(tmp_path)
+    session.mode = "auto"
+    called = []
+    session.on_confirm = lambda p: called.append(p) or True
+    session.handle("align these sections and reconstruct in 3D")
+    assert called == []                    # auto mode never asked
