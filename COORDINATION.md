@@ -23,7 +23,7 @@
 | 6 | Comprehensive tests | DONE (commit pending) |
 | 7 | Documentation | DONE (commit pending) |
 | 8 | Viewer app v1 (sutura-app) | DONE (commit pending) |
-| 9 | End-to-end integration test | pending |
+| 9 | End-to-end integration test | DONE (commit pending) |
 
 ## Baseline (from prior session, commit ca460a5)
 Full CLI skeleton committed: TUI (Textual), agent loop, 6 tools wrapping the engine, bundle writer (schema v1.0), rule/cloud/ollama backends, e2e test on DLPFC pair (in-dist → Sutura, 1.29 spot-pitch, valid bundle). All prior tests pass.
@@ -100,6 +100,11 @@ Built the **viewer app** — a local, display-only companion under `app/` (entry
 - **Reuse note:** reuses the web demo's *visual language* (layer palette `#8ecae6…#e63946`, three.js point cloud, method-honesty copy) rather than importing its React components — a deliberate v1 choice for a build-free, offline, local app. Web demo (`demo/`) untouched.
 - **Verified:** served the 4 real bundles from tonight (in-dist Sutura, off-dist Br8100/breast PASTE2, 4-section chain PASTE2+Sutura); `/api/runs` returns all 4 with honest methods; index/app.js/styles/logo/three.js all serve 200; `node --check app.js` passes; 10 hermetic app tests pass (store, API, chat honesty).
 - Files: `app/` (pyproject, sutura_app/{__init__,server,store,chat}.py, static/{index.html,styles.css,app.js,logo.jpg,vendor/three.module.min.js}, tests/test_app.py).
+
+### Item 9 — DONE
+- **Integration test** `app/tests/test_integration.py`: drives the **CLI** to align real DLPFC and write a bundle, then proves the **app** reads and displays it — store lists+loads the job, displayed method/score/reconstruction match what the CLI wrote, the referenced aligned `.h5ad` exists, the **HTTP API** serves the same run (as the browser fetches it), and the **chatbot** honestly names the method. Passes on the in-dist pair (Sutura, 1.29 spot-pitch).
+- **Documented** the working loop in `app/docs/INTEGRATION.md` (diagram + the two commands + what the test proves).
+- Proves the full local product loop **CLI → bundle → app**, no data egress.
 
 ## Open blockers
 - **Browser screenshot:** the Claude-in-Chrome extension is offline this session, so I could not capture a live in-browser screenshot of the viewer. Rendering is verified indirectly (API serves valid data for all 4 real bundles, all assets 200, `node --check` passes on the frontend JS). Providing a self-contained Artifact preview as visual confirmation instead.
