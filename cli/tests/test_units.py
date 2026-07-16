@@ -42,6 +42,8 @@ def test_rule_backend_needs_path():
     ("what was the best pair?", "worst"),
     ("explain the routing decision", "explain_routing"),
     ("why did it pick that method?", "explain_routing"),
+    ("which method did you use, and why?", "explain_routing"),
+    ("what method did you use?", "explain_routing"),
     ("regenerate the report", "report"),
 ])
 def test_rule_backend_query_intents(text, tool):
