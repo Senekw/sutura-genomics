@@ -161,17 +161,54 @@ def test_xenium_actionable_error(tmp_path):
 
 
 # --- workflow-level: single section is a clean message, not a crash ------- #
-def test_workflow_single_section_message(tmp_path):
+def _session(tmp_path):
     from sutura_cli.core.agent import Session
     from sutura_cli.core.config import Config
     from sutura_cli.core.llm import RuleBackend
-    d = tmp_path / "one"; d.mkdir()
-    _adata().write_h5ad(d / "only.h5ad")
     cfg = Config(store=tmp_path / "store", backend="rule", cloud_model="",
                  ollama_model="", ollama_host="http://localhost:11434")
-    sink = ListSink()
-    session = Session(cfg, sink, backend=RuleBackend())
+    return Session(cfg, ListSink(), backend=RuleBackend())
+
+
+def test_workflow_single_section_message(tmp_path):
+    d = tmp_path / "one"; d.mkdir()
+    _adata().write_h5ad(d / "only.h5ad")
+    session = _session(tmp_path)
     session.handle(f"align the sections in {d} and reconstruct in 3D")
-    msgs = " ".join(e.text for e in sink.of_kind("agent_message"))
+    msgs = " ".join(e.text for e in session.sink.of_kind("agent_message"))
     assert "at least 2" in msgs
     assert session.bundle is None          # no job created for a single section
+
+
+# --- Claude-Code UX: default to the current folder, ask when empty -------- #
+def test_bare_intent_defaults_to_current_folder(tmp_path, monkeypatch):
+    # one section in the cwd -> it uses the cwd (no path given) then asks for a 2nd
+    _adata().write_h5ad(tmp_path / "only.h5ad")
+    monkeypatch.chdir(tmp_path)
+    session = _session(tmp_path)
+    session.handle("align these sections and reconstruct in 3D")     # no path!
+    notes = " ".join(e.text for e in session.sink.events if e.kind == "note")
+    msgs = " ".join(e.text for e in session.sink.of_kind("agent_message"))
+    assert "current directory" in notes    # it fell back to cwd
+    assert "at least 2" in msgs            # and used it (found the 1 section there)
+
+
+def test_bare_intent_asks_when_folder_empty(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)             # empty cwd
+    session = _session(tmp_path)
+    session.handle("align these sections and reconstruct in 3D")
+    msgs = " ".join(e.text for e in session.sink.of_kind("agent_message"))
+    assert "Where are your data files" in msgs
+    assert session._awaiting_path is True
+    assert session.bundle is None
+
+
+def test_awaiting_path_nonpath_reply_falls_through(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)             # empty cwd
+    session = _session(tmp_path)
+    session.handle("align these sections and reconstruct in 3D")     # asks
+    assert session._awaiting_path is True
+    session.handle("what can you do?")      # not a path -> normal help, clears flag
+    assert session._awaiting_path is False
+    msgs = " ".join(e.text for e in session.sink.of_kind("agent_message"))
+    assert "build a 3D reconstruction" in msgs

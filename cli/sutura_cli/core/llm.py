@@ -120,6 +120,9 @@ _METRICS = re.compile(r"\b(metrics?|scores?|accuracy|errors?|quality|how (?:well
 _WORST = re.compile(r"\b(worst|best|which (?:section|slice|pair))\b", re.I)
 _EXPLAIN = re.compile(r"\b(explain|why)\b.*\b(rout|method|choose|chose|pick|decision|dist)", re.I)
 _ROUTING = re.compile(r"\brouting\b", re.I)
+_METHODQ = re.compile(r"\b(which|what)\s+method\b", re.I)
+_WHY = re.compile(r"\bwhy\b", re.I)
+_METHODWORD = re.compile(r"\b(method|methods|rout|paste|sutura|align)\b", re.I)
 _QUESTION = re.compile(r"\?|\b(how|which|what|why|did|was|were|does|do|is|are)\b", re.I)
 
 
@@ -194,8 +197,10 @@ class RuleBackend:
 
         method = "paste2" if _PASTE.search(t) else ("sutura" if _SUTURA.search(t) else None)
 
-        # explain a routing decision (before generic recon, since it mentions method)
-        if _EXPLAIN.search(t) or _ROUTING.search(t):
+        # explain a routing decision (before generic recon, since it mentions
+        # method); catches "which method / why did you pick / explain routing"
+        if (_EXPLAIN.search(t) or _ROUTING.search(t) or _METHODQ.search(t)
+                or (_WHY.search(t) and _METHODWORD.search(t))):
             sref = _SECTION_REF.search(t)
             return ToolRequest("explain_routing",
                                {"section": sref.group(1)} if sref else {})

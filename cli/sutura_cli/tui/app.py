@@ -22,11 +22,16 @@ _SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
 LOGO = "S U T U R A  Genomics"
 
+import os as _os
+
 WELCOME = (
     "[bold]Welcome to Sutura[/bold] - local-first spatial-transcriptomics alignment.\n"
     "Your data never leaves this machine; the model only ever sees metadata.\n\n"
-    'Try: [italic]align the sections in ./data and reconstruct in 3D[/italic]\n'
-    "Then follow up, e.g. [italic]redo section 2 with PASTE2[/italic].\n"
+    f"[dim]Working folder:[/dim] {_os.getcwd()}\n"
+    "Just tell me what to do in plain language - I'll use this folder by default.\n\n"
+    'Try: [italic]align these sections and reconstruct in 3D[/italic]\n'
+    "Then follow up, e.g. [italic]which section aligned worst?[/italic] or "
+    "[italic]redo section 2 with PASTE2[/italic].\n"
     "Type [bold]exit[/bold] (or Ctrl-C) to quit."
 )
 

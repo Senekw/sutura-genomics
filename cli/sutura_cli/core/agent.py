@@ -6,6 +6,7 @@ The same Session drives both the TUI and the headless/test runner.
 """
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 
@@ -15,8 +16,18 @@ from .config import Config
 from .context import WorkContext
 from .events import (AgentMessage, BundleWritten, EventSink, Note, StepFinished,
                      StepStarted)
-from .llm import Reply, ToolRequest, WorkflowRequest, select_backend
+from .llm import (Reply, ToolRequest, WorkflowRequest, _extract_path,
+                  select_backend)
 from .reconstruct import build_pointcloud
+
+
+def _looks_like_path(s: str) -> bool:
+    """Heuristic: does this reply look like a folder/file path (vs a sentence)?"""
+    if not s or " " in s.strip() and not ("/" in s or "\\" in s):
+        # multi-word with no separator is probably prose, not a path
+        return Path(s).expanduser().exists()
+    return ("/" in s or "\\" in s or s.lower().endswith(".h5ad")
+            or Path(s).expanduser().exists())
 
 
 class Session:
@@ -32,10 +43,20 @@ class Session:
         self.backend = backend
         self.bundle: Bundle | None = None
         self._results: dict[int, dict] = {}   # pair index -> align result (coords)
+        self._awaiting_path = False           # asked the user where their data is
 
     # ------------------------------------------------------------------ #
     def handle(self, instruction: str) -> Bundle | None:
         """Interpret one instruction and act on it. Returns the active bundle."""
+        # if we just asked "where is your data?", treat a path-like reply as the
+        # folder; anything else falls through to normal handling
+        if self._awaiting_path:
+            cand = _extract_path(instruction)
+            stripped = instruction.strip().strip("\"'")
+            if cand or _looks_like_path(stripped):
+                self._awaiting_path = False
+                return self._workflow(instruction, {"path": cand or stripped})
+            self._awaiting_path = False
         try:
             decision = self.backend.interpret(instruction, self.ctx.state_view())
         except Exception as e:
@@ -67,16 +88,39 @@ class Session:
     # ------------------------------------------------------------------ #
     def _workflow(self, instruction: str, args: dict) -> Bundle:
         path = args.get("path")
+
+        # 1. figure out where the data is (Claude Code style: default to the
+        #    folder the user is in; ask conversationally if it's empty).
+        if not path and not self.ctx.sections:
+            cwd = os.getcwd()
+            if tools._discover(Path(cwd)):
+                path = cwd
+                self.sink.emit(Note(text=f"no folder given — using the current "
+                                    f"directory ({cwd})", level="info"))
+            else:
+                self.sink.emit(AgentMessage(
+                    text=f"I don't see any spatial sections in this folder "
+                         f"({cwd}).\nWhere are your data files? Tell me the folder "
+                         f"(e.g. C:\\path\\to\\data), or cd into it and ask again. "
+                         f"I read .h5ad, Space Ranger, or Xenium output."))
+                self._awaiting_path = True
+                return self.bundle
+
         self.sink.emit(AgentMessage(
-            text="Planning: load sections -> QC -> routing -> align each pair "
+            text="On it: load sections -> QC -> routing -> align each pair "
                  "-> post-QC -> 3D reconstruct -> report. Everything runs "
                  "locally; the model only sees metadata."))
 
-        # 1. load (skip if a path is absent but sections already loaded)
-        if path or not self.ctx.sections:
-            if not path:
-                raise ValueError("no data path given and nothing is loaded yet")
-            tools.load_data(self.ctx, self.sink, path)
+        # 2. load (skip if we're reusing already-loaded sections)
+        if path:
+            try:
+                tools.load_data(self.ctx, self.sink, path)
+            except tools.LoaderError as e:
+                self.sink.emit(AgentMessage(
+                    text=f"{e}\nTell me the folder that has your sections and "
+                         f"I'll try again."))
+                self._awaiting_path = True
+                return self.bundle
 
         sections = self.ctx.ordered()
         if len(sections) < 2:
