@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sutura — result viewer</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="/logo.jpg" />
+</head>
+<body>
+  <aside id="sidebar">
+    <header class="brand">
+      <img src="/logo.jpg" alt="Sutura" class="logo" />
+      <div>
+        <div class="brand-name">SUTURA</div>
+        <div class="brand-sub">result viewer</div>
+      </div>
+    </header>
+    <div class="store-line" id="store-line"></div>
+    <div id="run-list" class="run-list"></div>
+    <footer class="side-foot">display-only · never runs alignment</footer>
+  </aside>
+
+  <main id="main">
+    <div id="empty" class="empty">
+      <img src="/logo.jpg" class="empty-logo" alt="" />
+      <h1>Sutura result viewer</h1>
+      <p>Select a run on the left to view its 3D reconstruction, the method used
+         for each pair (and why), metrics, and QC. This viewer only displays
+         bundles the Sutura CLI produced — it never runs alignment.</p>
+      <p id="empty-hint" class="hint"></p>
+    </div>
+
+    <section id="run-view" class="hidden">
+      <header class="run-head">
+        <div>
+          <h1 id="run-title"></h1>
+          <div id="run-meta" class="run-meta"></div>
+        </div>
+        <div id="run-badges" class="badges"></div>
+      </header>
+
+      <div class="grid">
+        <div class="viewer-card card">
+          <div class="card-head">
+            <h2>3D reconstruction</h2>
+            <div class="viewer-controls">
+              <label>colour
+                <select id="color-mode">
+                  <option value="layer">by layer</option>
+                  <option value="section">by section</option>
+                  <option value="method">by method</option>
+                </select>
+              </label>
+              <button id="reset-view" class="btn">reset view</button>
+            </div>
+          </div>
+          <div id="viewer"></div>
+          <div id="recon-note" class="note"></div>
+          <div id="legend" class="legend"></div>
+        </div>
+
+        <div class="summary-col">
+          <div id="summary-cards" class="cards"></div>
+          <div class="card">
+            <div class="card-head"><h2>Method per pair</h2>
+              <span class="honest">honest labelling</span></div>
+            <div id="pairs-table"></div>
+          </div>
+          <div class="card" id="candidates-card">
+            <div class="card-head"><h2>Method comparison</h2></div>
+            <div id="candidates-table"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Input QC</h2></div>
+            <div id="qc-table"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Report</h2></div>
+        <pre id="report" class="report"></pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- chatbot: collapsed until invoked -->
+  <button id="chat-toggle" class="chat-toggle" title="Ask about this run">Ask ▲</button>
+  <section id="chat" class="chat hidden">
+    <header class="chat-head">
+      <span>Ask about this run</span>
+      <button id="chat-close" class="btn-ghost">×</button>
+    </header>
+    <div id="chat-log" class="chat-log"></div>
+    <form id="chat-form" class="chat-form">
+      <input id="chat-input" placeholder="e.g. how does PASTE2 compare?" autocomplete="off" />
+      <button class="btn">send</button>
+    </form>
+    <div class="chat-foot">grounded in this run's bundle · won't run alignment</div>
+  </section>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

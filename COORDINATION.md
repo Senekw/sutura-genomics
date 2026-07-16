@@ -22,7 +22,7 @@
 | 5 | Polished streaming UX | DONE (commit pending) |
 | 6 | Comprehensive tests | DONE (commit pending) |
 | 7 | Documentation | DONE (commit pending) |
-| 8 | Viewer app v1 (sutura-app) | pending |
+| 8 | Viewer app v1 (sutura-app) | DONE (commit pending) |
 | 9 | End-to-end integration test | pending |
 
 ## Baseline (from prior session, commit ca460a5)
@@ -91,7 +91,18 @@ Comprehensive suite, all green (real coverage, not token tests):
 - **`docs/example_sessions.md`** (from item 1): real local-model sessions kept as the clean demo transcript.
 - Files: `cli/README.md`, `cli/docs/ARCHITECTURE.md` (new), `cli/docs/BUNDLE_SCHEMA.md`.
 
+### Item 8 — DONE (branch sutura-app, off sutura-cli)
+Built the **viewer app** — a local, display-only companion under `app/` (entry point `sutura-app`), branched from sutura-cli so it has the schema + real bundle producer for item 9.
+- **Zero-dependency Python server** (`server.py`, stdlib `http.server`): serves the SPA + a read-only JSON API — `GET /api/runs`, `GET /api/runs/<job_id>` (full bundle), `POST /api/chat`. Never runs alignment.
+- **`store.py`**: reads bundles from `~/.sutura/results/` per schema v1.0 (metadata/qc/routing/metrics/reconstruction/report), lists newest-first, ignores incomplete bundles (no metadata.json).
+- **Frontend** (`static/`, vanilla + **vendored three.js**, no build step): run list sidebar; per run → **3D reconstruction viewer** (three.js point cloud, orbit/zoom/autorotate, colour by **layer / section / method**, reusing the demo's layer palette), summary stat cards, **per-pair method + why + score + QC table**, **method-comparison table** (from candidates, off-dist only, kept marked), input-QC table, report.md, and honest badges. Uses the company logo (`static/logo.jpg`).
+- **Chatbot** (`chat.py`, collapsed until invoked): grounded strictly in the loaded bundle — answers method/why/worst/metrics, **shows how PASTE2 compares from the candidates** (and honestly says "only Sutura ran here; run redo-with-PASTE2 in the CLI" when it wasn't), **refuses to re-run alignment**, optional local-Ollama for free-form (given only bundle facts).
+- **Reuse note:** reuses the web demo's *visual language* (layer palette `#8ecae6…#e63946`, three.js point cloud, method-honesty copy) rather than importing its React components — a deliberate v1 choice for a build-free, offline, local app. Web demo (`demo/`) untouched.
+- **Verified:** served the 4 real bundles from tonight (in-dist Sutura, off-dist Br8100/breast PASTE2, 4-section chain PASTE2+Sutura); `/api/runs` returns all 4 with honest methods; index/app.js/styles/logo/three.js all serve 200; `node --check app.js` passes; 10 hermetic app tests pass (store, API, chat honesty).
+- Files: `app/` (pyproject, sutura_app/{__init__,server,store,chat}.py, static/{index.html,styles.css,app.js,logo.jpg,vendor/three.module.min.js}, tests/test_app.py).
+
 ## Open blockers
+- **Browser screenshot:** the Claude-in-Chrome extension is offline this session, so I could not capture a live in-browser screenshot of the viewer. Rendering is verified indirectly (API serves valid data for all 4 real bundles, all assets 200, `node --check` passes on the frontend JS). Providing a self-contained Artifact preview as visual confirmation instead.
 - **Xenium (unchanged):** no Xenium data on disk; squidpy 1.6.6 has no `xenium` reader. Implemented as detect + actionable error (convert Xenium → .h5ad, point Sutura at it) per the "clear message" option. Real Xenium ingest deferred until a sample + reader are available.
 
 ## Recommendations for next / for Codex

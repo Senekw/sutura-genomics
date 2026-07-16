@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sutura-app"
+version = "0.1.0"
+description = "Sutura viewer - a local, display-only companion app that renders the result bundles the Sutura CLI produces (3D reconstruction, methods, metrics, QC)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "Sutura Genomics" }]
+
+# Runtime is stdlib-only (http.server). three.js is vendored in static/vendor.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+sutura-app = "sutura_app.server:main"
+
+[tool.setuptools]
+packages = ["sutura_app"]
+
+[tool.setuptools.package-data]
+sutura_app = ["static/*", "static/vendor/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
