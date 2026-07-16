@@ -10,7 +10,8 @@ import pytest
 from sutura_cli.core import tools
 from sutura_cli.core.context import Section, WorkContext
 from sutura_cli.core.events import ListSink
-from sutura_cli.core.tools import LoaderError, _ensure_spatial, load_data
+from sutura_cli.core.tools import (LoaderError, _discover, _ensure_spatial,
+                                   _load_one, load_data)
 
 
 def _adata(n=150, g=20, spatial=True, obs_xy=False, obsm_key=None):
@@ -121,6 +122,42 @@ def test_align_zero_common_genes(tmp_path):
     with pytest.raises(LoaderError) as ei:
         tools.align(ctx, ListSink(), r.id, m.id, out_dir=tmp_path / "out")
     assert "share 0 genes" in str(ei.value)
+
+
+# --- Space Ranger detection + missing spatial/ --------------------------- #
+def test_discover_spaceranger_dir(tmp_path):
+    d = tmp_path / "sample"; d.mkdir()
+    (d / "filtered_feature_bc_matrix.h5").write_bytes(b"\x00")
+    (d / "spatial").mkdir()
+    found = _discover(d)
+    assert found and found[0][1] == "spaceranger"
+
+
+def test_discover_nested_h5ad_and_spaceranger(tmp_path):
+    _adata().write_h5ad(tmp_path / "a.h5ad")
+    sr = tmp_path / "sr"; sr.mkdir()
+    (sr / "filtered_feature_bc_matrix.h5").write_bytes(b"\x00")
+    (sr / "spatial").mkdir()
+    fmts = sorted(f[1] for f in _discover(tmp_path))
+    assert "h5ad" in fmts and "spaceranger" in fmts
+
+
+def test_spaceranger_missing_spatial_dir(tmp_path):
+    d = tmp_path / "sample"; d.mkdir()
+    (d / "filtered_feature_bc_matrix.h5").write_bytes(b"\x00")
+    with pytest.raises(LoaderError) as ei:
+        _load_one("spaceranger", d, tmp_path / "work", "sample")
+    assert "spatial/" in str(ei.value)
+
+
+def test_xenium_actionable_error(tmp_path):
+    d = tmp_path / "xen"; d.mkdir()
+    (d / "cell_feature_matrix.h5").write_bytes(b"\x00")
+    (d / "transcripts.parquet").write_bytes(b"\x00")
+    assert _discover(d)[0][1] == "xenium"
+    with pytest.raises(LoaderError) as ei:
+        _load_one("xenium", d, tmp_path / "work", "xen")
+    assert "convert" in str(ei.value).lower() and ".h5ad" in str(ei.value)
 
 
 # --- workflow-level: single section is a clean message, not a crash ------- #
