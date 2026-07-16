@@ -45,14 +45,17 @@ def _load_config(args) -> Config:
 
 
 def run_headless(instruction: str, cfg: Config) -> int:
+    from .render import banner
     sink = ConsoleSink()
     session = Session(cfg, sink)
-    sink.console.print(f"[bold]Sutura[/bold] [dim]v{__version__} - "
-                       f"backend: {session.backend.name} - store: {cfg.store}[/dim]\n")
+    model = getattr(session.backend, "model", None)
+    who = f"{session.backend.name}" + (f" ({model})" if model else "")
+    banner(sink.console, f"backend: {who}  ·  store: {cfg.store}  ·  no data egress")
+    sink.console.print(f"[#6ee7ff]▸[/#6ee7ff] [italic]{instruction}[/italic]\n")
     try:
         session.handle(instruction)
     except Exception as e:
-        sink.console.print(f"[red]error:[/red] {e}")
+        sink.console.print(f"\n[red]✗ error:[/red] {e}")
         return 1
     return 0
 

@@ -126,12 +126,21 @@ class Bundle:
         return self.root
 
     def summary(self) -> dict:
+        rec = self.reconstruction or {}
         return {
             "job_id": self.job_id,
             "status": self.status,
             "n_sections": len(self.sections),
             "n_pairs": len(self.pairs),
+            "n_points": rec.get("n_points", 0),
+            "composition": rec.get("composition"),
             "methods": sorted({p.get("method_label", p.get("method", "?"))
                                for p in self.pairs}),
+            "pairs": [{"ref": p["ref"], "mov": p["mov"],
+                       "method_label": p.get("method_label", p.get("method")),
+                       "score": p.get("score"), "metric": p.get("metric"),
+                       "has_ground_truth": p.get("has_ground_truth"),
+                       "verdict": (p.get("post_qc") or {}).get("verdict")}
+                      for p in self.pairs],
             "path": str(self.root),
         }

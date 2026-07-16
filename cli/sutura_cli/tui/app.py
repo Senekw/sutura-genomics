@@ -16,6 +16,9 @@ from ..core.agent import Session
 from ..core.config import Config
 from ..core.events import (AgentMessage, BundleWritten, Note, RoutingDecision,
                            StepFinished, StepProgress, StepStarted)
+from ..render import completion_panel
+
+_SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
 LOGO = "S U T U R A  Genomics"
 
@@ -52,16 +55,27 @@ class StatusBar(Static):
         self.mode = "manual mode"
         self.state = "idle"
         self.pct = None
+        self._spin = 0
+        self.working = False
 
     def set_state(self, state: str, pct=None):
         self.state = state
         self.pct = pct
+        self._spin = (self._spin + 1) % len(_SPINNER)
+        self.refresh()
+
+    def set_working(self, working: bool):
+        self.working = working
+        self.state = "working" if working else "idle"
+        self.pct = None
         self.refresh()
 
     def render(self):
         pct = f" [{self.pct}%]" if self.pct is not None else ""
-        return (f" [bold #6ee7ff]>[/bold #6ee7ff] [bold]{self.mode}[/bold] "
-                f"[dim]|[/dim] {self.state}{pct}")
+        spin = (f"[#a78bfa]{_SPINNER[self._spin]}[/#a78bfa] " if self.working
+                else "[green]●[/green] ")
+        return (f" [bold #6ee7ff]▷[/bold #6ee7ff] [bold]{self.mode}[/bold] "
+                f"[dim]│[/dim] {spin}{self.state}{pct}")
 
 
 class SuturaApp(App):
@@ -108,9 +122,9 @@ class SuturaApp(App):
             self.exit()
             return
         log = self.query_one("#stream", RichLog)
-        log.write(f"[bold #a0f0d0]you>[/bold #a0f0d0] {text}")
+        log.write(f"[bold #a0f0d0]▸ you[/bold #a0f0d0]  {text}")
         self.query_one("#prompt", Input).disabled = True
-        self.query_one(StatusBar).set_state("working")
+        self.query_one(StatusBar).set_working(True)
         self._run(text)
 
     # --- worker: blocking agent loop ------------------------------------ #
@@ -127,7 +141,7 @@ class SuturaApp(App):
     def _done(self):
         self.query_one("#prompt", Input).disabled = False
         self.query_one("#prompt", Input).focus()
-        self.query_one(StatusBar).set_state("idle")
+        self.query_one(StatusBar).set_working(False)
 
     # --- event rendering (UI thread) ------------------------------------ #
     class _Sink:
@@ -140,28 +154,41 @@ class SuturaApp(App):
     def _render(self, ev):
         log = self.query_one("#stream", RichLog)
         status = self.query_one(StatusBar)
+        if getattr(ev, "step_id", "").startswith("route") and not isinstance(
+                ev, RoutingDecision):
+            if isinstance(ev, StepProgress):
+                status.set_state("routing")
+            return
         if isinstance(ev, StepStarted):
-            det = f" [dim]- {ev.detail}[/dim]" if ev.detail else ""
-            log.write(f"[bold]> {ev.title}[/bold]{det}")
+            det = f"  [dim]{ev.detail}[/dim]" if ev.detail else ""
+            log.write(f"[bold #a78bfa]›[/bold #a78bfa] [bold]{ev.title}[/bold]{det}")
             status.set_state(ev.title.lower())
         elif isinstance(ev, StepProgress):
             status.set_state(ev.message, ev.pct)
         elif isinstance(ev, RoutingDecision):
-            tag = "in-distribution" if ev.in_distribution else "off-distribution"
-            log.write(f"  [cyan]route -> {ev.method}[/cyan] [dim]({tag}; "
-                      f"maha {ev.mahalanobis:.2f}, overlap "
-                      f"{int(ev.gene_overlap*100)}%)[/dim]")
+            tag = ("[green]in-distribution[/green]" if ev.in_distribution
+                   else "[#a78bfa]off-distribution[/#a78bfa]")
+            log.write(f"[bold #a78bfa]›[/bold #a78bfa] [bold]Routing[/bold]  "
+                      f"[dim]{ev.pair}[/dim]")
+            log.write(f"    [#6ee7ff]→ {ev.method}[/#6ee7ff]  {tag} "
+                      f"[dim]· Mahalanobis {ev.mahalanobis:.2f} · overlap "
+                      f"{int(ev.gene_overlap*100)}%[/dim]")
         elif isinstance(ev, StepFinished):
-            mark = {"ok": "[green]v[/green]", "warn": "[yellow]![/yellow]",
-                    "error": "[red]x[/red]"}.get(ev.status, "v")
-            log.write(f"{mark} {ev.summary}")
+            mark = {"ok": "[green]✓[/green]", "warn": "[yellow]⚠[/yellow]",
+                    "error": "[red]✗[/red]"}.get(ev.status, "[green]✓[/green]")
+            log.write(f"  {mark} {ev.summary}")
         elif isinstance(ev, Note):
             colour = {"warn": "yellow", "error": "red"}.get(ev.level, "dim")
-            log.write(f"  [{colour}]{ev.text}[/{colour}]")
+            log.write(f"    [{colour}]{ev.text}[/{colour}]")
         elif isinstance(ev, AgentMessage):
-            log.write(f"[bold cyan]{ev.text}[/bold cyan]")
+            log.write(f"[#6ee7ff]{ev.text}[/#6ee7ff]")
         elif isinstance(ev, BundleWritten):
-            log.write(f"[bold green]* bundle written:[/bold green] [dim]{ev.path}[/dim]")
+            panel = completion_panel(ev.summary)
+            if panel is not None:
+                log.write("")
+                log.write(panel)
+            else:
+                log.write(f"[green]✓ bundle:[/green] [dim]{ev.path}[/dim]")
 
 
 def run_tui(cfg: Config, initial_instruction: str | None = None) -> int:

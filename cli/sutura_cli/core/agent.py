@@ -199,13 +199,11 @@ class Session:
 
     def _finalise(self) -> Bundle:
         root = self.bundle.write()
+        # BundleWritten carries the full summary; the front-end renders the
+        # completion card from it (console panel / TUI card), so we don't also
+        # dump a verbose text block here.
         self.sink.emit(BundleWritten(job_id=self.bundle.job_id, path=str(root),
                                      summary=self.bundle.summary()))
-        methods = ", ".join(self.bundle.summary()["methods"]) or "n/a"
-        self.sink.emit(AgentMessage(
-            text=f"Results written to {root}\nMethods used: {methods}. "
-                 f"Open in the Sutura app to view the 3D model. "
-                 f'You can also say e.g. "redo section 2 with PASTE2".'))
         return self.bundle
 
     # ------------------------------------------------------------------ #

@@ -19,7 +19,7 @@
 | 2 | Off-distribution path, honest | DONE (commit pending) |
 | 3 | Robust loaders + error handling | DONE (commit pending) |
 | 4 | Multi-section (>2) reconstruction | DONE (commit pending) |
-| 5 | Polished streaming UX | pending |
+| 5 | Polished streaming UX | DONE (commit pending) |
 | 6 | Comprehensive tests | pending |
 | 7 | Documentation | pending |
 | 8 | Viewer app v1 (sutura-app) | pending |
@@ -69,6 +69,14 @@ Hardened `tools.py` + `agent.py` so every realistic failure mode yields a helpfu
 - **Proven on a real 4-section DLPFC chain** (Br5292 151507-510): 4 sections / 3 pairs / 18033 points. All four section centroids cluster within ~180 px in the common frame (6634-6817 x, 4953-5058 y) — composition works. z = 0/137/274/411 (pitch spacing). Methods honestly mixed: Sutura (1.29) then PASTE2/PASTE2 (post-QC retries at 6.67/4.35, since DLPFC 3rd/4th slices are farther apart — real orchestrator behavior).
 - Tests: composition unit test recovers a known chained similarity to atol 0.05; 2-section-exact asserted. 33 fast tests pass.
 - Files: `cli/sutura_cli/core/reconstruct.py`, `cli/sutura_cli/core/agent.py`, `cli/tests/test_units.py`.
+
+### Item 5 — DONE
+- Rewrote `render.py` into a demo-grade console renderer: rounded **banner** ("● SUTURA GENOMICS", tagline, backend/store/no-egress), one clean line per step with ✓/⚠/✗ marks, **routing shown with method-and-why** (→ method, in/off-distribution, Mahalanobis, gene overlap), sparse progress ticks so long aligns feel alive, and a **"Run complete" card** (rounded panel + per-pair Method/Result/QC table, sections/pairs/points, bundle path, "▶ open in the Sutura app").
+- **Windows fix:** forced UTF-8 + rich's modern renderer (`make_console`) so box-drawing and glyphs render in Windows Terminal instead of crashing the legacy cp1252 console.
+- TUI polished to match: `›` step markers, ✓/⚠/✗, two-line routing, a **braille spinner** in the status bar while working (`▷ manual mode │ ⠹ working 45%`), and the shared completion card rendered in-stream. New `tui_screenshot.svg`.
+- Refactored the completion card into `render.completion_panel()` shared by console + TUI. Enriched `bundle.summary()` with per-pair rows + reconstruction info. `agent._finalise` no longer dumps a verbose text block (the card replaces it).
+- Verified end-to-end on real DLPFC data (banner → steps → routing → align → card). 33 fast tests pass.
+- Files: `cli/sutura_cli/render.py`, `cli/sutura_cli/cli.py`, `cli/sutura_cli/tui/app.py`, `cli/sutura_cli/core/bundle.py`, `cli/sutura_cli/core/agent.py`, `cli/docs/tui_screenshot.svg`.
 
 ## Open blockers
 - **Xenium (unchanged):** no Xenium data on disk; squidpy 1.6.6 has no `xenium` reader. Implemented as detect + actionable error (convert Xenium → .h5ad, point Sutura at it) per the "clear message" option. Real Xenium ingest deferred until a sample + reader are available.
