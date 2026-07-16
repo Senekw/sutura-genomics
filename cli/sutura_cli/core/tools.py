@@ -32,6 +32,57 @@ def _layers_of(adata):
     return None
 
 
+# alternative spatial-coordinate locations we can recover from
+_OBSM_SPATIAL_ALIASES = ("spatial", "X_spatial", "spatial_coords", "xy",
+                         "X_umap_spatial", "spatial_stereoseq")
+_OBS_XY_PAIRS = (("x", "y"), ("X", "Y"),
+                 ("imagecol", "imagerow"), ("imagerow", "imagecol"),
+                 ("pxl_col_in_fullres", "pxl_row_in_fullres"),
+                 ("array_col", "array_row"), ("x_centroid", "y_centroid"),
+                 ("center_x", "center_y"))
+
+
+class LoaderError(ValueError):
+    """A user-facing loader problem with an actionable message (no stack trace)."""
+
+
+class AlignError(RuntimeError):
+    """A user-facing alignment failure with a readable message (no stack trace)."""
+
+
+def _ensure_spatial(adata, name):
+    """Guarantee adata.obsm['spatial'] is an (n,2) float array, recovering it from
+    common alternative locations. Raises LoaderError with guidance if impossible."""
+    import numpy as np
+    if "spatial" in adata.obsm:
+        coords = np.asarray(adata.obsm["spatial"], float)
+        if coords.ndim == 2 and coords.shape[1] >= 2:
+            adata.obsm["spatial"] = coords[:, :2]
+            return None
+    # try alternative obsm keys
+    for key in _OBSM_SPATIAL_ALIASES:
+        if key in adata.obsm:
+            arr = np.asarray(adata.obsm[key], float)
+            if arr.ndim == 2 and arr.shape[1] >= 2:
+                adata.obsm["spatial"] = arr[:, :2]
+                return f"{name}: used obsm['{key}'] as spatial coordinates"
+    # try pairs of obs columns
+    for cx, cy in _OBS_XY_PAIRS:
+        if cx in adata.obs.columns and cy in adata.obs.columns:
+            try:
+                xy = np.column_stack([adata.obs[cx].to_numpy(float),
+                                      adata.obs[cy].to_numpy(float)])
+            except (ValueError, TypeError):
+                continue
+            adata.obsm["spatial"] = xy
+            return f"{name}: built spatial coordinates from obs['{cx}'],obs['{cy}']"
+    have_obsm = list(adata.obsm.keys()) or ["(none)"]
+    raise LoaderError(
+        f"{name}: no spatial coordinates found. Sutura needs obsm['spatial'] "
+        f"(an n x 2 array of x,y positions). Available obsm keys: {have_obsm}. "
+        f"Add coordinates as adata.obsm['spatial'] and re-save the .h5ad.")
+
+
 def _has_layers(adata) -> bool:
     return any(c in adata.obs.columns
                for c in ("layer", "Layer", "layer_guess", "spatialLIBD"))
@@ -65,40 +116,73 @@ def _discover(path: Path):
 
 
 def _load_one(fmt: str, arg: Path, workdir: Path, name: str):
-    """Load one input into an AnnData and ensure an on-disk .h5ad path."""
+    """Load one input into an AnnData with obsm['spatial']; return
+    (adata, on_disk_h5ad_path, note_or_None). Raises LoaderError on user-facing
+    problems (never a bare stack trace)."""
     import anndata as ad
+    note = None
     if fmt == "h5ad":
-        adata = ad.read_h5ad(arg)
-        return adata, Path(arg)
+        try:
+            adata = ad.read_h5ad(arg)
+        except Exception as e:
+            raise LoaderError(f"{name}: not a readable .h5ad file "
+                              f"({type(e).__name__}: {e}).")
+        if adata.n_obs == 0 or adata.n_vars == 0:
+            raise LoaderError(f"{name}: the file has {adata.n_obs} cells and "
+                              f"{adata.n_vars} genes - it is empty.")
+        note = _ensure_spatial(adata, name)
+        return adata, Path(arg), note
+
     if fmt == "spaceranger":
         import scanpy as sc
-        adata = sc.read_visium(arg)
-        adata.var_names_make_unique()
-    elif fmt == "xenium":
+        h5 = Path(arg)
+        if not (h5 / "spatial").is_dir():
+            raise LoaderError(
+                f"{name}: looks like a Space Ranger dir but has no spatial/ "
+                f"subfolder. Expected filtered_feature_bc_matrix.h5 + spatial/.")
         try:
-            import squidpy as sq
-            adata = sq.read.xenium(arg)
+            adata = sc.read_visium(arg)
         except Exception as e:
-            raise RuntimeError(
-                f"Xenium input detected but could not be read ({type(e).__name__}: "
-                f"{e}). Provide a pre-converted .h5ad for now.")
+            raise LoaderError(
+                f"{name}: could not read Space Ranger output "
+                f"({type(e).__name__}: {e}). Expected a folder with "
+                f"filtered_feature_bc_matrix.h5 and a spatial/ subfolder.")
+        adata.var_names_make_unique()
+        note = _ensure_spatial(adata, name)
+    elif fmt == "xenium":
+        raise LoaderError(
+            f"{name}: Xenium input detected at {arg}, but automated Xenium "
+            f"ingest is not available in this environment (no Xenium reader in "
+            f"the installed squidpy). Convert the Xenium output to AnnData first "
+            f"(cells as obs, obsm['spatial'] = cell x,y centroids) and save a "
+            f".h5ad, then point Sutura at that file.")
     else:
-        raise RuntimeError(f"unsupported format {fmt!r}")
+        raise LoaderError(f"{name}: unsupported input format {fmt!r}.")
     out = workdir / f"{name}.h5ad"
     adata.write_h5ad(out)
-    return adata, out
+    return adata, out, note
 
 
 def load_data(ctx: WorkContext, sink: EventSink, path: str) -> dict:
     sid = "load_data"
     sink.emit(StepStarted(step_id=sid, title="Load data",
                           detail=f"scanning {path}"))
-    discovered = _discover(Path(path))
+    p = Path(path).expanduser()
+    if not p.exists():
+        sink.emit(StepFinished(step_id=sid, status="error",
+                               summary=f"path not found: {path}"))
+        raise LoaderError(
+            f"Path not found: {path}. Give a folder of .h5ad sections, a single "
+            f".h5ad file, or a Space Ranger output directory.")
+
+    discovered = _discover(p)
     if not discovered:
         sink.emit(StepFinished(step_id=sid, status="error",
                                summary=f"no readable sections found at {path}"))
-        raise FileNotFoundError(
-            f"No .h5ad / Space Ranger / Xenium sections found at {path}")
+        raise LoaderError(
+            f"No sections found at {path}. Sutura looks for: .h5ad files, a "
+            f"Space Ranger output dir (filtered_feature_bc_matrix + spatial/), "
+            f"or a Xenium bundle. None were found here.")
 
     loaded, warnings = [], []
     total = len(discovered)
@@ -106,23 +190,30 @@ def load_data(ctx: WorkContext, sink: EventSink, path: str) -> dict:
         sink.emit(StepProgress(step_id=sid, pct=int(100 * i / total),
                                message=f"reading {name} ({fmt})"))
         try:
-            adata, h5ad_path = _load_one(fmt, arg, ctx.workdir, name)
-        except Exception as e:
+            adata, h5ad_path, note = _load_one(fmt, arg, ctx.workdir, name)
+        except LoaderError as e:
             warnings.append(str(e))
             sink.emit(Note(text=str(e), level="warn"))
             continue
-        has_spatial = "spatial" in adata.obsm
+        except Exception as e:                      # never surface a raw traceback
+            msg = f"{name}: unexpected error while loading ({type(e).__name__}: {e})"
+            warnings.append(msg)
+            sink.emit(Note(text=msg, level="warn"))
+            continue
+        if note:
+            sink.emit(Note(text=note, level="info"))
         sec = ctx.add_section(Section(
             id=ctx.new_id(), name=name, fmt=fmt, h5ad_path=Path(h5ad_path),
             source=str(arg), adata=adata,
             n_spots=int(adata.n_obs), n_genes=int(adata.n_vars),
-            has_spatial=has_spatial, has_layers=_has_layers(adata)))
+            has_spatial="spatial" in adata.obsm, has_layers=_has_layers(adata)))
         loaded.append(sec.meta())
 
     if not loaded:
         sink.emit(StepFinished(step_id=sid, status="error",
                                summary="every candidate section failed to load"))
-        raise RuntimeError("No sections could be loaded. " + " ".join(warnings))
+        raise LoaderError(
+            "No sections could be loaded:\n  - " + "\n  - ".join(warnings))
 
     sink.emit(StepFinished(
         step_id=sid, status="warn" if warnings else "ok",
@@ -274,19 +365,35 @@ def align(ctx: WorkContext, sink: EventSink, ref_id: str, mov_id: str,
     sink.emit(StepStarted(step_id=sid, title="Align",
                           detail=f"{ref.name} -> {mov.name} ({label_hint})"))
 
-    if force_method:
-        result = _forced_align(ctx, ref, mov, force_method, out_dir)
-        sink.emit(StepProgress(step_id=sid, pct=95, message="writing aligned output"))
-    else:
-        pipeline = engine.load_pipeline()
-        extra_paths = [str(ctx.resolve(e).h5ad_path) for e in (extras or [])
-                       if ctx.resolve(e)]
-        files = [str(ref.h5ad_path), str(mov.h5ad_path), *extra_paths]
+    # gene-panel preflight: alignment needs shared genes
+    common = len(set(map(str, ref.adata.var_names)) & set(map(str, mov.adata.var_names)))
+    if common == 0:
+        raise LoaderError(
+            f"{ref.name} and {mov.name} share 0 genes, so they cannot be aligned "
+            f"(different gene panels / naming). Ensure both sections use the same "
+            f"gene identifiers.")
 
-        def _progress(stage, pct):
-            sink.emit(StepProgress(step_id=sid, pct=int(pct),
-                                   message=_STAGE_MSG.get(stage, stage)))
-        result = pipeline.run_alignment(files, out_dir, progress=_progress)
+    try:
+        if force_method:
+            result = _forced_align(ctx, ref, mov, force_method, out_dir)
+            sink.emit(StepProgress(step_id=sid, pct=95,
+                                   message="writing aligned output"))
+        else:
+            pipeline = engine.load_pipeline()
+            extra_paths = [str(ctx.resolve(e).h5ad_path) for e in (extras or [])
+                           if ctx.resolve(e)]
+            files = [str(ref.h5ad_path), str(mov.h5ad_path), *extra_paths]
+
+            def _progress(stage, pct):
+                sink.emit(StepProgress(step_id=sid, pct=int(pct),
+                                       message=_STAGE_MSG.get(stage, stage)))
+            result = pipeline.run_alignment(files, out_dir, progress=_progress)
+    except LoaderError:
+        raise
+    except Exception as e:                          # translate engine failures
+        raise AlignError(
+            f"alignment of {ref.name} -> {mov.name} failed "
+            f"({type(e).__name__}: {e}).") from e
 
     # attach reconstruction inputs (coords + layers; not expression)
     result["ref_name"] = ref.name
@@ -336,8 +443,18 @@ def post_qc(ctx: WorkContext, sink: EventSink, align_result: dict,
         good = coverage >= 0.6 and consistency >= 0.5
         basis = f"coverage {coverage:.2f}, neighbour consistency {consistency:.2f}"
     verdict = "pass" if good else "flag"
+    # very low footprint coverage often means the sections don't overlap well,
+    # i.e. they may not be adjacent serial slices
+    adjacency = None
+    if coverage < 0.4:
+        adjacency = ("low footprint overlap - these sections may not be adjacent "
+                     "serial slices (or are badly misaligned)")
+        sink.emit(Note(text=f"{ref.name} -> {mov.name}: {adjacency}", level="warn"))
     sink.emit(StepFinished(
         step_id=sid, status="ok" if good else "warn",
         summary=f"{verdict}: {basis}"))
-    return {"verdict": verdict, "neighbor_consistency": round(consistency, 3),
-            "footprint_coverage": round(coverage, 3), "basis": basis}
+    out = {"verdict": verdict, "neighbor_consistency": round(consistency, 3),
+           "footprint_coverage": round(coverage, 3), "basis": basis}
+    if adjacency:
+        out["adjacency_warning"] = adjacency
+    return out

@@ -17,7 +17,7 @@
 |---|------|--------|
 | 1 | Local LLM backend (no key) | DONE (commit pending) |
 | 2 | Off-distribution path, honest | DONE (commit pending) |
-| 3 | Robust loaders + error handling | pending |
+| 3 | Robust loaders + error handling | DONE (commit pending) |
 | 4 | Multi-section (>2) reconstruction | pending |
 | 5 | Polished streaming UX | pending |
 | 6 | Comprehensive tests | pending |
@@ -49,8 +49,21 @@ Full CLI skeleton committed: TUI (Textual), agent loop, 6 tools wrapping the eng
 - Note: breast shares 95% of the basis genes, so the "panel too different → PASTE2 direct, no adapt" branch isn't hit by breast; it would need a targeted/Xenium panel (<50% overlap). Logic is in place and unit-covered; not exercised on real data tonight.
 - Files: `cli/sutura_cli/core/tools.py` (honest routing preview), `cli/sutura_cli/core/reporting.py` (candidate breakdown), `cli/tests/test_units.py` (+2). 20 fast tests pass.
 
+### Item 3 — DONE
+Hardened `tools.py` + `agent.py` so every realistic failure mode yields a helpful message (new `LoaderError`/`AlignError`), never a stack trace:
+- **Missing path** → "Path not found: ... Give a folder of .h5ad / a .h5ad / a Space Ranger dir." **Empty/again dir** → "No sections found ... looks for .h5ad / Space Ranger / Xenium."
+- **Wrong obsm keys** → `_ensure_spatial` recovers coords from obsm aliases (X_spatial, spatial_coords, xy, ...) or obs column pairs (x/y, imagecol/imagerow, pxl_*_in_fullres, array_col/row, x_centroid/y_centroid) with an info note; if truly absent → actionable error listing available obsm keys.
+- **Empty section** (0 cells/genes) → clear error, other sections still load.
+- **Mismatched panels** → align preflight raises if the pair shares 0 genes ("share 0 genes ... same gene identifiers").
+- **Single-section input** → clean AgentMessage ("needs at least 2 adjacent sections"), no crash, no bundle created.
+- **Non-adjacent sections** → post-QC emits an adjacency warning when footprint coverage < 0.4 (recorded in bundle as `adjacency_warning`).
+- **Per-pair resilience:** a failing pair is caught, logged to bundle.warnings, and the job continues; if all pairs fail the bundle is written with status="failed" (honest record).
+- **Space Ranger:** validates spatial/ subfolder + readable matrix with targeted messages.
+- **Xenium:** detected and rejected with an actionable message (convert to .h5ad) — see blocker below.
+- Tests: new `cli/tests/test_loaders.py` (12 tests: spatial recovery, missing/empty path, empty h5ad, zero-gene guard, single-section). 32 fast tests pass.
+
 ## Open blockers
-- **Xenium:** no Xenium data on disk, and squidpy 1.6.6 in this venv has no `xenium` reader. Item 3 will implement detection + a clear actionable error (convert to .h5ad) rather than real Xenium ingest. Logged, moving on per rules.
+- **Xenium (unchanged):** no Xenium data on disk; squidpy 1.6.6 has no `xenium` reader. Implemented as detect + actionable error (convert Xenium → .h5ad, point Sutura at it) per the "clear message" option. Real Xenium ingest deferred until a sample + reader are available.
 
 ## Recommendations for next / for Codex
 - TBD (updated at end).

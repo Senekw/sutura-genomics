@@ -80,9 +80,14 @@ class Session:
 
         sections = self.ctx.ordered()
         if len(sections) < 2:
+            n = len(sections)
+            what = (f"Only {n} section loaded" if n
+                    else "No sections loaded")
             self.sink.emit(AgentMessage(
-                text=f"Only {len(sections)} section loaded; alignment needs at "
-                     "least 2 adjacent sections."))
+                text=f"{what}. Alignment needs at least 2 adjacent sections. "
+                     "Point me at a folder containing 2+ .h5ad files (or Space "
+                     "Ranger outputs), e.g. "
+                     '"align the sections in ./my_data and reconstruct in 3D".'))
             return self.bundle
 
         # start a fresh bundle for this job
@@ -100,15 +105,28 @@ class Session:
         if not qc_res["all_pass"]:
             self.bundle.warnings.append("one or more sections failed input QC")
 
-        # 3. align each adjacent pair
+        # 3. align each adjacent pair (one bad pair must not sink the whole job)
         for i in range(len(sections) - 1):
             ref, mov = sections[i], sections[i + 1]
-            route = tools.distribution_check(self.ctx, self.sink, ref.id, mov.id)
-            self.bundle.routing.append(route)
-            pdir = self.bundle.pair_dir(i, ref.name, mov.name)
-            result = tools.align(self.ctx, self.sink, ref.id, mov.id, out_dir=pdir)
-            pq = tools.post_qc(self.ctx, self.sink, result, ref.id, mov.id)
-            self._record_pair(i, ref, mov, result, pq, pdir)
+            try:
+                route = tools.distribution_check(self.ctx, self.sink, ref.id, mov.id)
+                self.bundle.routing.append(route)
+                pdir = self.bundle.pair_dir(i, ref.name, mov.name)
+                result = tools.align(self.ctx, self.sink, ref.id, mov.id, out_dir=pdir)
+                pq = tools.post_qc(self.ctx, self.sink, result, ref.id, mov.id)
+                self._record_pair(i, ref, mov, result, pq, pdir)
+            except (tools.LoaderError, tools.AlignError) as e:
+                msg = f"pair {ref.name} -> {mov.name} skipped: {e}"
+                self.sink.emit(Note(text=msg, level="error"))
+                self.bundle.warnings.append(msg)
+
+        if not self._results:
+            self.bundle.status = "failed"
+            self._finalise()
+            self.sink.emit(AgentMessage(
+                text="No pairs could be aligned - see the warnings above. "
+                     "The bundle records what was attempted."))
+            return self.bundle
 
         # 4. reconstruct + 5. report
         self._reconstruct()
