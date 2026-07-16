@@ -7,6 +7,7 @@ The same Session drives both the TUI and the headless/test runner.
 from __future__ import annotations
 
 import os
+import re
 import tempfile
 from pathlib import Path
 
@@ -44,6 +45,10 @@ class Session:
         self.bundle: Bundle | None = None
         self._results: dict[int, dict] = {}   # pair index -> align result (coords)
         self._awaiting_path = False           # asked the user where their data is
+        # safety mode: "auto" runs without asking; "manual" confirms before it
+        # reads files / runs alignment. on_confirm(prompt)->bool is set by the UI.
+        self.mode = "auto"
+        self.on_confirm = None
 
     # ------------------------------------------------------------------ #
     def handle(self, instruction: str) -> Bundle | None:
@@ -86,25 +91,71 @@ class Session:
         return self.bundle
 
     # ------------------------------------------------------------------ #
+    def _named_target(self, instruction: str, cwd: str):
+        """Resolve a bare file/folder name mentioned in the request against the
+        current folder — so "use my_sections" or "the file is breast.h5ad" work
+        with no path syntax. Returns a path string or None."""
+        for tok in re.findall(r"[^\s\"']+", instruction):
+            t = tok.strip(".,;:!?()").strip("\"'")
+            if len(t) < 2:
+                continue
+            for cand in ((Path(cwd) / t), Path(t).expanduser()):
+                try:
+                    if cand.exists():
+                        return str(cand)
+                except OSError:
+                    pass
+        return None
+
+    def _confirm_access(self, path) -> bool:
+        """In manual mode, ask before reading files / running alignment."""
+        if self.mode == "auto" or not self.on_confirm:
+            return True
+        if path:
+            n = len(tools._discover(Path(path).expanduser()))
+            where = path
+        else:
+            n = len(self.ctx.sections)
+            where = "the loaded sections"
+        prompt = (f"About to read {n} section{'' if n == 1 else 's'} from "
+                  f"{where} and run alignment. Continue?")
+        try:
+            return bool(self.on_confirm(prompt))
+        except Exception:
+            return False
+
+    # ------------------------------------------------------------------ #
     def _workflow(self, instruction: str, args: dict) -> Bundle:
         path = args.get("path")
+        cwd = os.getcwd()
 
-        # 1. figure out where the data is (Claude Code style: default to the
-        #    folder the user is in; ask conversationally if it's empty).
+        # 1. figure out where the data is: an explicit path, a bare file/folder
+        #    NAME mentioned in the request that exists here, else the current
+        #    folder; ask conversationally only if the folder is empty.
         if not path and not self.ctx.sections:
-            cwd = os.getcwd()
-            if tools._discover(Path(cwd)):
+            named = self._named_target(instruction, cwd)
+            if named:
+                path = named
+            elif tools._discover(Path(cwd)):
                 path = cwd
                 self.sink.emit(Note(text=f"no folder given — using the current "
                                     f"directory ({cwd})", level="info"))
             else:
                 self.sink.emit(AgentMessage(
                     text=f"I don't see any spatial sections in this folder "
-                         f"({cwd}).\nWhere are your data files? Tell me the folder "
-                         f"(e.g. C:\\path\\to\\data), or cd into it and ask again. "
-                         f"I read .h5ad, Space Ranger, or Xenium output."))
+                         f"({cwd}).\nWhere are your data files? Name the file or "
+                         f"folder (e.g. my_sections, or breast.h5ad), or cd into "
+                         f"it and ask again. I read .h5ad, Space Ranger, or "
+                         f"Xenium output."))
                 self._awaiting_path = True
                 return self.bundle
+
+        # 2. confirm before touching files (manual mode only)
+        if not self._confirm_access(path):
+            self.sink.emit(AgentMessage(
+                text="Okay — I haven't read anything or run alignment. Tell me "
+                     "when you're ready, or switch to auto mode."))
+            return self.bundle
 
         self.sink.emit(AgentMessage(
             text="On it: load sections -> QC -> routing -> align each pair "

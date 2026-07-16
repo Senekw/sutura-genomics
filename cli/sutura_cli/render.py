@@ -37,10 +37,10 @@ def _short_method(m: str) -> str:
 def _fit(s: str, w: int) -> str:
     return s if len(s) <= w else s[: w - 1] + "…"
 
-ACCENT = "#a78bfa"     # lavender, matching the Sutura mark
-ACCENT2 = "#6ee7ff"    # cyan highlight
-DIM = "grey62"
-_RULE = "#34344a"      # dim stage divider
+ACCENT = "#b78bff"     # purple, the Sutura accent
+ACCENT2 = "#d9c4ff"    # bright purple highlight
+DIM = "grey58"
+_RULE = "#2a2340"      # dim purple stage divider
 
 
 def make_console() -> Console:
@@ -59,15 +59,17 @@ _ICON = {"ok": "[green]✓[/green]", "warn": "[yellow]⚠[/yellow]",
          "error": "[red]✗[/red]"}
 
 
+_DNA = ["●╲ ╱●", " ╲╳╱ ", " ╱╳╲ ", "●╱ ╲●"]
+
+
 def banner(console: Console, subtitle: str) -> None:
+    mark = Text("\n".join(_DNA), style=f"bold {ACCENT}")
     title = Text()
-    title.append("● ", style=f"bold {ACCENT2}")
     title.append("SUTURA", style=f"bold {ACCENT}")
-    title.append(" GENOMICS", style="bold white")
+    title.append("  spatial-transcriptomics alignment assistant", style=DIM)
     body = Group(
+        mark,
         title,
-        Text("local-first spatial-transcriptomics alignment  ·  "
-             f"v{__version__}", style=DIM),
         Text(subtitle, style=DIM),
     )
     console.print(Panel(body, box=box.ROUNDED, border_style=ACCENT,

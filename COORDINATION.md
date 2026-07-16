@@ -105,5 +105,22 @@ User feedback: the Textual TUI was cluttered — branding top-right, backend bur
 - Tests: `test_tui.py` updated for `Brand`/`_backend_line`/`_short_method`; 44 fast tests pass.
 - Files: `cli/sutura_cli/tui/app.py`, `cli/sutura_cli/render.py`, `cli/sutura_cli/core/events.py` (+PairResult), `cli/sutura_cli/core/agent.py`, `cli/sutura_cli/core/tools.py`, `cli/tests/test_tui.py`, `cli/docs/tui_screenshot.svg`.
 
+## CLI redesign round 2 — assistant framing, theme, safety mode (2026-07-16) — DONE
+Purely UX/visual (functionality identical):
+1. **ASCII DNA logo** top-left in the `Brand` header (a 4-line double-helix mark, purple), doesn't scroll. Same mark added to the headless console banner.
+2. **Backend/model hidden:** removed the `ollama · llama3.2:3b` line from the header and headless startup; kept "local · no data egress". Backend still selected silently under the hood.
+3. **Purple / black / white theme** across the TUI (near-black `#08080c` bg, `#f0eefb` text, `#b78bff` purple accents/dividers/routing) and the console renderer (ACCENT→purple, dropped cyan).
+4. **Confirmation before file access:** in **manual mode** the agent asks "About to read N sections from <path> and run alignment. Continue? [y/n]" before reading/aligning; decline reads nothing. Implemented via `Session.on_confirm` + `Session.mode`; the TUI blocks the worker thread on a `threading.Event` until the user answers. Headless defaults to **auto** (no prompt).
+5. **Auto/manual toggle:** `f2` key or typing `auto`/`manual`; current mode shown in the status bar ("▸ manual mode — confirms before file access").
+6. **Name-a-file-and-go:** `Session._named_target` resolves a bare file/folder name mentioned in the request against the cwd ("use my_sections", "the file is breast.h5ad") — no path syntax needed.
+7. **Assistant framing:** welcome + placeholder call it "your spatial-transcriptomics alignment assistant", not a chatbot.
+- Note: the 21st.dev "Custom ASCII art" canvas raster pipeline (the big JSON param spec) is a *web/canvas* effect; it doesn't map to a Textual terminal, so the TUI uses a clean hand-drawn ASCII helix. That canvas effect is a candidate for the **web app** live view if wanted.
+- Tests: +9 (mode toggle, ASCII logo, `_named_target` file/folder resolution, manual-decline reads nothing, auto no-prompt). 49 fast tests pass.
+- Files: `cli/sutura_cli/tui/app.py`, `cli/sutura_cli/core/agent.py`, `cli/sutura_cli/render.py`, `cli/sutura_cli/cli.py`, `cli/tests/test_tui.py`, `cli/tests/test_loaders.py`, `cli/docs/tui_screenshot.svg`.
+
+## Still open (from the latest multi-part request)
+- **App live-progress mode (sutura-app):** stream CLI pipeline stages to the browser (SSE/WS), animate load → routing → before/after spot motion → 3D build-up → rotating volume with real metrics. Not started; buildable on sutura-app. Purple/black/white to match.
+- **Website (Senekw main / suturagenomics.bio):** requested login gate (beta-tester → SGYC1234/spatialbioSGYC) + working chatbot. BLOCKED on decisions: reverses the earlier "don't touch website"; it's the branch-protected production site (needs Senekw review, can't self-merge); hardcoding creds is client-visible; a real Ollama chatbot can't run on a static deploy (would be scripted/hardcoded responses). Awaiting user direction.
+
 ## Recommendations for next / for Codex
 - TBD (updated at end).
