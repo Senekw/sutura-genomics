@@ -1,2 +1,0 @@
-[console_scripts]
-sutura-app = sutura_app.server:main
