@@ -255,3 +255,11 @@ paste2=2.99 | gated_rigid=1.461 (reproduces) | gated_affine=1.44 | gated_quad=1.
 the array bridge). The leak-free version fails to generalize. Confirming across breast/mouse next.
 The GATE result stands (real, reproduces, leakage-audited GT-free + feature-free). Being brutally
 honest per the brief: the "biggest result" (self-sup OOD) does not survive a leakage-clean test.
+
+### Br8100 full severity (seed 0): affine EXTENDS the win to high severity
+config MEAN(sev-avg): paste2=3.30 | gated_rigid=2.77 | **gated_affine=2.36 (best)** | gated_quad=2.46
+| selfsup_clean=12.86 (leak-free, FAILS) | selfsup_leak=1.57 (leaking) | combo=7.02.
+gated_rigid now wins at EVERY severity s0..s8 (gate falls back at high sev so no harm - last night's
+crossover harm is gone). **gated_affine actively helps at high sev** (s6 3.29 vs paste2 3.63; s8 3.83
+vs 4.03) - the per-piece affine fit absorbs the smooth stretch the rigid model can't. This is the
+high-severity extension the brief asked for. Confirmed leak: clean 12.86 vs leaking 1.57.
