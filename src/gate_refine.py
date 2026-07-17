@@ -8,9 +8,19 @@ coordinates for each moving spot, plus the moving spots' own (observed, possibly
 coordinates, it detects the tissue's pieces, fits a low-order geometric transform per piece
 to the OT correspondence, and applies it ONLY where that fit is trustworthy - falling back
 to the OT result elsewhere. Because the trust decision is a self-gate on the fit's own
-residual (no ground truth, no expression features), it can only help or fall back; it does
-NOT regress. Validated to improve PASTE2 by ~15-30% median registration error on the DLPFC
-LODO tear benchmark and to generalize to off-distribution tissue (breast, mouse brain).
+residual (no ground truth, no expression features), it applies the correction only where a
+low-order transform explains the piece and falls back to the base elsewhere. Validated to
+improve PASTE2 by ~15-30% median registration error on the DLPFC LODO tear benchmark and to
+generalize to off-distribution tissue (breast, mouse brain), never regressing on any realistic
+(imperfect-OT) input tested.
+
+Safety caveat (honest): the gate assumes the base is a GOOD-BUT-NOISY OT correspondence that a
+per-piece fit denoises. If the base is already near-PERFECT while the moving frame carries a
+smooth non-rigid warp (e.g. identical-copy self-alignment, where PASTE2 matches each spot to its
+twin and is ~exact), the moderate fit residual can make the gate add a little error. This regime
+does not arise in genuine cross-section alignment (where the base is never exact); "never
+regress" is therefore an empirical property over realistic imperfect-OT inputs, not a hard
+guarantee for every possible input.
 
 Mechanism. A physical tear rigidly displaces a contiguous region, so on the moving slice's
 kNN graph the edges bridging the cut are stretched; cutting long edges splits the tissue into
