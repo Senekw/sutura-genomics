@@ -1,0 +1,7 @@
+[2026-07-17T06:30:14Z] ==============================================================================
+[2026-07-17T06:30:14Z] hybrid_combined START folds=['Br5292', 'Br5595', 'Br8100'] smoke=False res_epochs=40 configs=['shared_basis', 'ot_only', 'piecewise_only', 'residual', 'residual_ssa', 'hybrid_no_ssa', 'hybrid_full']
+[2026-07-17T06:30:14Z] PASTE2 refs {'Br5292': 5.28, 'Br5595': 4.35, 'Br8100': 3.46} | shared-basis ref 9.6
+[2026-07-17T06:30:14Z] ==============================================================================
+[2026-07-17T06:30:34Z] ... alive stage='Br5292:basis' (20s)
+[2026-07-17T06:30:54Z] ... alive stage='Br5292:basis' (40s)
+[2026-07-17T06:31:14Z] ... alive stage='Br5292:prep' (60s)
