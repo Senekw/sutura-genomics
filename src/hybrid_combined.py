@@ -306,15 +306,25 @@ def piecewise_predict(moving_coords, ot_coord_px, ot_conf, pitch):
     return pred, labels
 
 
-def piecewise_gated_predict(moving_coords, base_px, conf, pitch, tau=3.0):
+# Deployable gate: logistic on the per-piece rigid-fit residual (pitch units). The
+# threshold/scale are PRE-SET from the mechanism (a rigid model stops adding value once
+# its own fit residual exceeds roughly the PASTE2 error magnitude ~4-5 pitch) -- NOT tuned
+# on held-out results. GATE_THR is the residual at which trust is 50/50; GATE_SCALE its
+# softness. Reported alongside the oracle ceiling so the reader can see the headroom.
+GATE_THR = 4.5
+GATE_SCALE = 1.0
+
+
+def piecewise_gated_predict(moving_coords, base_px, conf, pitch,
+                            thr=GATE_THR, scale=GATE_SCALE):
     """Deployable severity gate (no ground truth). Per detected piece, fit a weighted
     similarity transform (moving -> base correspondence) and measure its OWN residual
     (median distance between the rigid-fitted point and the base coordinate, in pitch).
     A low fit residual means the piece really is rigid -> trust the piecewise correction;
     a high residual means strong non-rigid warp the rigid model can't represent -> fall
-    back to the base. Blend softly with weight exp(-res/tau). This turns the observed
-    'piecewise helps at low tear severity, hurts at high' crossover into an inference-time
-    decision using only observable fit quality (the tear offset / warp magnitude is not
+    back to the base. Blend with a logistic weight w = 1/(1+exp((res-thr)/scale)). This
+    turns the observed 'piecewise helps at low tear severity, hurts at high' crossover into
+    an inference-time decision using only observable fit quality (the warp magnitude is not
     known, but the rigid-fit residual tracks it)."""
     labels = detect_pieces(moving_coords, pitch)
     pred = base_px.copy()
@@ -325,7 +335,7 @@ def piecewise_gated_predict(moving_coords, base_px, conf, pitch, tau=3.0):
         R, t, sc = umeyama(moving_coords[m], base_px[m], w=conf[m])
         fit = sc * (moving_coords[m] @ R.T) + t
         res = float(np.median(np.linalg.norm(fit - base_px[m], axis=1)) / pitch)
-        wgt = float(np.exp(-res / tau))
+        wgt = float(1.0 / (1.0 + np.exp((res - thr) / scale)))
         pred[m] = wgt * fit + (1 - wgt) * base_px[m]
     return pred
 
