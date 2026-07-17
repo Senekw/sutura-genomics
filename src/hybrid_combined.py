@@ -967,7 +967,7 @@ def summarize():
 
 # --------------------------------------------------------------------------- #
 def main():
-    global RES_EPOCHS, RES_STEPS, NN_EPOCHS, NN_STEPS, SSA_EPOCHS, _HB_STOP
+    global RES_EPOCHS, RES_STEPS, NN_EPOCHS, NN_STEPS, SSA_EPOCHS, PASTE2_BASE, _HB_STOP
     p = argparse.ArgumentParser()
     p.add_argument("--smoke", action="store_true", help="1 fold, tiny epochs (correctness)")
     p.add_argument("--folds", default="", help="comma list of held-out donors (default all 3)")
@@ -980,6 +980,8 @@ def main():
     if args.plot_only:
         summarize()
         return
+
+    PASTE2_BASE = args.paste2_base
 
     configs = CONFIGS
     if args.smoke:
