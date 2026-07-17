@@ -41,3 +41,5 @@ dlpfc_lodo_paste2base,paste2,Br5292,Br5595+Br8100,5.407,4.863;5.041;5.333;5.674;
 dlpfc_lodo_paste2base,paste2_gated,Br5292,Br5595+Br8100,4.743,3.178;3.842;4.973;5.628;6.095,5.28,9.6,True,,1089.6,ok,2026-07-17T08:54:55Z,gated_run vs_paste2=5.407
 dlpfc_lodo_paste2base,paste2,Br5595,Br5292+Br8100,4.338,3.872;3.928;4.19;4.632;5.069,4.35,9.6,True,,765.9,ok,2026-07-17T09:08:35Z,gated_run vs_paste2=4.338
 dlpfc_lodo_paste2base,paste2_gated,Br5595,Br5292+Br8100,3.497,1.774;2.567;3.66;4.468;5.016,4.35,9.6,True,,765.9,ok,2026-07-17T09:08:35Z,gated_run vs_paste2=4.338
+dlpfc_lodo_paste2base,paste2,Br8100,Br5292+Br5595,3.417,2.987;3.015;3.426;3.626;4.033,3.46,9.6,True,,676.6,ok,2026-07-17T09:20:58Z,gated_run vs_paste2=3.417
+dlpfc_lodo_paste2base,paste2_gated,Br8100,Br5292+Br5595,2.946,1.461;2.451;3.229;3.588;4.003,3.46,9.6,True,,676.6,ok,2026-07-17T09:20:58Z,gated_run vs_paste2=3.417

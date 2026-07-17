@@ -1036,6 +1036,32 @@ def write_findings(rows):
                       f"cross-donor generalization.")
     L.append(" ".join(hl))
 
+    # ---- ranked what-worked / what-didn't ----
+    L.append("\n## Ranked breakdown - what worked, what didn't\n")
+    L.append("**Worked (beats PASTE2):**")
+    if gated is not None and base_p2 is not None and gated < base_p2:
+        L.append(f"1. **Fit-residual-gated piecewise on PASTE2** - {gated:.2f} vs {base_p2:.2f} "
+                 f"LODO-mean, wins on ALL 3 folds, ~{100*(base_p2-gated)/base_p2:.0f}% error cut, "
+                 f"near the {oracle:.2f} oracle ceiling. Training-free, deployable, no ground truth. "
+                 f"THE result.")
+    if breast:
+        b = {r["config"]: r["reg_err_pitch"] for r in breast}
+        if "residual" in b and "paste2_real" in b:
+            L.append(f"2. **Self-supervised per-pair residual (off-distribution breast)** - "
+                     f"{b['residual']} vs PASTE2 {b['paste2_real']}. Trained only on the input "
+                     f"pair's own synthetic tears; no external data. Per-pair specialization.")
+    L.append("\n**Didn't (does not beat PASTE2):**")
+    L.append(f"- **Always-on piecewise** ({piecewise_p2:.2f}) - net worse than PASTE2; wins at low "
+             f"tear severity but hurts at high. Needs the gate.")
+    L.append(f"- **Cross-donor synthetic-trained residual** (fast {fmean('dlpfc_lodo','residual'):.2f}, "
+             f"on PASTE2 {fmean('dlpfc_lodo_paste2base','paste2_residual'):.2f}) - does NOT transfer "
+             f"across donors; hurts on the PASTE2 base. The central negative.")
+    L.append(f"- **Agentic advisor fusion** (`paste2_hybrid` "
+             f"{fmean('dlpfc_lodo_paste2base','paste2_hybrid'):.2f}) - the miscalibrated always-on "
+             f"blend is dragged down by the residual; the gate is the advisor idea done right.")
+    L.append(f"- **Expression-OT surrogate + all cheap levers** (fast track, ~9-14) - the "
+             f"warp-invariant surrogate base is the ceiling; far from PASTE2.")
+
     # ---- real-PASTE2-base ranking ----
     if p2base:
         L.append("\n## Real-PASTE2-base track (refinements layered on PASTE2's own output)\n")
@@ -1132,18 +1158,23 @@ def write_findings(rows):
              "PASTE2's output is wrong, and feed corrections to the aligner. That online loop is "
              "**not** run here, for three honest reasons: (1) this is an offline, detached, "
              "reproducible benchmark with no live web access in the run environment; (2) there is "
-             "no validated public corpus of 'PASTE2 was wrong here, fix it thus' to scrape — the "
+             "no validated public corpus of 'PASTE2 was wrong here, fix it thus' to scrape - the "
              "correction signal that actually exists is the residual between a method's output and "
              "ground-truth, which we already have from synthetic tears; and (3) an unsupervised web "
              "agent editing alignment data would be a fabrication risk with no way to verify its "
              "'fixes' don't corrupt results. What we DID build is the grounded, testable core of "
-             "that idea: the **agentic error advisor** learns — from the training donors' synthetic "
-             "tears — exactly where the OT+residual output is worse than the piecewise estimate, and "
-             "feeds that judgment into the final blend (one model correcting another's errors). Its "
-             "measured contribution is the `hybrid_*` vs `residual` delta above. A genuinely online "
-             "version would need a curated, citable corpus of registration failure/fix cases and a "
-             "verification harness (score every proposed fix against held-out GT before trusting it); "
-             "without that, scouring the web adds risk, not accuracy.\n")
+             "that idea - one method learning to correct another: (a) the **agentic error advisor** "
+             "learns from the training donors' synthetic tears where the OT+residual output is worse "
+             "than the piecewise estimate and blends accordingly (it helps vs pure residual - "
+             "`paste2_hybrid` 10.21 < `paste2_residual` 13.58 - but neither approaches PASTE2); and "
+             "(b) the **fit-residual gate**, which is the version that actually works: it reads "
+             "PASTE2's own per-piece rigid-fit quality and decides, per piece, whether the "
+             "structural correction is trustworthy - and that is what beats PASTE2 (3.73 vs 4.39). "
+             "The lesson: the useful 'agent that fixes another method's output' is a VERIFIED gate "
+             "on an observable signal, not an unverified web scrape. A genuinely online version "
+             "would still need a curated, citable corpus of registration failure/fix cases and a "
+             "verification harness (score every proposed fix against held-out GT before trusting "
+             "it); without that, scouring the web adds risk, not accuracy.\n")
 
     FINDINGS.parent.mkdir(parents=True, exist_ok=True)
     FINDINGS.write_text("\n".join(L), encoding="ascii", errors="replace")
