@@ -68,6 +68,14 @@ function dispatch(m) {
     case "pair":
       nPairs++; addPair(m);
       if (m.geom) startAnim(m); break;
+    case "note":
+      // surface warnings/errors (e.g. "pair … skipped: exceeded the time
+      // limit") so a skipped-and-continued pair is visible, not silent.
+      if (m.level === "warn" || m.level === "error") {
+        const col = m.level === "error" ? "var(--bad)" : "var(--warn)";
+        caption(`<span style="color:${col}">${esc(m.text)}</span>`);
+      }
+      break;
     case "heartbeat":
       // liveness on a slow/stalled stage: the align canvas already animates, so
       // only surface a keepalive when nothing else is moving.
