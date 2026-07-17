@@ -42,6 +42,16 @@ selfsup_clean       5.88   5.88   5.96   6.12   6.27     6.02
 selfsup_leak        1.02   1.04   1.07   1.12   1.18     1.09
 combo_gated_selfsup 3.35   3.70   3.87   4.03   4.24     3.84
 
+### mousebrain  (severities [0, 2, 4, 6, 8], seeds [0])
+config              s0     s2     s4     s6     s8       MEAN
+paste2              5.39   5.39   5.43   5.53   5.59     5.47
+gated_rigid         4.89   5.00   5.08   5.39   5.57     5.18
+gated_affine        4.98   4.90   4.84   4.85   5.03     4.92
+gated_quad          5.06   5.05   4.99   4.97   5.03     5.02
+selfsup_clean       6.20   6.19   6.19   6.31   6.52     6.28
+selfsup_leak        0.80   0.82   0.83   0.86   0.89     0.84
+combo_gated_selfsup 5.27   5.17   5.25   5.39   5.47     5.31
+
 ==============================================================================
 DLPFC LODO-mean (mean over 3 donors of the sev-averaged error), per seed
 ==============================================================================
@@ -57,3 +67,4 @@ Gated_rigid vs PASTE2 per (dataset x severity): + = gated wins, - = loses
   Br5292       s0:+1.68  s1:+1.60  s2:+1.20  s3:+0.76  s4:+0.36  s6:+0.05  s8:+0.03
   Br5595       s0:+2.10  s1:+1.99  s2:+1.36  s3:+0.83  s4:+0.53  s6:+0.16  s8:+0.05
   breast       s0:+1.25  s2:+0.62  s4:+0.18  s6:-0.06  s8:+0.06
+  mousebrain   s0:+0.50  s2:+0.40  s4:+0.36  s6:+0.14  s8:+0.02
