@@ -415,3 +415,39 @@ PASTE2 starts...
 Filtered all slices for common genes. There are 32285 common genes.
 PASTE2 starts...
 [2026-07-17T12:10:33Z] ... alive stage='mousebrain:s2:seed0:paste2' (6240s)
+[2026-07-17T12:10:53Z] ... alive stage='mousebrain:s2:seed0:paste2' (6260s)
+[2026-07-17T12:11:13Z] ... alive stage='mousebrain:s2:seed0:paste2' (6280s)
+[2026-07-17T12:11:24Z] [mousebrain] s2 seed0: paste2=5.39 gated_rigid=5.00 gated_affine=4.90 selfsup_clean=6.19 selfsup_leak=0.82 (69s)
+Filtered all slices for common genes. There are 32285 common genes.
+PASTE2 starts...
+[2026-07-17T12:11:33Z] ... alive stage='mousebrain:s4:seed0:paste2' (6300s)
+[2026-07-17T12:11:53Z] ... alive stage='mousebrain:s4:seed0:paste2' (6320s)
+[2026-07-17T12:12:13Z] ... alive stage='mousebrain:s4:seed0:paste2' (6340s)
+[2026-07-17T12:12:22Z] [mousebrain] s4 seed0: paste2=5.43 gated_rigid=5.08 gated_affine=4.84 selfsup_clean=6.19 selfsup_leak=0.83 (58s)
+Filtered all slices for common genes. There are 32285 common genes.
+PASTE2 starts...
+[2026-07-17T12:12:33Z] ... alive stage='mousebrain:s6:seed0:paste2' (6360s)
+[2026-07-17T12:12:53Z] ... alive stage='mousebrain:s6:seed0:paste2' (6380s)
+[2026-07-17T12:13:13Z] ... alive stage='mousebrain:s6:seed0:paste2' (6400s)
+[2026-07-17T12:13:30Z] [mousebrain] s6 seed0: paste2=5.53 gated_rigid=5.39 gated_affine=4.85 selfsup_clean=6.31 selfsup_leak=0.86 (68s)
+Filtered all slices for common genes. There are 32285 common genes.
+PASTE2 starts...
+[2026-07-17T12:13:33Z] ... alive stage='mousebrain:s8:seed0:paste2' (6420s)
+[2026-07-17T12:13:53Z] ... alive stage='mousebrain:s8:seed0:paste2' (6440s)
+[2026-07-17T12:14:13Z] ... alive stage='mousebrain:s8:seed0:paste2' (6460s)
+[2026-07-17T12:14:33Z] ... alive stage='mousebrain:s8:seed0:paste2' (6480s)
+[2026-07-17T12:14:39Z] [mousebrain] s8 seed0: paste2=5.59 gated_rigid=5.57 gated_affine=5.03 selfsup_clean=6.52 selfsup_leak=0.89 (69s)
+[2026-07-17T12:14:39Z] === seed 0 pass done (6487s elapsed) ===
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T12:14:53Z] ... alive stage='Br8100:s0:seed1:paste2' (6500s)
+[2026-07-17T12:15:13Z] ... alive stage='Br8100:s0:seed1:paste2' (6520s)
+[2026-07-17T12:15:33Z] ... alive stage='Br8100:s0:seed1:paste2' (6540s)
+[2026-07-17T12:15:53Z] ... alive stage='Br8100:s0:seed1:paste2' (6560s)
+[2026-07-17T12:16:13Z] ... alive stage='Br8100:s0:seed1:paste2' (6580s)
+[2026-07-17T12:16:33Z] ... alive stage='Br8100:s0:seed1:paste2' (6600s)
+[2026-07-17T12:16:53Z] ... alive stage='Br8100:s0:seed1:paste2' (6620s)
+[2026-07-17T12:16:57Z] [Br8100] s0 seed1: paste2=2.84 gated_rigid=1.57 gated_affine=1.45 selfsup_clean=12.86 selfsup_leak=1.51 (138s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T12:17:13Z] ... alive stage='Br8100:s1:seed1:paste2' (6640s)
