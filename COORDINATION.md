@@ -375,3 +375,11 @@ applied the gate -> 2.51 pitch (26% better), labeled honestly "Applied PASTE2 + 
 bug: raw PASTE2 barycentric output carries NaN rows (zero-mass spots); gate_refine now fits on finite
 rows and fills NaN spots with the piece fit (never propagates NaN). +test. Robustness grid confirms
 the gate on the NEW DLPFC cross pairs too (Br5292b sev0: paste2 4.40 -> gated_affine 2.37).
+
+### Robustness pass - new DLPFC cross pairs confirm; PASTE2 s8 timeout on big pairs
+Br5292b (4789/4634 spots, NEW cross pair) seed0: gate wins at every completed severity -
+paste2 4.40->gated_affine 2.37 (s0), 4.51->2.63 (s2), 4.83->3.42 (s4), 5.18->4.24 (s6); ~35% mean cut.
+Br5595b/Br8100b in progress. HONEST: on the largest pairs at sev8, full-res PASTE2 exceeded the 900s
+watchdog and was skipped (per-cell try/except; run continued) - a real data point that full PASTE2 is
+impractical at ~4800 spots + max tear, reinforcing the subsampling speedup (~2500 spots = 3.4x lossless).
+The gate is unaffected (milliseconds); only the PASTE2 base is the bottleneck.
