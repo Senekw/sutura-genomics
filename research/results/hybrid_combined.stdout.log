@@ -4,3 +4,62 @@
 [2026-07-17T06:42:57Z] ==============================================================================
 [2026-07-17T06:43:17Z] ... alive stage='Br5292:basis' (20s)
 [2026-07-17T06:43:37Z] ... alive stage='Br5292:prep' (40s)
+[2026-07-17T06:43:57Z] ... alive stage='Br5292:prep' (60s)
+[2026-07-17T06:44:17Z] ... alive stage='Br5292:prep' (80s)
+[2026-07-17T06:44:37Z] ... alive stage='Br5292:train_plain' (100s)
+[2026-07-17T06:44:58Z] ... alive stage='Br5292:train_plain' (120s)
+[2026-07-17T06:45:18Z] ... alive stage='Br5292:train_plain' (140s)
+[2026-07-17T06:45:38Z] ... alive stage='Br5292:train_plain' (160s)
+[2026-07-17T06:45:58Z] ... alive stage='Br5292:train_plain' (180s)
+[2026-07-17T06:46:18Z] ... alive stage='Br5292:train_plain' (200s)
+[2026-07-17T06:46:38Z] ... alive stage='Br5292:train_plain' (220s)
+[2026-07-17T06:46:58Z] ... alive stage='Br5292:train_plain' (240s)
+[2026-07-17T06:47:18Z] ... alive stage='Br5292:train_plain' (260s)
+[2026-07-17T06:47:38Z] ... alive stage='Br5292:train_plain' (280s)
+[2026-07-17T06:47:58Z] ... alive stage='Br5292:train_plain' (300s)
+[2026-07-17T06:48:17Z] [Br5292] trained plain shared-basis NN (223s)
+[2026-07-17T06:48:18Z] ... alive stage='Br5292:train_residual' (320s)
+[2026-07-17T06:48:38Z] ... alive stage='Br5292:train_residual' (340s)
+[2026-07-17T06:48:58Z] ... alive stage='Br5292:train_residual' (360s)
+[2026-07-17T06:49:18Z] ... alive stage='Br5292:train_residual' (380s)
+[2026-07-17T06:49:38Z] ... alive stage='Br5292:train_residual' (400s)
+[2026-07-17T06:49:58Z] ... alive stage='Br5292:train_residual' (420s)
+[2026-07-17T06:50:18Z] ... alive stage='Br5292:train_residual' (440s)
+[2026-07-17T06:50:38Z] ... alive stage='Br5292:train_residual' (460s)
+[2026-07-17T06:50:58Z] ... alive stage='Br5292:train_residual' (480s)
+[2026-07-17T06:51:18Z] ... alive stage='Br5292:train_residual' (500s)
+[2026-07-17T06:51:38Z] ... alive stage='Br5292:train_residual' (520s)
+[2026-07-17T06:51:58Z] ... alive stage='Br5292:train_residual' (540s)
+[2026-07-17T06:52:09Z] [Br5292] trained OT-init learned residual (232s)
+[2026-07-17T06:52:14Z] [Br5292] fit agentic advisor gate (ok, 5s)
+[2026-07-17T06:52:18Z] ... alive stage='Br5292:ssa' (560s)
+[2026-07-17T06:52:38Z] ... alive stage='Br5292:ssa' (580s)
+[2026-07-17T06:52:58Z] ... alive stage='Br5292:ssa' (600s)
+[2026-07-17T06:53:18Z] ... alive stage='Br5292:ssa' (620s)
+[2026-07-17T06:53:31Z] [Br5292] self-supervised adaptation done (78s)
+[2026-07-17T06:53:33Z] [Br5292] shared_basis: held-out=10.328 in-dist=2.762 (PASTE2 5.28) beats=False
+[2026-07-17T06:53:35Z] [Br5292] ot_only: held-out=12.631 in-dist=12.758 (PASTE2 5.28) beats=False
+[2026-07-17T06:53:36Z] [Br5292] piecewise_only: held-out=13.269 in-dist=13.720 (PASTE2 5.28) beats=False
+[2026-07-17T06:53:38Z] ... alive stage='Br5292:eval:residual' (640s)
+[2026-07-17T06:53:39Z] [Br5292] residual: held-out=12.292 in-dist=5.484 (PASTE2 5.28) beats=False
+[2026-07-17T06:53:41Z] [Br5292] residual_ssa: held-out=12.592 in-dist=12.684 (PASTE2 5.28) beats=False
+[2026-07-17T06:53:44Z] [Br5292] hybrid_no_ssa: held-out=11.429 in-dist=5.336 (PASTE2 5.28) beats=False
+[2026-07-17T06:53:47Z] [Br5292] hybrid_full: held-out=12.383 in-dist=12.488 (PASTE2 5.28) beats=False
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T06:53:58Z] ... alive stage='paste2base:sev0' (660s)
+[2026-07-17T06:54:18Z] ... alive stage='paste2base:sev0' (680s)
+[2026-07-17T06:54:38Z] ... alive stage='paste2base:sev0' (700s)
+[2026-07-17T06:54:57Z] ... alive stage='paste2base:sev0' (720s)
+[2026-07-17T06:55:17Z] ... alive stage='paste2base:sev0' (740s)
+[2026-07-17T06:55:37Z] ... alive stage='paste2base:sev0' (760s)
+[2026-07-17T06:55:57Z] ... alive stage='paste2base:sev0' (780s)
+[2026-07-17T06:56:17Z] ... alive stage='paste2base:sev0' (800s)
+[2026-07-17T06:56:37Z] ... alive stage='paste2base:sev0' (820s)
+[2026-07-17T06:56:57Z] ... alive stage='paste2base:sev0' (840s)
+[2026-07-17T06:57:17Z] ... alive stage='paste2base:sev0' (860s)
+[2026-07-17T06:57:34Z]     paste2 base sev0: p2=4.86 p2_piecewise=1.81 p2_residual=12.47 p2_hybrid=7.05  (227s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T06:57:38Z] ... alive stage='paste2base:sev2' (880s)
+[2026-07-17T06:57:58Z] ... alive stage='paste2base:sev2' (900s)
