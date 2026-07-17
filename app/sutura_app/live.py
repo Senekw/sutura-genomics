@@ -21,11 +21,13 @@ _TARGET_PTS = 1600          # downsample per section for smooth animation
 # --- live-run watchdog defaults (overridable via env) ------------------- #
 # No event from the pipeline for this many seconds => the current stage is
 # considered stalled and an error is surfaced (instead of hanging forever).
-# Kept ABOVE the per-pair alignment timeout (SUTURA_ALIGN_TIMEOUT, default 150s)
-# so a single wedged pair is skipped-and-continued first; this is the backstop
-# for a stall that a per-pair skip can't reach (e.g. a one-pair run, or a hang
-# in load/QC/reconstruct).
-_STAGE_TIMEOUT = float(os.environ.get("SUTURA_LIVE_STAGE_TIMEOUT", "240"))
+# Generous by design: a full-resolution PASTE2 pair emits NO intermediate
+# progress for ~6-7 min, so this must sit ABOVE that (600s) to avoid aborting a
+# legitimately slow solve when a user disables the per-pair skip
+# (SUTURA_ALIGN_TIMEOUT=0). In the default live view the per-pair skip (180s)
+# fires first; this is the backstop for a true hang or a stall in
+# load/QC/reconstruct that the per-pair skip can't reach.
+_STAGE_TIMEOUT = float(os.environ.get("SUTURA_LIVE_STAGE_TIMEOUT", "600"))
 # Hard cap on the whole run, a backstop for a pipeline that never returns.
 _RUN_TIMEOUT = float(os.environ.get("SUTURA_LIVE_RUN_TIMEOUT", "5400"))
 # How often the supervisor emits a heartbeat (browser + terminal liveness).

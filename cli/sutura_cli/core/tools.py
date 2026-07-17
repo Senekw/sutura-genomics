@@ -19,15 +19,19 @@ from .context import Section, WorkContext
 from .events import (EventSink, Note, RoutingDecision, StepFinished,
                      StepProgress, StepStarted)
 
-# Per-pair alignment time limit. A single pathological pair (e.g. a PASTE2 /
-# optimal-transport solve that wedges or grinds for minutes) must not hang the
-# whole job — it is skipped like any other bad pair. Generous default; normal
-# DLPFC pairs align in well under 30s. Override with SUTURA_ALIGN_TIMEOUT (0 or
-# negative disables the limit).
-try:
-    _ALIGN_TIMEOUT = float(os.environ.get("SUTURA_ALIGN_TIMEOUT", "150"))
-except ValueError:
-    _ALIGN_TIMEOUT = 150.0
+# Per-pair alignment time limit. A single very slow / wedged pair (notably a
+# full-resolution PASTE2 optimal-transport solve, which can take many minutes)
+# must not stall an interactive run — past the limit it is skipped like any
+# other bad pair and the job continues.
+#
+# Read at CALL time (not import) so the live server can bound pairs for the
+# responsive browser view while headless/batch runs leave it OFF and let PASTE2
+# finish. Default 0 = OFF (no limit). Set SUTURA_ALIGN_TIMEOUT to enable.
+def _align_timeout() -> float:
+    try:
+        return float(os.environ.get("SUTURA_ALIGN_TIMEOUT", "0"))
+    except ValueError:
+        return 0.0
 
 
 def _call_with_timeout(fn, timeout: float, what: str):
@@ -419,11 +423,12 @@ def align(ctx: WorkContext, sink: EventSink, ref_id: str, mov_id: str,
             f"gene identifiers.")
 
     what = f"alignment of {ref.name} -> {mov.name}"
+    timeout = _align_timeout()
     try:
         if force_method:
             result = _call_with_timeout(
                 lambda: _forced_align(ctx, ref, mov, force_method, out_dir),
-                _ALIGN_TIMEOUT, what)
+                timeout, what)
             sink.emit(StepProgress(step_id=sid, pct=95,
                                    message="writing aligned output"))
         else:
@@ -437,7 +442,7 @@ def align(ctx: WorkContext, sink: EventSink, ref_id: str, mov_id: str,
                                        message=_STAGE_MSG.get(stage, stage)))
             result = _call_with_timeout(
                 lambda: pipeline.run_alignment(files, out_dir, progress=_progress),
-                _ALIGN_TIMEOUT, what)
+                timeout, what)
     except (LoaderError, AlignError):
         raise
     except Exception as e:                          # translate engine failures

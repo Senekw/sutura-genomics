@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import mimetypes
+import os
 import queue
 import threading
 import time
@@ -178,6 +179,11 @@ def serve_live(instruction: str, host="127.0.0.1", port=8787,
     if not instruction:
         print("usage: sutura-app live \"align ./data and reconstruct in 3D\"")
         return 2
+    # Keep the live browser view responsive: a full-resolution PASTE2 pair takes
+    # ~6-7 min, so in live mode cap per-pair time and skip a pair that exceeds it
+    # (with an honest note) rather than stalling the animation. Headless/batch
+    # runs leave this OFF and let PASTE2 finish. User-set value always wins.
+    os.environ.setdefault("SUTURA_ALIGN_TIMEOUT", "180")
     httpd = ThreadingHTTPServer((host, port), Handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     url = f"http://{host}:{port}/live"
