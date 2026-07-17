@@ -253,3 +253,17 @@
 [2026-07-17T07:54:38Z] ... alive stage='paste2base:sev6' (4300s)
 [2026-07-17T07:54:58Z] ... alive stage='paste2base:sev6' (4320s)
 [2026-07-17T07:55:01Z]     paste2 base sev6: p2=4.63 p2_piecewise=6.68 p2_residual=11.54 p2_hybrid=9.12  (164s)
+[2026-07-17T07:55:18Z] ... alive stage='paste2base:sev8' (4340s)
+[2026-07-17T07:55:38Z] ... alive stage='paste2base:sev8' (4360s)
+[2026-07-17T07:55:58Z] ... alive stage='paste2base:sev8' (4380s)
+[2026-07-17T07:56:18Z] ... alive stage='paste2base:sev8' (4400s)
+[2026-07-17T07:56:38Z] ... alive stage='paste2base:sev8' (4420s)
+[2026-07-17T07:56:57Z] ... alive stage='paste2base:sev8' (4440s)
+[2026-07-17T07:57:17Z] ... alive stage='paste2base:sev8' (4460s)
+[2026-07-17T07:57:37Z] ... alive stage='paste2base:sev8' (4480s)
+[2026-07-17T07:57:43Z]     paste2 base sev8: p2=5.07 p2_piecewise=8.11 p2_residual=11.98 p2_hybrid=9.74  (162s)
+[2026-07-17T07:57:43Z] [Br5595] paste2-base: paste2=4.338 paste2_piecewise=4.753 paste2_residual=11.281 paste2_hybrid=8.594
+[2026-07-17T07:57:43Z] [Br5595] fold done (1570s)
+[2026-07-17T07:57:43Z] wrote C:\Users\karti\arca\research\results\hybrid_combined.png
+[2026-07-17T07:57:43Z] wrote C:\Users\karti\arca\research\FINDINGS_hybrid_combined.md
+[2026-07-17T07:57:57Z] ... alive stage='Br8100:basis' (4500s)
