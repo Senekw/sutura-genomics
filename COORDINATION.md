@@ -288,3 +288,11 @@ N=3639(full) 238s paste2 3.50 gated 3.26 | N=2500 71s (3.4x) paste2 3.60 gated 3
 the GATE beats PASTE2 at EVERY subsample level. Recommendation: subsample to ~2500 spots = 3.4x faster,
 lossless; ~1500 = 13x, minor loss. With base-caching (already in the harness) this makes the method
 practical. (Note: n_scored shrinks with N so low-N numbers are noisier.)
+
+### MOUSEBRAIN (2nd OOD, seed 0) + seed-0 pass COMPLETE
+mousebrain: paste2=5.47 | gated_rigid=5.18 | **gated_affine=4.92 (best, wins every severity)** |
+selfsup_clean=6.28 (leak-free, LOSES) | selfsup_leak=0.84 (leak signature). 
+=> Gate generalizes to BOTH OOD datasets (breast + mouse), beating PASTE2 at ~every severity.
+Self-sup leak-free FAILS on all 5 datasets; the leak version is last night's result.
+SEED-0 SUMMARY (all 5 datasets): gate (esp. affine) beats PASTE2 everywhere. affine LODO(DLPFC,7sev)
+=3.08 vs paste2 4.28; breast affine 3.22 vs 3.65; mouse affine 4.92 vs 5.47. Seeds 1,2 (variance) running.
