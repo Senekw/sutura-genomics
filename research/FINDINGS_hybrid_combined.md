@@ -1,6 +1,6 @@
 # Hybrid torn-tissue alignment ? does combining cheap levers beat PASTE2?
 
-_Generated 2026-07-17T08:17:46Z on branch `hybrid-combined`._
+_Generated 2026-07-17T08:34:25Z on branch `hybrid-combined`._
 
 **Question.** Combine, in one toggleable pipeline, an OT correspondence prior (PASTE2-style, no training), tear-detection + piecewise classical alignment, a learned residual trained only on SYNTHETIC tears, and per-dataset self-supervised adaptation. Does the combination beat PASTE2 on held-out / torn DLPFC and on an off-distribution breast pair ? and which components drive any gain?
 
@@ -38,6 +38,18 @@ Best configuration: **`shared_basis`** at **9.05** LODO-mean pitches, which does
 ## Synthetic-data transfer
 
 Training the residual purely on synthetic tears of the training donors and evaluating on the real held-out donor moves error 11.24 -> 13.96 pitches. Synthetic training **does NOT transfer (no improvement over the OT base on held-out real tissue)**.
+
+## Breast (off-distribution) pair
+
+| config | error (pitch) |
+|---|---|
+| `hybrid_no_ssa` | 1.163 |
+| `residual` | 1.199 |
+| `paste2_real` | 3.652 |
+| `piecewise_only` | 17.258 |
+| `ot_only` | 17.769 |
+
+Breast has no held-out donor, so the learned residual is self-supervised on the pair's OWN synthetic tears; `paste2_real` is the true FGW baseline on the same warped slices.
 
 ## On the requested internet-scouring agent
 

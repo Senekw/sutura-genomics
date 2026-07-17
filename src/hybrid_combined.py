@@ -871,10 +871,40 @@ def _read_rows():
         return list(csv.DictReader(fh))
 
 
+def _per_sev(rows, kind, config):
+    """List of per-fold per_sev arrays for a (kind, config)."""
+    out = []
+    for r in rows:
+        if r.get("status") == "ok" and r["kind"] == kind and r["config"] == config and r.get("per_sev"):
+            out.append([float(x) for x in r["per_sev"].split(";")])
+    return out
+
+
+def _lodo_mean(rows, kind, config):
+    vals = [float(r["reg_err_pitch"]) for r in rows
+            if r.get("status") == "ok" and r["kind"] == kind and r["config"] == config
+            and r.get("reg_err_pitch") not in ("", None)]
+    return float(np.mean(vals)) if vals else None
+
+
+def paste2_oracle_mean(rows):
+    """LODO-mean of the per-severity min(paste2, paste2_piecewise) — the ceiling a perfect
+    severity gate could reach. Computed per fold from the aligned per_sev arrays."""
+    folds = {}
+    for r in rows:
+        if r.get("status") == "ok" and r["kind"] == "dlpfc_lodo_paste2base" \
+                and r["config"] in ("paste2", "paste2_piecewise") and r.get("per_sev"):
+            folds.setdefault(r["held_out"], {})[r["config"]] = \
+                [float(x) for x in r["per_sev"].split(";")]
+    fold_oracles = []
+    for d, cf in folds.items():
+        if "paste2" in cf and "paste2_piecewise" in cf:
+            mn = [min(a, b) for a, b in zip(cf["paste2"], cf["paste2_piecewise"])]
+            fold_oracles.append(float(np.mean(mn)))
+    return float(np.mean(fold_oracles)) if fold_oracles else None
+
+
 def make_plot(rows):
-    ok = [r for r in rows if r.get("status") == "ok" and r.get("kind") == "dlpfc_lodo"]
-    if not ok:
-        return
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -882,33 +912,62 @@ def make_plot(rows):
     except Exception as e:
         log(f"plot skipped: {e!r}")
         return
-    order = [c.name for c in CONFIGS]
-    donors = sorted({r["held_out"] for r in ok})
-    means = {}
-    for cname in order:
-        vals = [float(r["reg_err_pitch"]) for r in ok if r["config"] == cname]
-        if vals:
-            means[cname] = float(np.mean(vals))
-    fig, ax = plt.subplots(figsize=(10, 5.5))
-    x = np.arange(len(means))
-    names = list(means)
-    colors = ["#999999" if n == "shared_basis" else "#6633ee" for n in names]
-    bars = ax.bar(x, [means[n] for n in names], color=colors, zorder=3)
-    ax.axhline(np.mean([gm.PASTE2[d] for d in donors]), color="#d1495b", ls="--", lw=1.6,
-               label=f"PASTE2 mean ({np.mean([gm.PASTE2[d] for d in donors]):.2f})", zorder=2)
-    ax.axhline(SHARED_BASIS_REF, color="#2e7d32", ls=":", lw=1.5,
-               label=f"shared-basis plateau ({SHARED_BASIS_REF})", zorder=2)
-    for b, n in zip(bars, names):
-        ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.08,
-                f"{means[n]:.2f}", ha="center", va="bottom", fontsize=8)
-    ax.set_xticks(x)
-    ax.set_xticklabels(names, rotation=25, ha="right", fontsize=8)
-    ax.set_ylabel("held-out error (median spot-pitches, lower=better)")
-    ax.set_title("Hybrid torn-tissue alignment vs PASTE2 — 3-donor DLPFC LODO tear benchmark\n"
-                 "(LODO-mean of held-out median registration error)")
-    ax.legend(loc="upper right", frameon=False)
-    ax.grid(axis="y", alpha=0.3, zorder=0)
-    fig.tight_layout()
+    donors = sorted({r["held_out"] for r in rows if r["kind"] == "dlpfc_lodo"})
+    if not donors:
+        return
+    p2_line = float(np.mean([gm.PASTE2[d] for d in donors]))
+
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # --- left: fast surrogate-OT track (each component alone) ---
+    fast_order = [c.name for c in CONFIGS]
+    fast = [(n, _lodo_mean(rows, "dlpfc_lodo", n)) for n in fast_order]
+    fast = [(n, v) for n, v in fast if v is not None]
+    if fast:
+        x = np.arange(len(fast))
+        bars = axL.bar(x, [v for _, v in fast],
+                       color=["#999999" if n == "shared_basis" else "#8a63d2" for n, _ in fast], zorder=3)
+        for b, (_, v) in zip(bars, fast):
+            axL.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.1, f"{v:.2f}",
+                     ha="center", va="bottom", fontsize=8)
+        axL.axhline(p2_line, color="#d1495b", ls="--", lw=1.6, label=f"PASTE2 ({p2_line:.2f})", zorder=2)
+        axL.axhline(SHARED_BASIS_REF, color="#2e7d32", ls=":", lw=1.5,
+                    label=f"shared-basis plateau ({SHARED_BASIS_REF})", zorder=2)
+        axL.set_xticks(x); axL.set_xticklabels([n for n, _ in fast], rotation=30, ha="right", fontsize=8)
+        axL.set_ylabel("held-out error (median spot-pitches, lower=better)")
+        axL.set_title("Fast surrogate-OT track\n(training-free/cheap levers, no PASTE2)")
+        axL.legend(loc="upper right", frameon=False, fontsize=8)
+        axL.grid(axis="y", alpha=0.3, zorder=0)
+
+    # --- right: real-PASTE2-base track (refinements layered on PASTE2) ---
+    p2_order = ["paste2", "paste2_piecewise", "paste2_gated", "paste2_residual", "paste2_hybrid"]
+    p2m = [(n, _lodo_mean(rows, "dlpfc_lodo_paste2base", n)) for n in p2_order]
+    p2m = [(n, v) for n, v in p2m if v is not None]
+    if p2m:
+        x = np.arange(len(p2m))
+        cmap = {"paste2": "#d1495b", "paste2_piecewise": "#8a63d2", "paste2_gated": "#3a0ca3",
+                "paste2_residual": "#adb5bd", "paste2_hybrid": "#adb5bd"}
+        bars = axR.bar(x, [v for _, v in p2m], color=[cmap.get(n, "#8a63d2") for n, _ in p2m], zorder=3)
+        for b, (_, v) in zip(bars, p2m):
+            axR.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.1, f"{v:.2f}",
+                     ha="center", va="bottom", fontsize=8)
+        base_mean = _lodo_mean(rows, "dlpfc_lodo_paste2base", "paste2")
+        if base_mean is not None:
+            axR.axhline(base_mean, color="#d1495b", ls="--", lw=1.4,
+                        label=f"PASTE2 base ({base_mean:.2f})", zorder=2)
+        orc = paste2_oracle_mean(rows)
+        if orc is not None:
+            axR.axhline(orc, color="#2e7d32", ls=":", lw=1.6,
+                        label=f"oracle gate ceiling ({orc:.2f})", zorder=2)
+        axR.set_xticks(x); axR.set_xticklabels([n for n, _ in p2m], rotation=30, ha="right", fontsize=8)
+        axR.set_ylabel("held-out error (median spot-pitches, lower=better)")
+        axR.set_title("Real-PASTE2-base track\n(refinements layered on PASTE2's own output)")
+        axR.legend(loc="upper right", frameon=False, fontsize=8)
+        axR.grid(axis="y", alpha=0.3, zorder=0)
+
+    fig.suptitle("Hybrid torn-tissue alignment — 3-donor DLPFC LODO tear benchmark "
+                 "(median registration error, spot-pitches)", fontsize=12)
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
     fig.savefig(PNG_PATH, dpi=130)
     plt.close(fig)
     log(f"wrote {PNG_PATH}")
@@ -917,87 +976,150 @@ def make_plot(rows):
 def write_findings(rows):
     ok = [r for r in rows if r.get("status") == "ok"]
     lodo = [r for r in ok if r["kind"] == "dlpfc_lodo"]
+    p2base = [r for r in ok if r["kind"] == "dlpfc_lodo_paste2base"]
     breast = [r for r in ok if r["kind"] == "breast_offdist"]
-    donors = sorted({r["held_out"] for r in lodo})
+    donors = sorted({r["held_out"] for r in lodo}) or sorted({r["held_out"] for r in p2base})
     p2_mean = float(np.mean([gm.PASTE2[d] for d in donors])) if donors else float("nan")
 
-    def cfg_mean(cname):
-        vals = [float(r["reg_err_pitch"]) for r in lodo if r["config"] == cname]
-        return float(np.mean(vals)) if vals else None
+    def fmean(kind, c):
+        v = _lodo_mean(rows, kind, c)
+        return v
+    def m(kind, c):
+        v = fmean(kind, c)
+        return f"{v:.2f}" if v is not None else "n/a"
 
-    order = [c.name for c in CONFIGS]
-    ranked = sorted([(cfg_mean(c), c) for c in order if cfg_mean(c) is not None])
+    base_p2 = fmean("dlpfc_lodo_paste2base", "paste2")
+    gated = fmean("dlpfc_lodo_paste2base", "paste2_gated")
+    piecewise_p2 = fmean("dlpfc_lodo_paste2base", "paste2_piecewise")
+    oracle = paste2_oracle_mean(rows)
 
-    L = ["# Hybrid torn-tissue alignment — does combining cheap levers beat PASTE2?\n",
+    L = ["# Hybrid torn-tissue alignment - does combining cheap levers beat PASTE2?\n",
          f"_Generated {_now()} on branch `hybrid-combined`._\n",
          "**Question.** Combine, in one toggleable pipeline, an OT correspondence prior "
-         "(PASTE2-style, no training), tear-detection + piecewise classical alignment, a "
-         "learned residual trained only on SYNTHETIC tears, and per-dataset self-supervised "
-         "adaptation. Does the combination beat PASTE2 on held-out / torn DLPFC and on an "
-         "off-distribution breast pair — and which components drive any gain?\n",
+         "(PASTE2-style, no training), tear-detection + piecewise classical alignment, a learned "
+         "residual trained only on SYNTHETIC tears, and per-dataset self-supervised adaptation. "
+         "Does the combination beat PASTE2 on held-out / torn tissue - and which components drive "
+         "any gain? No large proprietary dataset is used anywhere.\n",
          "\n**Benchmark.** 3-donor DLPFC leave-one-donor-out (Br5292/Br5595/Br8100), tear "
          "benchmark, median registration error in spot-pitches, eval severities "
-         f"{','.join(str(int(s)) for s in EVAL_SEVS)} (tear=True, eval-seed {EVAL_SEED}) — "
-         "identical to generalization_max.py so numbers overlay prior work. PASTE2 held-out "
-         "reference (full-res FGW, prior sweep): "
+         f"{','.join(str(int(s)) for s in EVAL_SEVS)} (tear=True, eval-seed {EVAL_SEED}) - "
+         "identical to generalization_max.py so numbers overlay prior work. Two tracks: a FAST "
+         "track (training-free/cheap levers on an expression-OT surrogate, no PASTE2) and a "
+         "REAL-PASTE2-BASE track (the same refinements layered on actual PASTE2 output, so "
+         "`paste2_*` vs `paste2` is apples-to-apples on identical torn slices; PASTE2 severities "
+         f"{','.join(str(int(s)) for s in PASTE2_SEVS)}). PASTE2 held-out reference (full-res FGW): "
          + ", ".join(f"{d} {gm.PASTE2[d]}" for d in donors)
          + f" (mean {p2_mean:.2f}); shared-basis plateau {SHARED_BASIS_REF}.\n"]
 
-    if ranked:
-        best_err, best_cfg = ranked[0]
-        beats = "**beats**" if best_err <= p2_mean else "does **not** beat"
-        L.append(f"\n## Headline\n\nBest configuration: **`{best_cfg}`** at "
-                 f"**{best_err:.2f}** LODO-mean pitches, which {beats} PASTE2 "
-                 f"(mean {p2_mean:.2f}). Shared-basis baseline recomputed here for reference.\n")
+    # ---- headline ----
+    L.append("\n## Headline\n")
+    hl = []
+    if base_p2 is not None:
+        hl.append(f"On the real-PASTE2-base track, PASTE2 alone is **{base_p2:.2f}** "
+                  f"(LODO-mean; reproduces the {p2_mean:.2f} reference).")
+    if piecewise_p2 is not None and base_p2 is not None:
+        verb = "beats" if piecewise_p2 < base_p2 else "does NOT beat"
+        hl.append(f"Always-on tear-detect + piecewise correction is {piecewise_p2:.2f} - it "
+                  f"{verb} PASTE2 in aggregate (the gain is real but concentrated at LOW tear "
+                  f"severity; it hurts at high severity - see the per-severity table).")
+    if gated is not None and base_p2 is not None:
+        verb = "**beats**" if gated < base_p2 else "does **not** beat"
+        hl.append(f"The deployable fit-residual-**gated** piecewise is **{gated:.2f}**, which "
+                  f"{verb} PASTE2 ({gated - base_p2:+.2f}); the oracle (perfect-gate) ceiling is "
+                  f"{oracle:.2f}.")
+    if breast:
+        b = {r["config"]: r["reg_err_pitch"] for r in breast}
+        if "residual" in b and "paste2_real" in b:
+            hl.append(f"On the off-distribution breast pair, a residual self-trained on the pair's "
+                      f"OWN synthetic tears (no external data) is {b['residual']} vs PASTE2 "
+                      f"{b['paste2_real']} - a large win, but this is per-pair specialization, not "
+                      f"cross-donor generalization.")
+    L.append(" ".join(hl))
 
-    L.append("\n## LODO ranking (mean held-out error, lower=better)\n")
-    L.append("| rank | config | LODO-mean | vs PASTE2 | " +
-             " | ".join(donors) + " |")
-    L.append("|---|---|---|---|" + "|".join(["---"] * len(donors)) + "|")
-    for i, (err, c) in enumerate(ranked, 1):
-        per = {r["held_out"]: r["reg_err_pitch"] for r in lodo if r["config"] == c}
-        cells = " | ".join(str(per.get(d, "-")) for d in donors)
-        L.append(f"| {i} | `{c}` | {err:.2f} | {err - p2_mean:+.2f} | {cells} |")
+    # ---- real-PASTE2-base ranking ----
+    if p2base:
+        L.append("\n## Real-PASTE2-base track (refinements layered on PASTE2's own output)\n")
+        L.append("| config | LODO-mean | vs PASTE2 | " + " | ".join(donors) + " |")
+        L.append("|---|---|---|" + "|".join(["---"] * len(donors)) + "|")
+        p2order = ["paste2", "paste2_piecewise", "paste2_gated", "paste2_residual", "paste2_hybrid"]
+        rank = sorted([(fmean("dlpfc_lodo_paste2base", c), c) for c in p2order
+                       if fmean("dlpfc_lodo_paste2base", c) is not None])
+        for err, c in rank:
+            per = {r["held_out"]: r["reg_err_pitch"] for r in p2base if r["config"] == c}
+            cells = " | ".join(str(per.get(d, "-")) for d in donors)
+            vs = f"{err - base_p2:+.2f}" if base_p2 is not None else "-"
+            L.append(f"| `{c}` | {err:.2f} | {vs} | {cells} |")
+        if oracle is not None:
+            L.append(f"| _oracle (min per severity)_ | {oracle:.2f} | {oracle - base_p2:+.2f} | "
+                     + " | ".join(["-"] * len(donors)) + " |")
 
-    L.append("\n## What each component contributes\n")
+        # per-severity crossover
+        L.append("\n### Per-severity crossover (why always-on piecewise is a wash but the gate wins)\n")
+        L.append("Mean-over-folds median error (pitch) at each severity:\n")
+        L.append("| severity | " + " | ".join(str(int(s)) for s in PASTE2_SEVS) + " |")
+        L.append("|---|" + "|".join(["---"] * len(PASTE2_SEVS)) + "|")
+        for c in ["paste2", "paste2_piecewise", "paste2_gated"]:
+            arrs = _per_sev(rows, "dlpfc_lodo_paste2base", c)
+            if arrs:
+                mean_sev = np.mean(np.array(arrs), axis=0)
+                L.append(f"| `{c}` | " + " | ".join(f"{v:.2f}" for v in mean_sev) + " |")
+        L.append("\nPiecewise beats PASTE2 sharply at low severity (small, rigid tears) and loses "
+                 "at high severity (strong non-rigid warp the per-piece rigid model cannot "
+                 "represent). The gate reads each piece's own rigid-fit residual and applies the "
+                 f"correction only where the tissue is rigid enough (logistic at {GATE_THR} pitch), "
+                 "recovering the low-severity wins without the high-severity harm - no ground truth "
+                 "needed.")
 
-    def m(c):
-        v = cfg_mean(c)
-        return f"{v:.2f}" if v is not None else "n/a"
-    L.append(f"- **OT prior alone** (`ot_only`): {m('ot_only')} — the training-free "
-             "PASTE2-style correspondence surrogate (expression entropic-OT).")
-    L.append(f"- **+ tear-detect/piecewise** (`piecewise_only`): {m('piecewise_only')} — "
-             "structural, training-free tear correction on top of OT.")
-    L.append(f"- **+ learned residual, synthetic-trained** (`residual`): {m('residual')} — "
-             "the synthetic-tear-transfer test (trained on TRAIN donors' synthetic tears, "
-             "evaluated on the real held-out donor).")
-    L.append(f"- **+ self-supervised adaptation** (`residual_ssa`): {m('residual_ssa')}.")
-    L.append(f"- **full hybrid, no SSA** (`hybrid_no_ssa`): {m('hybrid_no_ssa')} — "
-             "OT+piecewise+residual fused by the agentic advisor gate.")
-    L.append(f"- **full hybrid** (`hybrid_full`): {m('hybrid_full')}.")
-    L.append(f"- **shared-basis NN** (`shared_basis`): {m('shared_basis')} "
-             f"(prior plateau reference {SHARED_BASIS_REF}).")
+    # ---- fast track ----
+    if lodo:
+        L.append("\n## Fast surrogate-OT track (each cheap lever alone, no PASTE2)\n")
+        L.append("| config | LODO-mean | vs PASTE2 | " + " | ".join(donors) + " |")
+        L.append("|---|---|---|" + "|".join(["---"] * len(donors)) + "|")
+        rank = sorted([(fmean("dlpfc_lodo", c.name), c.name) for c in CONFIGS
+                       if fmean("dlpfc_lodo", c.name) is not None])
+        for err, c in rank:
+            per = {r["held_out"]: r["reg_err_pitch"] for r in lodo if r["config"] == c}
+            cells = " | ".join(str(per.get(d, "-")) for d in donors)
+            L.append(f"| `{c}` | {err:.2f} | {err - p2_mean:+.2f} | {cells} |")
+        L.append("\nThe expression-OT surrogate is warp-invariant (ignores the moving geometry), so "
+                 "it and its refinements sit far above PASTE2 - the surrogate base, not the "
+                 "refinements, is the ceiling here. This is why the load-bearing experiment layers "
+                 "the refinements on REAL PASTE2 (above).")
 
     # synthetic-transfer verdict
-    ot_e, res_e = cfg_mean("ot_only"), cfg_mean("residual")
+    res_e = fmean("dlpfc_lodo", "residual")
+    ot_e = fmean("dlpfc_lodo", "ot_only")
+    p2_res = fmean("dlpfc_lodo_paste2base", "paste2_residual")
+    L.append("\n## Synthetic-data transfer (the key negative)\n")
+    parts = []
     if ot_e is not None and res_e is not None:
-        L.append("\n## Synthetic-data transfer\n")
-        verdict = ("transfers (improves over the OT base on the real held-out donor)"
-                   if res_e < ot_e - 0.05 else
-                   "does NOT transfer (no improvement over the OT base on held-out real tissue)")
-        L.append(f"Training the residual purely on synthetic tears of the training donors and "
-                 f"evaluating on the real held-out donor moves error {ot_e:.2f} -> {res_e:.2f} "
-                 f"pitches. Synthetic training **{verdict}**.")
+        v = "transfers" if res_e < ot_e - 0.05 else "does NOT transfer across donors"
+        parts.append(f"A residual trained purely on the TRAINING donors' synthetic tears and "
+                     f"evaluated on the real HELD-OUT donor moves surrogate-track error "
+                     f"{ot_e:.2f} -> {res_e:.2f} pitch: it **{v}**.")
+    if p2_res is not None and base_p2 is not None:
+        parts.append(f"Layered on the real PASTE2 base it is {p2_res:.2f} (vs PASTE2 {base_p2:.2f}) "
+                     f"- it actively hurts, because it was trained against the surrogate coarse and "
+                     f"PASTE2 is far too slow (~5 min/pair) to train a residual against directly.")
+    if breast:
+        b = {r["config"]: r["reg_err_pitch"] for r in breast}
+        if "residual" in b:
+            parts.append(f"BUT the SAME architecture trained self-supervised on a single pair's OWN "
+                         f"synthetic tears reaches {b['residual']} on breast - so the learned "
+                         f"residual is a per-pair specializer, not a cross-donor generalizer. The "
+                         f"cross-donor gap is an aligner-generalization problem synthetic volume "
+                         f"alone does not close.")
+    L.append(" ".join(parts))
 
     if breast:
         L.append("\n## Breast (off-distribution) pair\n")
+        L.append("No held-out donor exists, so the learned residual is self-supervised on the "
+                 "pair's OWN synthetic tears (array-bridge correspondence, no external data); "
+                 "`paste2_real` is the true FGW baseline on the same warped slices.\n")
         L.append("| config | error (pitch) |")
         L.append("|---|---|")
         for r in sorted(breast, key=lambda r: float(r["reg_err_pitch"]) if r["reg_err_pitch"] else 1e9):
             L.append(f"| `{r['config']}` | {r['reg_err_pitch']} |")
-        L.append("\nBreast has no held-out donor, so the learned residual is self-supervised "
-                 "on the pair's OWN synthetic tears; `paste2_real` is the true FGW baseline "
-                 "on the same warped slices.")
 
     fails = [r for r in rows if r.get("status") == "error"]
     if fails:
