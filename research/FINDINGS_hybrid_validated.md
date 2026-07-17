@@ -65,12 +65,27 @@ DLPFC/mouse high-severity cells are net positive with affine).
 
 ## Variance across seeds (robustness, not a lucky number)
 
-DLPFC LODO-mean per warp seed (mean over 3 donors of the sev-averaged error), 7-severity grid:
+DLPFC LODO-mean per warp seed (mean over 3 donors of the sev-averaged error), 7-severity grid,
+3 seeds (0/1/2):
 
-<!-- VARIANCE_TABLE: finalized after seeds 1-2 complete -->
+| config | seed0 | seed1 | seed2 | mean ± std |
+|---|---|---|---|---|
+| PASTE2 | 4.276 | 4.220 | 4.286 | **4.26 ± 0.03** |
+| gated_rigid | 3.493 | 3.232 | 3.522 | **3.42 ± 0.13** |
+| **gated_affine** | 3.076 | 3.068 | 3.157 | **3.10 ± 0.04** |
+| gated_quad | 3.137 | 3.202 | 3.122 | 3.15 ± 0.04 |
 
-The effect size (~1 pitch improvement) is far larger than the across-seed spread, so the win is not
-seed-dependent.
+Off-distribution (sev-averaged, mean ± std over 3 seeds):
+
+| dataset | PASTE2 | gated_affine |
+|---|---|---|
+| breast | 3.67 ± 0.12 | **3.21 ± 0.03** |
+| mouse brain | 5.58 ± 0.11 | **5.26 ± 0.24** |
+
+The improvement (~1.16 pitch on DLPFC, 27%) dwarfs the across-seed std (~0.04 for affine), so the win
+is **not seed-dependent**. The tightest margin is mouse brain (~6%, and at one seed the *rigid* gate
+essentially ties PASTE2, 5.74 vs 5.72) - the hardest OOD case where PASTE2 is already ~5.5 pitch;
+`gated_affine` stays net-positive there across all seeds. Full run: 1117 rows, **0 errors**.
 
 ## The high-severity extension (affine)
 

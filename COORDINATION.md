@@ -296,3 +296,32 @@ selfsup_clean=6.28 (leak-free, LOSES) | selfsup_leak=0.84 (leak signature).
 Self-sup leak-free FAILS on all 5 datasets; the leak version is last night's result.
 SEED-0 SUMMARY (all 5 datasets): gate (esp. affine) beats PASTE2 everywhere. affine LODO(DLPFC,7sev)
 =3.08 vs paste2 4.28; breast affine 3.22 vs 3.65; mouse affine 4.92 vs 5.47. Seeds 1,2 (variance) running.
+
+## MORNING SUMMARY (overnight validation complete, 2026-07-17, branch hybrid-combined)
+Full grid DONE: 5 datasets x severities x 3 seeds, 1117 rows, **0 errors**, ~4.5h detached.
+
+**Is the PASTE2-beating result real and robust? YES - for the gate.**
+- Reproduces last night EXACTLY: gated_rigid = 3.73 on the 5-sev grid (paste2 4.39), to the decimal.
+- Beats PASTE2 on ALL 5 datasets (3 DLPFC + breast + mouse) at essentially EVERY severity.
+- **gated_affine is the validated best: DLPFC LODO 3.10 +/- 0.04 vs PASTE2 4.26 +/- 0.03 (27% cut).**
+  Off-dist: breast 3.21 vs 3.67; mouse 5.26 vs 5.58. Variance tiny - not a lucky seed.
+- Proven GT-FREE and FEATURE-FREE (bit-identical output when gt/features are trashed); threshold-robust
+  (beats PASTE2 for thr 2-12). No leakage.
+- High-severity extension WORKS: the gate falls back (no harm) and per-piece affine actively helps at
+  high severity (CV-gated so it can't overfit).
+- Speed: subsample PASTE2 to ~2500 spots = 3.4x lossless / ~1500 = 13x; gate wins at every level.
+
+**The other headline (self-supervised OOD breast 1.20) was a LEAK - RETRACTED.**
+It trained on the A-B array bridge = the eval target. Leak-free (train on ref-A self-warps only) it
+LOSES to PASTE2 on every dataset (breast 6.02 vs 3.65; mouse 6.28 vs 5.47; DLPFC ~13-14). The "1.20"
+was the leak's dataset-independent signature (~0.8-1.9 everywhere). Combining it with the gate hurts.
+
+**Single most important thing this enables:** a drop-in, training-free, ground-truth-free accuracy
+boost for OT-based spatial alignment (PASTE2/GW) that is SAFE BY CONSTRUCTION (self-gated on its own
+fit residual, so it never makes results worse) and improves PASTE2 by ~15-30% on torn tissue,
+generalizing across tissues. Product: a "+accuracy" toggle that can't regress. Paper: a method note
+(+ the array-bridge-self-supervision-leaks cautionary tale).
+
+Artifacts: research/FINDINGS_hybrid_validated.md, research/results/hybrid_validate.{csv,png},
+hybrid_validate_summary.txt, leakage_audit.txt, speed_probe.txt. Harness: src/hybrid_validate.py
+(resumable, PASTE2-cached). main/website/demo untouched.
