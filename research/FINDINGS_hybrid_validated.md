@@ -63,6 +63,17 @@ The single regime where the *rigid* gate is neutral/negative is high-severity OO
 `gated_affine`/`gated_quad` cover it (breast s6: affine 3.73 vs paste2 3.70 - still ~neutral, but the
 DLPFC/mouse high-severity cells are net positive with affine).
 
+**Robustness on 3 additional DLPFC cross-section pairs** (the 2nd adjacent pair of each donor,
+appended to the CSV as kind=`dlpfc_cross`; seed 0, gated_affine): Br5292b 4.66->3.00 (-36%),
+Br5595b 5.56->4.67 (-16%), Br8100b 5.40->4.78 (-11%). The gate wins on all three at every completed
+severity - the margin scales inversely with how good PASTE2 already is (these 2nd pairs are harder for
+PASTE2). One cell (Br5292b sev8, ~4800 spots) exceeded the 900 s PASTE2 watchdog and was skipped
+(handled by per-cell try/except) - full PASTE2 is impractical at high spot-count + max tear, which the
+subsampling path (~2500 spots = 3.4x lossless) addresses. NOTE: identical-copy self-alignment on
+single-section tissues (cerebellum/kidney/...) is NOT a valid gate test - PASTE2 matches each spot to
+its identical twin and is ~exact, leaving nothing to refine; so "never-regress" is empirical over
+realistic imperfect-OT inputs, not a hard guarantee on a near-perfect base (see gate_refine caveat).
+
 ## Variance across seeds (robustness, not a lucky number)
 
 DLPFC LODO-mean per warp seed (mean over 3 donors of the sev-averaged error), 7-severity grid,
