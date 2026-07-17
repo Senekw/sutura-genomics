@@ -1135,3 +1135,8 @@ Br5292b,dlpfc_cross,4.0,0,paste2,4.8335,4.8335,True,4620,139.0,,ok,2026-07-17T18
 Br5292b,dlpfc_cross,4.0,0,gated_rigid,4.2892,4.8335,True,4620,139.0,,ok,2026-07-17T18:02:41Z,
 Br5292b,dlpfc_cross,4.0,0,gated_affine,3.4152,4.8335,True,4620,139.0,,ok,2026-07-17T18:02:41Z,
 Br5292b,dlpfc_cross,4.0,0,gated_quad,3.6229,4.8335,True,4620,139.0,,ok,2026-07-17T18:02:41Z,
+Br5292b,dlpfc_cross,6.0,0,paste2,5.1775,5.1775,True,4620,139.0,,ok,2026-07-17T18:15:44Z,
+Br5292b,dlpfc_cross,6.0,0,gated_rigid,5.034,5.1775,True,4620,139.0,,ok,2026-07-17T18:15:44Z,
+Br5292b,dlpfc_cross,6.0,0,gated_affine,4.2359,5.1775,True,4620,139.0,,ok,2026-07-17T18:15:44Z,
+Br5292b,dlpfc_cross,6.0,0,gated_quad,4.3872,5.1775,True,4620,139.0,,ok,2026-07-17T18:15:44Z,
+Br5292b,dlpfc_cross,8.0,0,paste2,,,,,,,error,2026-07-17T18:30:44Z,paste2 TimeoutError: exceeded 900s
