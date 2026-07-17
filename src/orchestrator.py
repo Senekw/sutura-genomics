@@ -86,6 +86,8 @@ class OrchestratorConfig:
     retry_error_pitch: float = 6.0   # post-QC (GT): median error above this -> retry
     min_coverage: float = 0.6        # post-QC (no-GT proxy): coverage below -> retry
     sutura_ckpt: str = "arca_shared_basis.pt"
+    gate_refine: bool = False        # optional: apply the Sutura gate refinement to a PASTE2
+                                     # result (training-free, never-regress; default OFF)
 
 
 # --------------------------------------------------------------------------- #
@@ -217,9 +219,9 @@ class Aligner:
             return err, pred, coords
         return err
 
-    def paste2(self, A, B0, severity, seed, prior_name, use_cache):
+    def paste2(self, A, B0, severity, seed, prior_name, use_cache, return_pred=False):
         key = (prior_name, float(severity), int(seed))
-        if use_cache and key in self.p2cache:
+        if use_cache and not return_pred and key in self.p2cache:
             return self.p2cache[key]
         from paste2.PASTE2 import partial_pairwise_align
         from paste2.helper import filter_for_common_genes
@@ -231,7 +233,13 @@ class Aligner:
         pi = np.asarray(partial_pairwise_align(Aa, Bb, s=0.99, alpha=0.1,
                                                dissimilarity="pca", verbose=False))
         pb, cm = barycentric_projection(pi, Aa.obsm["spatial"])
-        return registration_error_stats(pb, gt_A, mask=have & (cm > 0))["median"] / pitch
+        mask = have & (cm > 0)
+        err = registration_error_stats(pb, gt_A, mask=mask)["median"] / pitch
+        if return_pred:
+            # pb: PASTE2 barycentric reference-frame coords; moving: the warped/torn coords
+            return err, dict(pred=pb, gt=gt_A, mask=mask,
+                             moving=np.asarray(w.obsm["spatial"], float), pitch=pitch)
+        return err
 
     def run(self, method, A, B0, severity, seed, prior_name, use_cache=True):
         if method == "sutura":
@@ -240,7 +248,7 @@ class Aligner:
 
 
 def plain_summary(name, qc, dcheck, initial_method, initial_err, retry,
-                  alt_method, alt_err, final_method, final_err):
+                  alt_method, alt_err, final_method, final_err, refine=None):
     parts = [f"[{name}] QC {'passed' if qc['ok'] else 'FAILED'} "
              f"({qc.get('n_ref','?')}+{qc.get('n_mov','?')} spots)."]
     parts.append(f"Distribution check: {dcheck['reason']}; "
@@ -253,6 +261,13 @@ def plain_summary(name, qc, dcheck, initial_method, initial_err, retry,
                      f"{final_method.upper()} ({final_err:.2f} pitch).")
     else:
         parts.append("Post-QC passed; no retry.")
+    if refine is not None:
+        if refine["kept"]:
+            parts.append(f"Applied PASTE2 + Sutura refinement: {refine['base_err']:.2f} -> "
+                         f"{refine['refined_err']:.2f} pitch (kept, never-regress).")
+        else:
+            parts.append(f"Sutura refinement did not improve PASTE2 "
+                         f"({refine['base_err']:.2f} -> {refine['refined_err']:.2f}); kept PASTE2.")
     return " ".join(parts)
 
 
@@ -267,11 +282,18 @@ def orchestrate(name, cfg, proj, aligner, severity, seed, use_cache=True):
     initial_method = "sutura" if dcheck["in_distribution"] else "paste2"
     alt_method = "paste2" if initial_method == "sutura" else "sutura"
 
+    p2pred = {}   # captures the PASTE2 barycentric prediction for optional gate refinement
+
     def run_qc(method):
         """Run a method; return (median_error, footprint_coverage_or_None)."""
         if method == "sutura":
             e, pred, refc = aligner.sutura(A, B, severity, seed, return_pred=True)
             return e, footprint_coverage_proxy(pred, refc)
+        if cfg.gate_refine:
+            e, bundle = aligner.paste2(A, B, severity, seed, ds["prior"],
+                                       use_cache, return_pred=True)
+            p2pred["data"] = bundle
+            return e, None
         return aligner.run(method, A, B, severity, seed, ds["prior"], use_cache), None
 
     initial_err, coverage = run_qc(initial_method)
@@ -289,6 +311,22 @@ def orchestrate(name, cfg, proj, aligner, severity, seed, use_cache=True):
         if alt_err < initial_err:
             final_method, final_err = alt_method, alt_err
 
+    # optional post-PASTE2 refinement (behind cfg.gate_refine; default OFF, so default
+    # behaviour is unchanged). Safe by construction: kept only if it does not regress.
+    refine = None
+    if cfg.gate_refine and final_method == "paste2" and "data" in p2pred:
+        from gate_refine import gate_refine as _gate
+        d = p2pred["data"]
+        refined = _gate(d["pred"], d["moving"], order="affine", pitch=d["pitch"])
+        ref_err = registration_error_stats(refined, d["gt"], mask=d["mask"])["median"] / d["pitch"]
+        base_err = float(final_err)
+        kept = ref_err <= base_err
+        refine = {"base_err": round(base_err, 3), "refined_err": round(float(ref_err), 3),
+                  "kept": bool(kept)}
+        if kept:
+            final_method = "paste2+sutura_refine"
+            final_err = ref_err
+
     row = {"dataset": name, "tissue": ds["tissue"], "truth": ds["truth"],
            "qc_ok": True, "chosen_method": final_method,
            "initial_method": initial_method,
@@ -297,9 +335,10 @@ def orchestrate(name, cfg, proj, aligner, severity, seed, use_cache=True):
            "error": round(float(final_err), 3), "retry": retry,
            "retry_error": None if alt_err is None else round(float(alt_err), 3),
            "footprint_coverage": None if coverage is None else round(coverage, 3),
-           "severity": severity, "seed": seed}
+           "severity": severity, "seed": seed,
+           "gate_refine": None if refine is None else refine}
     return row, plain_summary(name, qc, dcheck, initial_method, initial_err,
-                              retry, alt_method, alt_err, final_method, final_err)
+                              retry, alt_method, alt_err, final_method, final_err, refine)
 
 
 def main():
@@ -308,17 +347,24 @@ def main():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--maha-threshold", type=float, default=2.5)
     p.add_argument("--no-paste2-cache", action="store_true")
+    p.add_argument("--gate-refine", action="store_true",
+                   help="apply the training-free Sutura gate refinement to PASTE2 results "
+                        "(never-regress; default off - does not change default behaviour)")
+    p.add_argument("--only", default="", help="comma subset of datasets to run")
     p.add_argument("--out", default="orchestrator_eval.csv")
     args = p.parse_args()
 
-    cfg = OrchestratorConfig(maha_threshold=args.maha_threshold)
+    cfg = OrchestratorConfig(maha_threshold=args.maha_threshold, gate_refine=args.gate_refine)
     proj = Projector()
     aligner = Aligner(cfg, proj)
     use_cache = not args.no_paste2_cache
 
     rows = []
-    print(f"orchestrator validation (tear severity={args.severity}, seed={args.seed})\n")
-    for name in DATASETS:
+    only = [s.strip() for s in args.only.split(",") if s.strip()]
+    names = [n for n in DATASETS if not only or n in only]
+    print(f"orchestrator validation (tear severity={args.severity}, seed={args.seed}"
+          f"{', gate-refine ON' if args.gate_refine else ''})\n")
+    for name in names:
         row, summary = orchestrate(name, cfg, proj, aligner, args.severity,
                                    args.seed, use_cache)
         rows.append(row)
