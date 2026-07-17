@@ -63,3 +63,20 @@ Filtered all slices for common genes. There are 33538 common genes.
 PASTE2 starts...
 [2026-07-17T06:57:38Z] ... alive stage='paste2base:sev2' (880s)
 [2026-07-17T06:57:58Z] ... alive stage='paste2base:sev2' (900s)
+[2026-07-17T06:58:18Z] ... alive stage='paste2base:sev2' (920s)
+[2026-07-17T06:58:38Z] ... alive stage='paste2base:sev2' (940s)
+[2026-07-17T06:58:58Z] ... alive stage='paste2base:sev2' (960s)
+[2026-07-17T06:59:18Z] ... alive stage='paste2base:sev2' (980s)
+[2026-07-17T06:59:38Z] ... alive stage='paste2base:sev2' (1000s)
+[2026-07-17T06:59:58Z] ... alive stage='paste2base:sev2' (1020s)
+[2026-07-17T07:00:17Z] ... alive stage='paste2base:sev2' (1040s)
+[2026-07-17T07:00:37Z] ... alive stage='paste2base:sev2' (1060s)
+[2026-07-17T07:00:57Z] ... alive stage='paste2base:sev2' (1080s)
+[2026-07-17T07:01:17Z] ... alive stage='paste2base:sev2' (1100s)
+[2026-07-17T07:01:38Z] ... alive stage='paste2base:sev2' (1120s)
+[2026-07-17T07:01:58Z] ... alive stage='paste2base:sev2' (1140s)
+[2026-07-17T07:02:18Z] ... alive stage='paste2base:sev2' (1160s)
+[2026-07-17T07:02:21Z]     paste2 base sev2: p2=5.04 p2_piecewise=2.82 p2_residual=12.59 p2_hybrid=7.61  (288s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T07:02:38Z] ... alive stage='paste2base:sev4' (1180s)
