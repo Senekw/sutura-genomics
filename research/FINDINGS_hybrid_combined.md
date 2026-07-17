@@ -1,6 +1,6 @@
 # Hybrid torn-tissue alignment ? does combining cheap levers beat PASTE2?
 
-_Generated 2026-07-17T08:54:55Z on branch `hybrid-combined`._
+_Generated 2026-07-17T09:08:35Z on branch `hybrid-combined`._
 
 **Question.** Combine, in one toggleable pipeline, an OT correspondence prior (PASTE2-style, no training), tear-detection + piecewise classical alignment, a learned residual trained only on SYNTHETIC tears, and per-dataset self-supervised adaptation. Does the combination beat PASTE2 on held-out / torn DLPFC and on an off-distribution breast pair ? and which components drive any gain?
 

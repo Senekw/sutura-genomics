@@ -39,3 +39,5 @@ breast_offdist,hybrid_no_ssa,breast,self,1.163,1.116;1.115;1.13;1.141;1.15;1.198
 breast_offdist,paste2_real,breast,none,3.652,3.470;3.490;3.614;3.696;3.991,,,,,,ok,2026-07-17T08:34:25Z,
 dlpfc_lodo_paste2base,paste2,Br5292,Br5595+Br8100,5.407,4.863;5.041;5.333;5.674;6.122,5.28,9.6,True,,1089.6,ok,2026-07-17T08:54:55Z,gated_run vs_paste2=5.407
 dlpfc_lodo_paste2base,paste2_gated,Br5292,Br5595+Br8100,4.743,3.178;3.842;4.973;5.628;6.095,5.28,9.6,True,,1089.6,ok,2026-07-17T08:54:55Z,gated_run vs_paste2=5.407
+dlpfc_lodo_paste2base,paste2,Br5595,Br5292+Br8100,4.338,3.872;3.928;4.19;4.632;5.069,4.35,9.6,True,,765.9,ok,2026-07-17T09:08:35Z,gated_run vs_paste2=4.338
+dlpfc_lodo_paste2base,paste2_gated,Br5595,Br5292+Br8100,3.497,1.774;2.567;3.66;4.468;5.016,4.35,9.6,True,,765.9,ok,2026-07-17T09:08:35Z,gated_run vs_paste2=4.338
