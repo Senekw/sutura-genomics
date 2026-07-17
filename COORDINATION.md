@@ -263,3 +263,11 @@ gated_rigid now wins at EVERY severity s0..s8 (gate falls back at high sev so no
 crossover harm is gone). **gated_affine actively helps at high sev** (s6 3.29 vs paste2 3.63; s8 3.83
 vs 4.03) - the per-piece affine fit absorbs the smooth stretch the rigid model can't. This is the
 high-severity extension the brief asked for. Confirmed leak: clean 12.86 vs leaking 1.57.
+
+### DLPFC LODO-mean (seed 0) - reproduces 3.73 exactly + affine improves it
+On last night's 5-sev grid [0,2,4,6,8]: gated_rigid = (Br8100 2.946 + Br5292 4.744 + Br5595 3.498)/3
+= **3.73**, paste2 = **4.39** - EXACT reproduction of last night to the decimal.
+On the fuller 7-sev grid [0,1,2,3,4,6,8]: paste2=4.28 | gated_rigid=3.49 | **gated_affine=3.08 (best,
+28% cut vs PASTE2)** | gated_quad=3.14. Wins on all 3 folds at every severity. selfsup_clean fails on
+all 3 (13-14); selfsup_leak gives the ~1.1-1.9 leak signature. Affine = the high-severity extension,
+validated across all DLPFC donors. Seeds 1,2 (variance) + breast/mouse OOD pending.
