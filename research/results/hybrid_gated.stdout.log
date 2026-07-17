@@ -137,3 +137,61 @@ PASTE2 starts...
 [2026-07-17T09:08:35Z] [Br5595] gated fold done (820s)
 [2026-07-17T09:08:35Z] wrote C:\Users\karti\arca\research\results\hybrid_combined.png
 [2026-07-17T09:08:35Z] wrote C:\Users\karti\arca\research\FINDINGS_hybrid_combined.md
+[2026-07-17T09:08:54Z] ... alive stage='Br8100:gated_basis' (1980s)
+[2026-07-17T09:09:14Z] ... alive stage='Br8100:gated_basis' (2000s)
+[2026-07-17T09:09:35Z] ... alive stage='Br8100:gated_basis' (2020s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T09:09:55Z] ... alive stage='paste2base:sev0' (2040s)
+[2026-07-17T09:10:15Z] ... alive stage='paste2base:sev0' (2060s)
+[2026-07-17T09:10:35Z] ... alive stage='paste2base:sev0' (2080s)
+[2026-07-17T09:10:55Z] ... alive stage='paste2base:sev0' (2100s)
+[2026-07-17T09:11:15Z] ... alive stage='paste2base:sev0' (2120s)
+[2026-07-17T09:11:16Z]     paste2 base sev0: p2=2.99 p2_gated=1.46  (94s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T09:11:35Z] ... alive stage='paste2base:sev2' (2140s)
+[2026-07-17T09:11:55Z] ... alive stage='paste2base:sev2' (2160s)
+[2026-07-17T09:12:15Z] ... alive stage='paste2base:sev2' (2180s)
+[2026-07-17T09:12:34Z] ... alive stage='paste2base:sev2' (2200s)
+[2026-07-17T09:12:54Z] ... alive stage='paste2base:sev2' (2220s)
+[2026-07-17T09:13:05Z]     paste2 base sev2: p2=3.01 p2_gated=2.45  (109s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T09:13:14Z] ... alive stage='paste2base:sev4' (2240s)
+[2026-07-17T09:13:34Z] ... alive stage='paste2base:sev4' (2260s)
+[2026-07-17T09:13:54Z] ... alive stage='paste2base:sev4' (2280s)
+[2026-07-17T09:14:14Z] ... alive stage='paste2base:sev4' (2300s)
+[2026-07-17T09:14:34Z] ... alive stage='paste2base:sev4' (2320s)
+[2026-07-17T09:14:54Z] ... alive stage='paste2base:sev4' (2340s)
+[2026-07-17T09:15:14Z] ... alive stage='paste2base:sev4' (2360s)
+[2026-07-17T09:15:34Z] ... alive stage='paste2base:sev4' (2380s)
+[2026-07-17T09:15:54Z] ... alive stage='paste2base:sev4' (2400s)
+[2026-07-17T09:16:15Z] ... alive stage='paste2base:sev4' (2420s)
+[2026-07-17T09:16:31Z]     paste2 base sev4: p2=3.43 p2_gated=3.23  (207s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T09:16:35Z] ... alive stage='paste2base:sev6' (2440s)
+[2026-07-17T09:16:55Z] ... alive stage='paste2base:sev6' (2460s)
+[2026-07-17T09:17:15Z] ... alive stage='paste2base:sev6' (2480s)
+[2026-07-17T09:17:35Z] ... alive stage='paste2base:sev6' (2500s)
+[2026-07-17T09:17:55Z] ... alive stage='paste2base:sev6' (2520s)
+[2026-07-17T09:18:15Z] ... alive stage='paste2base:sev6' (2540s)
+[2026-07-17T09:18:35Z] ... alive stage='paste2base:sev6' (2560s)
+[2026-07-17T09:18:42Z]     paste2 base sev6: p2=3.63 p2_gated=3.59  (131s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T09:18:54Z] ... alive stage='paste2base:sev8' (2580s)
+[2026-07-17T09:19:14Z] ... alive stage='paste2base:sev8' (2600s)
+[2026-07-17T09:19:34Z] ... alive stage='paste2base:sev8' (2620s)
+[2026-07-17T09:19:54Z] ... alive stage='paste2base:sev8' (2640s)
+[2026-07-17T09:20:14Z] ... alive stage='paste2base:sev8' (2660s)
+[2026-07-17T09:20:34Z] ... alive stage='paste2base:sev8' (2680s)
+[2026-07-17T09:20:54Z] ... alive stage='paste2base:sev8' (2700s)
+[2026-07-17T09:20:58Z]     paste2 base sev8: p2=4.03 p2_gated=4.00  (136s)
+[2026-07-17T09:20:58Z] [Br8100] GATED: paste2=3.417 paste2_gated=2.946
+[2026-07-17T09:20:58Z] [Br8100] gated fold done (743s)
+[2026-07-17T09:20:58Z] wrote C:\Users\karti\arca\research\results\hybrid_combined.png
+[2026-07-17T09:20:58Z] wrote C:\Users\karti\arca\research\FINDINGS_hybrid_combined.md
+[2026-07-17T09:20:58Z] hybrid_combined GATED-ONLY DONE
+[2026-07-17T09:20:58Z] DONE
