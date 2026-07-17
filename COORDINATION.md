@@ -367,3 +367,11 @@ it does not regress, so the shipped default is safe.
 The gate is a real, robust, honestly-scoped result: publishable as a method note (pending one real-tear
 experiment) and shippable as a safe accuracy add-on now. The retracted leaky self-sup is NOT
 reintroduced anywhere.
+
+### Orchestrator wiring VERIFIED on a real run
+`python src/orchestrator.py --only Br8100 --gate-refine`: routed off-dist Br8100 to PASTE2 (3.39),
+applied the gate -> 2.51 pitch (26% better), labeled honestly "Applied PASTE2 + Sutura refinement:
+3.39 -> 2.51 pitch (kept, never-regress)". Default (no flag) behavior unchanged. Fixed a real-input
+bug: raw PASTE2 barycentric output carries NaN rows (zero-mass spots); gate_refine now fits on finite
+rows and fills NaN spots with the piece fit (never propagates NaN). +test. Robustness grid confirms
+the gate on the NEW DLPFC cross pairs too (Br5292b sev0: paste2 4.40 -> gated_affine 2.37).

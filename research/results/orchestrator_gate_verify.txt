@@ -1,0 +1,11 @@
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+orchestrator validation (tear severity=4.0, seed=0, gate-refine ON)
+
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[Br8100] QC passed (3639+3673 spots). Distribution check: Mahalanobis 4.77 > threshold 2.5 (off-distribution); in-distribution confidence 0.03. Routed to PASTE2 -> median error 3.39 pitch. Post-QC passed; no retry. Applied PASTE2 + Sutura refinement: 3.39 -> 2.51 pitch (kept, never-regress).
+
+wrote C:\Users\karti\arca\results\orchestrator_gate_verify.csv (1 rows)
