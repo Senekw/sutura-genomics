@@ -217,3 +217,32 @@ Repo: `Senekw/sutura-genomics` (Next.js 16, static export, Netlify). Worked on a
 
 ## Recommendations for next / for Codex
 - TBD (updated at end).
+
+## Overnight validation of the hybrid PASTE2-beating result (2026-07-17, branch hybrid-combined)
+**Goal:** rigorously validate/harden/extend last night's result: fit-residual-gated piecewise
+correction on PASTE2 beat PASTE2 (3.73 vs 4.39 LODO), and self-supervised breast 1.20 vs 3.65.
+Branch pushed to Senekw first (backup). Built `src/hybrid_validate.py` (resumable, PASTE2 cache,
+heartbeat, per-cell try/except, watchdog).
+
+### Setup verified before launch
+- PASTE2 is deterministic: re-solving Br8100 sev0 gives 2.9866 == last night's 2.987 (cache sound).
+- **Gate reproduces exactly with UNIFORM weights**: gated_rigid Br8100 sev0 = 1.4611 == last night's
+  1.461. KEY: the gate needs NO features at all - only the PASTE2 base coords + moving geometry
+  (per-pair OT confidence weighting actually made it slightly worse: 1.736). So the gate is fully
+  feature-free / deployable, which also strengthens the leakage story.
+- PASTE2 timing: DLPFC ~90-450s/solve (grows with severity); OOD cheap (mousebrain sev4 = 55s).
+  Caching every base makes all re-analysis free.
+- OOD pairs available: breast (bridge 91%), mousebrain (bridge 90%). Mouse kidney is single-section
+  (no pair); no cerebellum on disk. So OOD = breast + mousebrain + the DLPFC held-out donors.
+
+### Grid running (PID 22340, seed-outer so seed-0-all-datasets lands first)
+Datasets Br8100/Br5292/Br5595 (DLPFC) + breast/mousebrain (OOD); DLPFC sev {0,1,2,3,4,6,8},
+OOD sev {0,2,4,6,8}; seeds {0,1,2}. Configs per cell (on the cached PASTE2 base): paste2,
+gated_rigid (=last night's gate), gated_rigid_cv, gated_affine, gated_quad (CV-gated, high-sev
+extension), gated_rigid_thr{2,3,6,8} (robustness), selfsup_clean (leak-free: trained only on
+self-warps of ref A), selfsup_leak (trained on A-B bridge == last night's breast setup),
+combo_gated_selfsup. Incremental -> research/results/hybrid_validate.csv.
+
+### Early single-cell numbers (Br8100 sev0 seed0, cached)
+paste2 2.99 | gated_rigid 1.461 (reproduces) | gated_affine 1.44 | gated_quad 1.45 |
+selfsup_clean 14.05 (leak-free residual does NOT transfer at sev0 - watch this). 
