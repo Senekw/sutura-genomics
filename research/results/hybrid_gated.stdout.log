@@ -1,0 +1,23 @@
+[2026-07-17T08:35:54Z] ==============================================================================
+[2026-07-17T08:35:54Z] hybrid_combined GATED-ONLY START folds=['Br5292', 'Br5595', 'Br8100']
+[2026-07-17T08:35:54Z] ==============================================================================
+[2026-07-17T08:36:14Z] ... alive stage='Br5292:gated_basis' (20s)
+[2026-07-17T08:36:35Z] ... alive stage='Br5292:gated_basis' (40s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T08:36:55Z] ... alive stage='paste2base:sev0' (60s)
+[2026-07-17T08:37:15Z] ... alive stage='paste2base:sev0' (80s)
+[2026-07-17T08:37:35Z] ... alive stage='paste2base:sev0' (100s)
+[2026-07-17T08:37:55Z] ... alive stage='paste2base:sev0' (120s)
+[2026-07-17T08:38:15Z] ... alive stage='paste2base:sev0' (140s)
+[2026-07-17T08:38:35Z] ... alive stage='paste2base:sev0' (160s)
+[2026-07-17T08:38:55Z] ... alive stage='paste2base:sev0' (180s)
+[2026-07-17T08:39:15Z] ... alive stage='paste2base:sev0' (200s)
+[2026-07-17T08:39:35Z] ... alive stage='paste2base:sev0' (220s)
+[2026-07-17T08:39:55Z] ... alive stage='paste2base:sev0' (240s)
+[2026-07-17T08:40:15Z] ... alive stage='paste2base:sev0' (260s)
+[2026-07-17T08:40:18Z]     paste2 base sev0: p2=4.86 p2_gated=3.18  (213s)
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-17T08:40:35Z] ... alive stage='paste2base:sev2' (280s)
+[2026-07-17T08:40:55Z] ... alive stage='paste2base:sev2' (300s)

@@ -37,3 +37,5 @@ breast_offdist,piecewise_only,breast,self,17.258,16.863;16.865;16.992;17.131;17.
 breast_offdist,residual,breast,self,1.199,1.153;1.156;1.171;1.178;1.187;1.238;1.307,,,,,1.9,ok,2026-07-17T08:22:32Z,
 breast_offdist,hybrid_no_ssa,breast,self,1.163,1.116;1.115;1.13;1.141;1.15;1.198;1.291,,,,,1.7,ok,2026-07-17T08:22:33Z,
 breast_offdist,paste2_real,breast,none,3.652,3.470;3.490;3.614;3.696;3.991,,,,,,ok,2026-07-17T08:34:25Z,
+dlpfc_lodo_paste2base,paste2,Br5292,Br5595+Br8100,5.407,4.863;5.041;5.333;5.674;6.122,5.28,9.6,True,,1089.6,ok,2026-07-17T08:54:55Z,gated_run vs_paste2=5.407
+dlpfc_lodo_paste2base,paste2_gated,Br5292,Br5595+Br8100,4.743,3.178;3.842;4.973;5.628;6.095,5.28,9.6,True,,1089.6,ok,2026-07-17T08:54:55Z,gated_run vs_paste2=5.407
