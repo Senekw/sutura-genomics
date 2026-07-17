@@ -642,3 +642,4 @@
 [2026-07-17T20:46:38Z] [Br5292b] s8 seed1 PASTE2 FAILED/timeout: TimeoutError('exceeded 900s')
 [2026-07-17T20:46:39Z] ... alive stage='Br5595b:build' (11960s)
 [2026-07-17T20:46:41Z] [Br5595b] built (dlpfc_cross): A=4110 B=4015 pitch=137.0 bridge=92%
+[2026-07-17T20:46:59Z] ... alive stage='Br5595b:s0:seed1:paste2' (11980s)
