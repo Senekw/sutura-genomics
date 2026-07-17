@@ -68,3 +68,101 @@ def test_serialize_pair_without_geometry():
         ref_layers = None; mov_layers = None
     m = live.serialize(P())
     assert m["type"] == "pair" and m["geom"] is None
+
+
+# --- overflow / backpressure --------------------------------------------- #
+def test_publish_evicts_oldest_not_newest_on_overflow():
+    """A slow/full subscriber must keep the NEWEST events (incl. done/end),
+    dropping the oldest — the previous code dropped the newest and could lose
+    the terminal event, freezing the browser on the last stage."""
+    hub = live.LiveHub()
+    q = hub.subscribe()
+    # shrink this subscriber's queue to force overflow deterministically
+    small = queue.Queue(maxsize=3)
+    with hub._lock:
+        hub._subs.discard(q); hub._subs.add(small)
+    for i in range(10):
+        hub.publish({"type": "n", "i": i})
+    got = []
+    try:
+        while True:
+            got.append(small.get_nowait()["i"])
+    except queue.Empty:
+        pass
+    assert got == [7, 8, 9], got            # newest survive, oldest evicted
+
+
+# --- watchdog / heartbeat (hermetic: fake Session, no engine) ------------- #
+def _fake_session(monkeypatch, handle):
+    import sutura_cli.core.agent as agentmod
+
+    class Fake:
+        def __init__(self, cfg, sink): self.sink = sink; self.mode = "manual"
+        def handle(self, instruction): handle(self.sink)
+    monkeypatch.setattr(agentmod, "Session", Fake)
+
+
+def _collect(hub, seconds):
+    import threading, time
+    box = {"m": []}
+
+    def drain():
+        q = hub.subscribe(); t0 = time.time()
+        while time.time() - t0 < seconds:
+            try:
+                box["m"].append(q.get(timeout=0.1))
+            except queue.Empty:
+                pass
+    t = threading.Thread(target=drain, daemon=True); t.start()
+    return box, t
+
+
+def test_watchdog_surfaces_error_on_stall(monkeypatch):
+    import time
+    _fake_session(monkeypatch, lambda sink: time.sleep(30))   # never emits
+    hub = live.LiveHub()
+    box, t = _collect(hub, 6)
+    time.sleep(0.1)
+    t0 = time.time()
+    outcome = live.run_live("x", None, hub, stage_timeout=1.5, run_timeout=20)
+    dur = time.time() - t0
+    t.join()
+    assert outcome["status"] == "stalled"
+    assert dur < 5                                # did NOT hang
+    errs = [m for m in box["m"] if m.get("type") == "error"]
+    assert errs and "stalled" in errs[0]["text"]
+    assert any(m.get("type") == "end" for m in box["m"])
+
+
+def test_watchdog_clean_completion(monkeypatch):
+    import time
+
+    def handle(sink):
+        class E: kind = "step_started"; step_id = "load_data"; title = "Load"; detail = ""
+        sink.emit(E()); time.sleep(0.2)
+    _fake_session(monkeypatch, handle)
+    hub = live.LiveHub()
+    box, t = _collect(hub, 3)
+    time.sleep(0.1)
+    outcome = live.run_live("x", None, hub, stage_timeout=5, run_timeout=20)
+    t.join()
+    assert outcome["status"] == "complete"
+    assert any(m.get("type") == "end" and m.get("status") == "complete"
+               for m in box["m"])
+
+
+def test_multisink_tees_and_isolates_failures():
+    seen_a, seen_b = [], []
+
+    class A:
+        def emit(self, ev): seen_a.append(ev)
+
+    class Boom:
+        def emit(self, ev): raise RuntimeError("sink b is broken")
+
+    class C:
+        def emit(self, ev): seen_b.append(ev)
+
+    ms = live.MultiSink([A(), Boom(), C()])
+    ms.emit("x")                               # Boom must not stop A or C
+    assert seen_a == ["x"] and seen_b == ["x"]

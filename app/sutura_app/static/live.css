@@ -28,6 +28,9 @@ body {
   box-shadow: 0 0 12px var(--purple); }
 .stage.done .dot { border-color: var(--good); background: var(--good);
   box-shadow: none; }
+.stage.error { color: var(--bad); }
+.stage.error .dot { border-color: var(--bad); background: var(--bad);
+  box-shadow: 0 0 12px var(--bad); }
 .stage .lbl { font-weight: 600; }
 .stage .sub { font-size: 11px; color: var(--dim); margin-top: 1px; }
 .tl-foot { margin-top: auto; font-size: 11px; color: var(--dim); }

@@ -185,5 +185,29 @@ Repo: `Senekw/sutura-genomics` (Next.js 16, static export, Netlify). Worked on a
 - **Verified:** `next build` + TypeScript pass; `/demo/beta` and `/demo/runs` generate; credential + intent logic sanity-checked. Purple `#6633ee` (site's existing brand) kept.
 - Files: `src/lib/demoAuth.ts`, `src/app/demo/login/page.tsx`, `src/app/demo/beta/page.tsx` (new), `src/app/demo/runs/page.tsx`, `src/lib/analysisChat.ts`, `src/components/demo/AnalysisAssistant.tsx`. Commit `2af09c2`.
 
+## App live-progress `--live` freeze — DIAGNOSED + FIXED (2026-07-16, branch `sutura-app`)
+**Symptom (reported):** `sutura --live "align these sections and reconstruct in 3D"` froze — both the browser live view and the terminal got stuck mid-run and stopped progressing to the next step.
+
+**Reproduction (what I ran):** editable-installed `cli/` + `app/`, `SUTURA_REPO=C:\Users\karti\arca`. Drove the REAL pipeline via `sutura_app.server live` on clean DLPFC sets (2-section `demo_data/` = 151507/08; 12-section `data/` = 11 pairs) and watched the SSE stream with a timestamping client (browser proxy — the Chrome extension was offline, so no canvas screenshot; the SSE bytes are identical to what the browser's `EventSource` receives, and `live.js` is purely event-driven off them).
+
+**Root cause (three real problems, not a pipeline deadlock):**
+1. **Terminal is silent for the whole run.** `serve_live` ran the pipeline with ONLY a `LiveSink` (hub → browser); nothing was ever printed to the terminal during a run. Confirmed: a 12-section run did >90s of real work while the terminal still showed only its 2 startup lines. That IS "terminal stuck mid-run" — there was no progress output at all.
+2. **No watchdog / heartbeat / timeout anywhere.** The only keepalive was the 15s SSE `: ping`, which just warms the socket — it does NOT detect a stalled *stage*. If any stage genuinely stalled (hard pair, model hiccup, memory thrash on large inputs), the browser timeline sat on "active" forever and the terminal stayed silent — a silent hang with no diagnosis and no way to tell "slow" from "wedged".
+3. **Fragile SSE fan-out under backpressure.** `LiveHub.publish` used `queue.put_nowait` on a 1000-cap queue and silently dropped the NEWEST message on overflow — including the terminal `done`/`end` — so a slow/large run could leave the browser stuck on the last stage; `subscribe()` history replay also truncated silently at 1000. (Ruled OUT as the trigger for small runs: the pipeline never deadlocks — 2- and 12-section runs stream every stage — and history replay works, so a late/slow browser still gets the full backlog. Verified by a late-connect client that got the full stream via replay.)
+
+**Fix (all in `app/`, pipeline untouched):**
+- **Terminal now shows progress.** `serve_live` tees the SAME event stream to the CLI's `ConsoleSink` (`sutura_cli.render`) — `--live` renders load→QC→Alignment table→3D→report→"Run complete" card, identical to headless, plus a final `✓ alignment complete` / `✗ did not finish (…)` line.
+- **Watchdog + heartbeat + timeout** (`live.run_live` rewritten): pipeline runs in a worker thread; the main thread supervises. A `WatchedSink` stamps the last-event time + current stage; if no event arrives for `SUTURA_LIVE_STAGE_TIMEOUT` (default 180s) or the run exceeds `SUTURA_LIVE_RUN_TIMEOUT` (default 5400s), it publishes an `error` (browser + terminal) and `end`, and returns — **surfaces instead of hanging**. A `heartbeat` every `SUTURA_LIVE_HEARTBEAT` (default 10s) proves liveness on long stages. `run_live` returns an outcome dict; `serve_live`'s exit code reflects it.
+- **Robust delivery.** `publish` now evicts the OLDEST queued item on overflow (keeps newest incl. `done`/`end`); queue cap 8192, history cap 20000 (trim oldest). `MultiSink` tees to N sinks and isolates a failing sink.
+- **Browser** (`live.js`/`live.css`): handles `heartbeat` (keepalive caption on idle stages), `error` (marks the active stage red, "Live run interrupted"), and `end` with non-complete status; new `.stage.error` style.
+
+**Verification (real runs):**
+- **Watchdog unit tests** (hermetic, fake Session): a stalled stage surfaces `error("stalled")`+`end` in ~2s (no hang); a slow-but-progressing stage emits ≥2 heartbeats and completes; clean run ends `status=complete`. Overflow test proves newest events survive.
+- **2-section end-to-end (fixed):** terminal streamed the full run and printed `✓ alignment complete`; browser SSE delivered load→qc→route→align→postqc→pair(geom 159KB)→reconstruct→report→**done→end** with 4 interleaved heartbeats (job `…225334-9e076e`, Sutura 1.29 spot-pitch, 8,610-pt volume).
+- **12-section large-input (fixed):** <RESULT PENDING — see next line>
+- Tests: `app/tests/test_live.py` +5 (overflow-evicts-oldest, watchdog stall, watchdog clean, heartbeat, MultiSink isolation); full app suite 19 passed.
+- Files: `app/sutura_app/live.py`, `server.py`, `static/live.{js,css}`, `tests/test_live.py`. No CLI/pipeline changes. Env knobs: `SUTURA_LIVE_STAGE_TIMEOUT`, `SUTURA_LIVE_RUN_TIMEOUT`, `SUTURA_LIVE_HEARTBEAT`.
+- **Note:** there is no literal 35-section folder in the repo; the largest homogeneous set is `data/` (12 DLPFC sections → 11 real alignments), used as the large-input test.
+
 ## Recommendations for next / for Codex
 - TBD (updated at end).

@@ -14,12 +14,14 @@ const $ = (id) => document.getElementById(id);
 const stagesEl = $("stages"), pairsEl = $("pairs"), sumEl = $("summary");
 const titleEl = $("title"), instrEl = $("instr"), capEl = $("caption"), legendEl = $("legend");
 
-let stageState = {};          // key -> "active"|"done"
+let stageState = {};          // key -> "active"|"done"|"error"
 let curStageSub = {};
 let mode = "idle";            // idle | align | done3d
 let anim = null;              // current pair animation
 let recon = null;             // final reconstruction points
 let nPairs = 0;
+let activeStage = null;       // current active stage key (for heartbeat/error)
+let finished = false;         // done or errored — stop heartbeat chatter
 
 // ---- timeline ----------------------------------------------------------- //
 function renderStages() {
@@ -31,7 +33,7 @@ function renderStages() {
   }).join("");
 }
 function setStage(k, state, sub) {
-  if (state === "active") { for (const s in stageState) if (stageState[s] === "active") stageState[s] = "done"; }
+  if (state === "active") { for (const s in stageState) if (stageState[s] === "active") stageState[s] = "done"; activeStage = k; }
   stageState[k] = state;
   if (sub !== undefined) curStageSub[k] = sub;
   renderStages();
@@ -66,10 +68,32 @@ function dispatch(m) {
     case "pair":
       nPairs++; addPair(m);
       if (m.geom) startAnim(m); break;
+    case "heartbeat":
+      // liveness on a slow/stalled stage: the align canvas already animates, so
+      // only surface a keepalive when nothing else is moving.
+      if (!finished && mode !== "align" && m.idle >= 5) {
+        const label = (STAGES.find(s => s[0] === m.stage) || [,"working"])[1];
+        caption(`<span style="color:var(--dim)">still working — ${esc(label)} · ` +
+                `${m.elapsed}s elapsed</span>`);
+      }
+      break;
     case "done":
-      finish(m); break;
+      finished = true; finish(m); break;
     case "error":
-      caption(`<span style="color:var(--bad)">error: ${esc(m.text)}</span>`); break;
+      finished = true;
+      if (activeStage && stageState[activeStage] !== "done") setStage(activeStage, "error");
+      titleEl.textContent = "Live run interrupted";
+      caption(`<span style="color:var(--bad)">✗ ${esc(m.text)}</span>`);
+      break;
+    case "end":
+      // stream closed. if it ended without a clean 'done' and no error was
+      // shown, say so rather than leaving the last stage spinning forever.
+      if (!finished && m.status && m.status !== "complete") {
+        finished = true;
+        if (activeStage && stageState[activeStage] !== "done") setStage(activeStage, "error");
+        caption(`<span style="color:var(--bad)">✗ run ended without completing (${esc(m.status)})</span>`);
+      }
+      break;
   }
 }
 

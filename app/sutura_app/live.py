@@ -11,10 +11,44 @@ actual aligned coordinates the orchestrator computed. Nothing is fabricated.
 from __future__ import annotations
 
 import json
+import os
 import queue
 import threading
+import time
 
 _TARGET_PTS = 1600          # downsample per section for smooth animation
+
+# --- live-run watchdog defaults (overridable via env) ------------------- #
+# No event from the pipeline for this many seconds => the current stage is
+# considered stalled and an error is surfaced (instead of hanging forever).
+_STAGE_TIMEOUT = float(os.environ.get("SUTURA_LIVE_STAGE_TIMEOUT", "180"))
+# Hard cap on the whole run, a backstop for a pipeline that never returns.
+_RUN_TIMEOUT = float(os.environ.get("SUTURA_LIVE_RUN_TIMEOUT", "5400"))
+# How often the supervisor emits a heartbeat (browser + terminal liveness).
+_HEARTBEAT_EVERY = float(os.environ.get("SUTURA_LIVE_HEARTBEAT", "10"))
+
+# SSE queue / history bounds. Large enough that realistic runs never drop an
+# event; the evict-oldest path in publish() is only a last-resort safety valve.
+_QUEUE_MAX = 8192
+_HISTORY_MAX = 20000
+
+
+def _put_drop_oldest(q: "queue.Queue", msg: dict) -> None:
+    """Deliver msg, evicting the oldest queued item if the subscriber is full.
+    The previous code silently dropped the NEWEST message on overflow, which
+    could lose the terminal 'done'/'end' and freeze the browser on the last
+    stage. Dropping the oldest keeps the stream converging to the latest state."""
+    try:
+        q.put_nowait(msg)
+    except queue.Full:
+        try:
+            q.get_nowait()
+        except queue.Empty:
+            pass
+        try:
+            q.put_nowait(msg)
+        except queue.Full:
+            pass
 
 
 def _as_xy(coords):
@@ -65,21 +99,18 @@ class LiveHub:
     def publish(self, msg: dict):
         with self._lock:
             self.history.append(msg)
+            if len(self.history) > _HISTORY_MAX:
+                # trim oldest; 'done'/'end' live at the tail so replay keeps them
+                del self.history[:-_HISTORY_MAX]
             subs = list(self._subs)
         for q in subs:
-            try:
-                q.put_nowait(msg)
-            except queue.Full:
-                pass
+            _put_drop_oldest(q, msg)
 
     def subscribe(self) -> queue.Queue:
-        q: queue.Queue = queue.Queue(maxsize=1000)
+        q: queue.Queue = queue.Queue(maxsize=_QUEUE_MAX)
         with self._lock:
             for msg in self.history:      # replay backlog first
-                try:
-                    q.put_nowait(msg)
-                except queue.Full:
-                    break
+                _put_drop_oldest(q, msg)
             self._subs.add(q)
         return q
 
@@ -172,21 +203,129 @@ class LiveSink:
             self.hub.publish(msg)
 
 
-def run_live(instruction: str, cfg, hub: LiveHub):
-    """Run the real CLI pipeline, streaming everything to the hub. Runs in a
-    worker thread started by the server; auto mode so it never blocks on a
-    terminal confirmation."""
+class MultiSink:
+    """Fan one event stream out to several EventSinks (e.g. the browser hub AND
+    the terminal console renderer). A failure in one sink must not stop the
+    others or the pipeline."""
+
+    def __init__(self, sinks):
+        self.sinks = [s for s in sinks if s is not None]
+
+    def emit(self, ev):
+        for s in self.sinks:
+            try:
+                s.emit(ev)
+            except Exception:
+                pass
+
+
+class WatchedSink:
+    """Wraps a sink and records a monotonic timestamp + current stage on every
+    event, so a supervisor thread can tell 'still making progress' from
+    'stalled'. Heartbeats are published OUT OF BAND (not through this sink), so
+    they never reset the stall timer."""
+
+    def __init__(self, inner, state: dict):
+        self.inner = inner
+        self.state = state          # shared {"t": monotonic, "stage": str, ...}
+
+    def emit(self, ev):
+        kind = getattr(ev, "kind", "")
+        if kind == "step_started":
+            self.state["stage"] = _stage_key(getattr(ev, "step_id", ""),
+                                             getattr(ev, "title", ""))
+        elif kind == "step_progress":
+            self.state["stage"] = _stage_key(getattr(ev, "step_id", ""), "")
+        self.state["t"] = time.monotonic()
+        self.state["events"] = self.state.get("events", 0) + 1
+        self.inner.emit(ev)
+
+
+def run_live(instruction: str, cfg, hub: LiveHub, extra_sinks=None,
+             stage_timeout: float = _STAGE_TIMEOUT,
+             run_timeout: float = _RUN_TIMEOUT,
+             on_status=None):
+    """Run the real CLI pipeline, streaming everything to the hub AND to any
+    extra_sinks (e.g. the terminal console renderer), under a watchdog.
+
+    The pipeline runs in a worker thread; this function supervises it:
+      * emits a periodic heartbeat so the browser and terminal show liveness;
+      * if no pipeline event arrives for `stage_timeout` s, or the whole run
+        exceeds `run_timeout` s, it surfaces an error (browser + terminal) and
+        returns instead of hanging silently.
+
+    on_status(str) is an optional callback for terminal-side status lines
+    (heartbeats, stall/abort notices). Returns a dict describing the outcome."""
     from sutura_cli.core.agent import Session
+
     hub.reset()
     hub.publish({"type": "start", "instruction": instruction})
-    sink = LiveSink(hub)
-    try:
-        session = Session(cfg, sink)
-        session.mode = "auto"
-        session.handle(instruction)
-    except Exception as e:
-        hub.publish({"type": "error", "text": f"{type(e).__name__}: {e}"})
-    finally:
-        hub.publish({"type": "end"})
-        with hub._lock:
-            hub.running = False
+
+    state = {"t": time.monotonic(), "stage": "load", "events": 0}
+    sink = WatchedSink(MultiSink([LiveSink(hub), *(extra_sinks or [])]), state)
+
+    done = threading.Event()
+    outcome = {"status": "running", "error": None}
+
+    def _work():
+        try:
+            session = Session(cfg, sink)
+            session.mode = "auto"
+            session.handle(instruction)
+            outcome["status"] = "complete"
+        except Exception as e:            # never let the worker die silently
+            outcome["status"] = "error"
+            outcome["error"] = f"{type(e).__name__}: {e}"
+            hub.publish({"type": "error", "text": outcome["error"]})
+        finally:
+            done.set()
+
+    worker = threading.Thread(target=_work, name="sutura-live-pipeline",
+                              daemon=True)
+    worker.start()
+
+    start = time.monotonic()
+    last_beat = start
+    while not done.wait(timeout=1.0):
+        now = time.monotonic()
+        since_event = now - state["t"]
+        elapsed = now - start
+
+        # 1) stage stall: no pipeline event for too long
+        if since_event > stage_timeout:
+            msg = (f"stage '{state['stage']}' stalled — no progress for "
+                   f"{int(since_event)}s. Aborting the live view (the alignment "
+                   f"thread may still be running in the background).")
+            hub.publish({"type": "error", "text": msg})
+            outcome["status"] = "stalled"
+            outcome["error"] = msg
+            if on_status:
+                on_status(f"✗ {msg}")
+            break
+
+        # 2) global backstop
+        if elapsed > run_timeout:
+            msg = (f"run exceeded the {int(run_timeout)}s limit while in stage "
+                   f"'{state['stage']}'. Aborting the live view.")
+            hub.publish({"type": "error", "text": msg})
+            outcome["status"] = "timeout"
+            outcome["error"] = msg
+            if on_status:
+                on_status(f"✗ {msg}")
+            break
+
+        # 3) heartbeat (browser liveness + terminal keepalive on long stages)
+        if now - last_beat >= _HEARTBEAT_EVERY:
+            last_beat = now
+            hub.publish({"type": "heartbeat", "stage": state["stage"],
+                         "elapsed": int(elapsed),
+                         "idle": round(since_event, 1)})
+            if on_status and since_event > _HEARTBEAT_EVERY:
+                on_status(f"… still in '{state['stage']}' "
+                          f"({int(elapsed)}s elapsed, {int(since_event)}s since "
+                          f"the last step)")
+
+    hub.publish({"type": "end", "status": outcome["status"]})
+    with hub._lock:
+        hub.running = False
+    return outcome

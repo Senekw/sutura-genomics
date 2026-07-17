@@ -163,8 +163,13 @@ def serve(host="127.0.0.1", port=8787, open_browser=True):
 
 def serve_live(instruction: str, host="127.0.0.1", port=8787,
                open_browser=True) -> int:
-    """Run a REAL alignment and stream it live to the browser, then keep serving
-    so the finished 3D view stays interactive."""
+    """Run a REAL alignment and stream it live to the browser AND the terminal,
+    then keep serving so the finished 3D view stays interactive.
+
+    The pipeline runs under a watchdog (see live.run_live): the terminal shows
+    the same stage-by-stage progress as the browser, a heartbeat proves both are
+    alive on long stages, and a stalled stage surfaces an error instead of
+    hanging silently."""
     try:
         import sys
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -176,17 +181,40 @@ def serve_live(instruction: str, host="127.0.0.1", port=8787,
     httpd = ThreadingHTTPServer((host, port), Handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     url = f"http://{host}:{port}/live"
-    print(f"Sutura live  ->  {url}")
-    print(f"streaming a real alignment; nothing leaves this machine.")
+
+    # Terminal renderer: tee the SAME event stream the browser gets to the
+    # console, so `--live` no longer looks frozen while work is happening.
+    from sutura_cli.render import ConsoleSink, banner
+    console_sink = ConsoleSink()
+    banner(console_sink.console, "live · streaming to the browser · no data egress")
+    console_sink.console.print(f"[#d9c4ff]▸[/#d9c4ff] live view: {url}")
+    console_sink.console.print(f"[grey58]▸[/grey58] [italic]{instruction}[/italic]\n")
+
     if open_browser:
         try:
             webbrowser.open(url)
         except Exception:
             pass
     time.sleep(1.0)                       # let the browser connect first
+
     from sutura_cli.core.config import Config
-    run_live(instruction, Config.load(), HUB)
-    print(f"alignment complete — view at {url}  (Ctrl-C to stop)")
+
+    def _status(line: str):
+        console_sink.console.print(f"[grey58]{line}[/grey58]")
+
+    outcome = run_live(instruction, Config.load(), HUB,
+                       extra_sinks=[console_sink], on_status=_status)
+
+    status = outcome.get("status")
+    if status == "complete":
+        console_sink.console.print(
+            f"\n[green]✓ alignment complete[/green] — view at {url}  "
+            f"(Ctrl-C to stop)")
+    else:
+        console_sink.console.print(
+            f"\n[red]✗ live run did not finish cleanly ({status})[/red]: "
+            f"{outcome.get('error') or 'see above'}\n"
+            f"the viewer is still up at {url}  (Ctrl-C to stop)")
     try:
         while True:
             time.sleep(1)
@@ -194,7 +222,7 @@ def serve_live(instruction: str, host="127.0.0.1", port=8787,
         print("\nstopped.")
     finally:
         httpd.server_close()
-    return 0
+    return 0 if status == "complete" else 1
 
 
 def main(argv=None) -> int:
