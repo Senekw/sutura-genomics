@@ -306,6 +306,30 @@ def piecewise_predict(moving_coords, ot_coord_px, ot_conf, pitch):
     return pred, labels
 
 
+def piecewise_gated_predict(moving_coords, base_px, conf, pitch, tau=3.0):
+    """Deployable severity gate (no ground truth). Per detected piece, fit a weighted
+    similarity transform (moving -> base correspondence) and measure its OWN residual
+    (median distance between the rigid-fitted point and the base coordinate, in pitch).
+    A low fit residual means the piece really is rigid -> trust the piecewise correction;
+    a high residual means strong non-rigid warp the rigid model can't represent -> fall
+    back to the base. Blend softly with weight exp(-res/tau). This turns the observed
+    'piecewise helps at low tear severity, hurts at high' crossover into an inference-time
+    decision using only observable fit quality (the tear offset / warp magnitude is not
+    known, but the rigid-fit residual tracks it)."""
+    labels = detect_pieces(moving_coords, pitch)
+    pred = base_px.copy()
+    for lab in np.unique(labels):
+        m = labels == lab
+        if m.sum() < 5:
+            continue
+        R, t, sc = umeyama(moving_coords[m], base_px[m], w=conf[m])
+        fit = sc * (moving_coords[m] @ R.T) + t
+        res = float(np.median(np.linalg.norm(fit - base_px[m], axis=1)) / pitch)
+        wgt = float(np.exp(-res / tau))
+        pred[m] = wgt * fit + (1 - wgt) * base_px[m]
+    return pred
+
+
 # --------------------------------------------------------------------------- #
 # component 3: learned residual (OTInitNet), trained on TRAIN-donor synthetic tears only
 # --------------------------------------------------------------------------- #
@@ -493,6 +517,7 @@ class Cfg:
     ssa: bool = False
     agentic: bool = False
     plain: bool = False          # plain shared-basis NN baseline (no OT)
+    gated: bool = False          # fit-residual-gated piecewise (deployable severity gate)
 
 
 CONFIGS = [
@@ -527,6 +552,10 @@ def predict(cfg, pair, moving_coords, models, base_px=None, base_conf=None):
         ot_px = pair["ot_coarse"].numpy() * pitch
         ot_conf = pair["ot_conf"]
         ot_coarse_t = pair["ot_coarse"]
+
+    if cfg.gated:
+        return piecewise_gated_predict(moving_coords, ot_px, ot_conf, pitch)
+
     piece_px, labels = piecewise_predict(moving_coords, ot_px, ot_conf, pitch)
 
     if cfg.residual:
@@ -562,17 +591,22 @@ PASTE2_SEVS = [0.0, 2.0, 4.0, 6.0, 8.0]
 PASTE2_CONFIGS = [
     Cfg("paste2", ot=True),                                                # real PASTE2 base
     Cfg("paste2_piecewise", ot=True, piecewise=True),
+    Cfg("paste2_gated", ot=True, gated=True),                              # deployable severity gate
     Cfg("paste2_residual", ot=True, residual=True),
     Cfg("paste2_hybrid", ot=True, piecewise=True, residual=True, agentic=True),
 ]
+# lean set for a training-free targeted re-run (--gated-only): base vs deployable gate
+GATED_P2_CONFIGS = [Cfg("paste2", ot=True), Cfg("paste2_gated", ot=True, gated=True)]
 
 
-def score_paste2_base(pair, models, sevs=PASTE2_SEVS, seed=EVAL_SEED, timeout=PASTE2_TIMEOUT):
-    """For each severity: run REAL PASTE2 once on the torn slice, then score every
-    PASTE2_CONFIG on that identical solve (so paste2_hybrid vs paste2 is apples-to-apples
-    on the same warped tissue). Returns {config: (mean_err, per_sev_list)}. A wedged/timed-out
-    solve drops that severity (recorded as NaN) and the loop continues."""
-    acc = {c.name: [] for c in PASTE2_CONFIGS}
+def score_paste2_base(pair, models, sevs=PASTE2_SEVS, seed=EVAL_SEED, timeout=PASTE2_TIMEOUT,
+                      configs=None):
+    """For each severity: run REAL PASTE2 once on the torn slice, then score every config
+    in `configs` on that identical solve (so paste2_* vs paste2 is apples-to-apples on the
+    same warped tissue). Returns {config: (mean_err, per_sev_list)}. A wedged/timed-out solve
+    drops that severity (recorded as NaN) and the loop continues."""
+    configs = configs if configs is not None else PASTE2_CONFIGS
+    acc = {c.name: [] for c in configs}
     for sv in sevs:
         stage(f"paste2base:sev{sv:g}")
         w, _ = apply_warp(pair["B"], sv, seed=seed, tear=True)
@@ -583,18 +617,18 @@ def score_paste2_base(pair, models, sevs=PASTE2_SEVS, seed=EVAL_SEED, timeout=PA
                                         pair["coords"], pair["pitch"])
         except Exception as e:                       # noqa: BLE001
             log(f"    paste2 base sev{sv:g} FAILED/timeout: {e!r} — sev dropped")
-            for c in PASTE2_CONFIGS:
+            for c in configs:
                 acc[c.name].append(float("nan"))
             continue
-        for c in PASTE2_CONFIGS:
+        for c in configs:
             pred = predict(c, pair, mov, models, base_px=base_px)
             st = registration_error_stats(pred, pair["gt"], mask=pair["have"])
             acc[c.name].append(st["median"] / pair["pitch"])
         log(f"    paste2 base sev{sv:g}: "
             + " ".join(f"{c.name.replace('paste2','p2')}={acc[c.name][-1]:.2f}"
-                       for c in PASTE2_CONFIGS) + f"  ({time.time()-t0:.0f}s)")
+                       for c in configs) + f"  ({time.time()-t0:.0f}s)")
     out = {}
-    for c in PASTE2_CONFIGS:
+    for c in configs:
         vals = [v for v in acc[c.name] if np.isfinite(v)]
         out[c.name] = (float(np.mean(vals)) if vals else float("nan"),
                        [round(x, 3) for x in acc[c.name]])
@@ -711,6 +745,31 @@ def run_fold(ho, configs, res_epochs, res_steps, nn_epochs, nn_steps):
                             timestamp=_now(), seconds=round(time.time() - t, 1)))
             log(f"[{ho}] paste2-base FAILED: {e!r}\n{traceback.format_exc()}")
     return results
+
+
+def run_fold_gated(ho):
+    """Training-free targeted pass: real PASTE2 base vs the deployable fit-residual gate
+    on the held-out donor. No models trained (the gate needs none). Appends paste2_gated
+    rows (the paste2 baseline already exists from the main run)."""
+    donors = list(gm.DONORS)
+    train_donors = [d for d in donors if d != ho]
+    stage(f"{ho}:gated_basis")
+    train_slices = [s for d in train_donors for pr in gm.DONORS[d][:2] for s in pr]
+    basis = gm.fit_fold_basis(train_slices, "svd", PCA_DIM, 2000)
+    ho_pair = attach_ot(gm.prep_pair(*gm.DONORS[ho][0], basis, KNN))
+    t = time.time()
+    p2 = score_paste2_base(ho_pair, {}, configs=GATED_P2_CONFIGS)
+    base_err = p2["paste2"][0]
+    for cname in ("paste2", "paste2_gated"):
+        err, per_sev = p2[cname]
+        append_row(dict(kind="dlpfc_lodo_paste2base", config=cname, held_out=ho,
+                        train="+".join(train_donors), reg_err_pitch=round(err, 3),
+                        per_sev=";".join(f"{s:g}" for s in per_sev),
+                        paste2_ref=gm.PASTE2[ho], shared_basis_ref=SHARED_BASIS_REF,
+                        beats_paste2=bool(np.isfinite(err) and err <= base_err),
+                        in_dist="", seconds=round(time.time() - t, 1), status="ok",
+                        timestamp=_now(), detail=f"gated_run vs_paste2={base_err:.3f}"))
+    log(f"[{ho}] GATED: paste2={p2['paste2'][0]:.3f} paste2_gated={p2['paste2_gated'][0]:.3f}")
 
 
 # --------------------------------------------------------------------------- #
@@ -974,6 +1033,9 @@ def main():
     p.add_argument("--no-breast", action="store_true")
     p.add_argument("--paste2-base", action="store_true",
                    help="also run real PASTE2 as the OT base (slow; watchdog-bounded)")
+    p.add_argument("--gated-only", action="store_true",
+                   help="training-free targeted pass: real PASTE2 vs the deployable "
+                        "fit-residual-gated piecewise, appended to the existing CSV")
     p.add_argument("--plot-only", action="store_true")
     args = p.parse_args()
 
@@ -982,6 +1044,32 @@ def main():
         return
 
     PASTE2_BASE = args.paste2_base
+
+    if args.gated_only:
+        folds = [d.strip() for d in args.folds.split(",") if d.strip()] or list(gm.DONORS)
+        hb = threading.Thread(target=_heartbeat, daemon=True)
+        hb.start()
+        log("=" * 78)
+        log(f"hybrid_combined GATED-ONLY START folds={folds}")
+        log("=" * 78)
+        for ho in folds:
+            t0 = time.time()
+            try:
+                run_fold_gated(ho)
+            except Exception as e:                   # noqa: BLE001
+                log(f"[{ho}] GATED FAILED: {e!r}\n{traceback.format_exc()}")
+                append_row(dict(kind="dlpfc_lodo_paste2base", config="(gated)", held_out=ho,
+                                status="error", detail=f"{type(e).__name__}: {e}"[:200],
+                                timestamp=_now()))
+            log(f"[{ho}] gated fold done ({time.time()-t0:.0f}s)")
+            try:
+                summarize()
+            except Exception as e:                   # noqa: BLE001
+                log(f"gated summary refresh failed: {e!r}")
+        _HB_STOP = True
+        log("hybrid_combined GATED-ONLY DONE")
+        log("DONE")
+        return
 
     configs = CONFIGS
     if args.smoke:
