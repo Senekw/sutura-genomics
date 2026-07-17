@@ -207,25 +207,36 @@ def gate_refine(base_coords, moving_coords, order="affine", *, pitch=None,
         cv = (o != 0)
     rng = np.random.default_rng(seed)
 
+    # OT barycentric output can carry NaN rows (moving spots that received no transported
+    # mass). Fit each piece on its FINITE base rows only; for NaN-base spots the gate outputs
+    # the piece's fitted prediction (a bonus - it places spots the OT step could not), since
+    # there is no base value to blend with / fall back to.
+    finite = np.isfinite(base).all(1) & np.isfinite(mov).all(1)
+    mov_ok = np.isfinite(mov).all(1)
     labels = detect_pieces(mov, pitch, stretch=stretch, min_frac=min_frac)
     out = base.copy()
     min_n = 6 if o == 0 else (10 if o == 1 else 18)
     info_pieces = []
     for lab in np.unique(labels):
         m = labels == lab
-        npiece = int(m.sum())
-        if npiece < min_n:
-            info_pieces.append((int(lab), npiece, 0.0, float("nan")))
+        fm = m & finite                                  # finite rows used for the fit
+        if int(fm.sum()) < min_n:
+            info_pieces.append((int(lab), int(m.sum()), 0.0, float("nan")))
             continue
-        s, d, wt = mov[m], base[m], weights[m]
-        fit = _fit_predict(s, d, o, wt)
+        s, d, wt = mov[fm], base[fm], weights[fm]
         if cv:
             res = _cv_residual(s, d, o, wt, pitch, rng)
         else:
-            res = float(np.median(np.linalg.norm(fit - d, axis=1)) / pitch)
+            res = float(np.median(np.linalg.norm(_fit_predict(s, d, o, wt) - d, axis=1)) / pitch)
         w = float(1.0 / (1.0 + np.exp((res - thr) / scale)))
-        out[m] = w * fit + (1 - w) * d
-        info_pieces.append((int(lab), npiece, w, res))
+        pm = m & mov_ok                                  # every finite-moving spot in the piece
+        fit_pm = _fit_predict(s, d, o, wt, eval_src=mov[pm])
+        base_pm = base[pm]
+        blended = w * fit_pm + (1 - w) * base_pm
+        nan_base = ~np.isfinite(base_pm).all(1)
+        blended[nan_base] = fit_pm[nan_base]             # no base to blend -> use the fit
+        out[pm] = blended
+        info_pieces.append((int(lab), int(m.sum()), w, res))
     if return_info:
         gated_frac = sum(p[1] * p[2] for p in info_pieces) / max(n, 1)
         return out, {"labels": labels, "pieces": info_pieces, "pitch": pitch,

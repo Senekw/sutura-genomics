@@ -106,6 +106,19 @@ def test_no_tear_single_piece_still_safe():
     assert _median_err(out, ref, 1.0) <= _median_err(base, ref, 1.0) + 1e-6
 
 
+def test_nan_base_handling():
+    """OT barycentric output can carry NaN rows (zero transported mass). The gate must not
+    propagate NaN: every finite-moving spot gets a finite corrected coordinate."""
+    rng = np.random.default_rng(4)
+    ref = rng.normal(0, 10, (500, 2))
+    base = ref + rng.normal(0, 0.8, ref.shape)
+    moving = ref.copy()
+    moving[ref[:, 0] > 0] += 6.0
+    base[rng.random(500) < 0.15] = np.nan          # 15% of the OT output is NaN
+    out = gr.gate_refine(base, moving, order="affine", pitch=1.0)
+    assert np.isfinite(out).all(), "gate propagated NaN from the base"
+
+
 def test_return_info():
     base, moving, _, pitch = _synthetic_torn()
     out, info = gr.gate_refine(base, moving, order="affine", pitch=pitch, return_info=True)
