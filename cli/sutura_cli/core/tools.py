@@ -8,6 +8,8 @@ Tools: load_data, qc, distribution_check, align, post_qc.
 """
 from __future__ import annotations
 
+import os
+import threading
 from pathlib import Path
 
 import numpy as np
@@ -16,6 +18,44 @@ from . import engine
 from .context import Section, WorkContext
 from .events import (EventSink, Note, RoutingDecision, StepFinished,
                      StepProgress, StepStarted)
+
+# Per-pair alignment time limit. A single pathological pair (e.g. a PASTE2 /
+# optimal-transport solve that wedges or grinds for minutes) must not hang the
+# whole job — it is skipped like any other bad pair. Generous default; normal
+# DLPFC pairs align in well under 30s. Override with SUTURA_ALIGN_TIMEOUT (0 or
+# negative disables the limit).
+try:
+    _ALIGN_TIMEOUT = float(os.environ.get("SUTURA_ALIGN_TIMEOUT", "150"))
+except ValueError:
+    _ALIGN_TIMEOUT = 150.0
+
+
+def _call_with_timeout(fn, timeout: float, what: str):
+    """Run fn() in a daemon thread and give up after `timeout` seconds. On
+    timeout, raise AlignError so the caller skips this pair and continues; the
+    underlying engine call keeps running in the (daemon) background thread —
+    Python can't safely kill it, but it no longer blocks the pipeline."""
+    if not timeout or timeout <= 0:
+        return fn()
+    box: dict = {}
+
+    def _run():
+        try:
+            box["r"] = fn()
+        except BaseException as e:      # propagate any engine failure verbatim
+            box["e"] = e
+
+    t = threading.Thread(target=_run, name="sutura-align", daemon=True)
+    t.start()
+    t.join(timeout)
+    if t.is_alive():
+        raise AlignError(
+            f"{what} exceeded the {int(timeout)}s per-pair time limit and was "
+            f"skipped (the engine alignment call was still running). Set "
+            f"SUTURA_ALIGN_TIMEOUT to change or disable this limit.")
+    if "e" in box:
+        raise box["e"]
+    return box.get("r")
 
 
 # ======================================================================== #
@@ -378,9 +418,12 @@ def align(ctx: WorkContext, sink: EventSink, ref_id: str, mov_id: str,
             f"(different gene panels / naming). Ensure both sections use the same "
             f"gene identifiers.")
 
+    what = f"alignment of {ref.name} -> {mov.name}"
     try:
         if force_method:
-            result = _forced_align(ctx, ref, mov, force_method, out_dir)
+            result = _call_with_timeout(
+                lambda: _forced_align(ctx, ref, mov, force_method, out_dir),
+                _ALIGN_TIMEOUT, what)
             sink.emit(StepProgress(step_id=sid, pct=95,
                                    message="writing aligned output"))
         else:
@@ -392,8 +435,10 @@ def align(ctx: WorkContext, sink: EventSink, ref_id: str, mov_id: str,
             def _progress(stage, pct):
                 sink.emit(StepProgress(step_id=sid, pct=int(pct),
                                        message=_STAGE_MSG.get(stage, stage)))
-            result = pipeline.run_alignment(files, out_dir, progress=_progress)
-    except LoaderError:
+            result = _call_with_timeout(
+                lambda: pipeline.run_alignment(files, out_dir, progress=_progress),
+                _ALIGN_TIMEOUT, what)
+    except (LoaderError, AlignError):
         raise
     except Exception as e:                          # translate engine failures
         raise AlignError(

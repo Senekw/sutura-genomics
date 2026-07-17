@@ -21,7 +21,11 @@ _TARGET_PTS = 1600          # downsample per section for smooth animation
 # --- live-run watchdog defaults (overridable via env) ------------------- #
 # No event from the pipeline for this many seconds => the current stage is
 # considered stalled and an error is surfaced (instead of hanging forever).
-_STAGE_TIMEOUT = float(os.environ.get("SUTURA_LIVE_STAGE_TIMEOUT", "180"))
+# Kept ABOVE the per-pair alignment timeout (SUTURA_ALIGN_TIMEOUT, default 150s)
+# so a single wedged pair is skipped-and-continued first; this is the backstop
+# for a stall that a per-pair skip can't reach (e.g. a one-pair run, or a hang
+# in load/QC/reconstruct).
+_STAGE_TIMEOUT = float(os.environ.get("SUTURA_LIVE_STAGE_TIMEOUT", "240"))
 # Hard cap on the whole run, a backstop for a pipeline that never returns.
 _RUN_TIMEOUT = float(os.environ.get("SUTURA_LIVE_RUN_TIMEOUT", "5400"))
 # How often the supervisor emits a heartbeat (browser + terminal liveness).
