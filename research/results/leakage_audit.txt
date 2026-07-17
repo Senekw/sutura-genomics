@@ -1,0 +1,16 @@
+=== LEAKAGE AUDIT ===
+1. gated_piecewise args: ['moving', 'base_px', 'conf', 'pitch', 'order', 'thr', 'scale', 'seed', 'cv']
+   -> takes moving, base_px, conf, pitch only; no gt/have/target. PASS=True
+2. gate output identical after trashing gt: PASS=True  (max|d|=0.00e+00)
+3. gate output identical after trashing features: PASS=True (feature-free)
+4. clean self-sup branch references A-B bridge quantities ['pair["gt_norm"]', 'pair["gt"]', 'pair["mask"]', 'array_bridge']: NONE
+   -> clean trains on A->A self-warps (target pair['a_norm']=A's own coords). PASS=True
+   (leak branch DOES use the bridge: ['pair["gt_norm"]', 'pair["mask"]'] - that's the leaking baseline)
+5. gate vs PASTE2 (base 2.987) across thresholds:
+     thr=   2: gated=2.368  beats=True
+     thr=   3: gated=1.928  beats=True
+     thr= 4.5: gated=1.461  beats=True
+     thr=   6: gated=1.367  beats=True
+     thr=   8: gated=1.368  beats=True
+     thr=  12: gated=1.371  beats=True
+=== END AUDIT ===
