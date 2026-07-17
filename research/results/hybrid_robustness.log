@@ -1,0 +1,37 @@
+[2026-07-17T17:25:08Z] ================================================================================
+[2026-07-17T17:25:08Z] hybrid_robustness START datasets=['kidney'] seeds=[0] smoke=False
+[2026-07-17T17:25:08Z] gate=gate_refine ['gated_rigid', 'gated_affine', 'gated_quad'] | subsample(self)=3000 | cache=C:\Users\karti\arca\research\results\paste2_cache
+[2026-07-17T17:25:08Z] ================================================================================
+[2026-07-17T17:25:08Z] [kidney] built (self): A=1438 B=1438 pitch=137.0 bridge=100%
+[2026-07-17T17:25:23Z] [kidney] s4 seed0: paste2=0.00 rigid=2.24 affine=2.15 quad=2.00 (15s)
+[2026-07-17T17:25:23Z] === seed 0 pass done (15s) ===
+[2026-07-17T17:25:23Z] hybrid_robustness DONE total=15s
+[2026-07-17T17:25:23Z] DONE
+[2026-07-17T17:27:19Z] ================================================================================
+[2026-07-17T17:27:19Z] hybrid_robustness START datasets=['Br5292b', 'Br5595b', 'Br8100b'] seeds=[0, 1] smoke=False
+[2026-07-17T17:27:19Z] gate=gate_refine ['gated_rigid', 'gated_affine', 'gated_quad'] | subsample(self)=3000 | cache=C:\Users\karti\arca\research\results\paste2_cache
+[2026-07-17T17:27:19Z] ================================================================================
+[2026-07-17T17:27:19Z] [Br5292b] built (dlpfc_cross): A=4789 B=4634 pitch=139.0 bridge=100%
+[2026-07-17T17:27:39Z] ... alive stage='Br5292b:s0:seed0:paste2' (20s)
+[2026-07-17T17:27:59Z] ... alive stage='Br5292b:s0:seed0:paste2' (40s)
+[2026-07-17T17:28:19Z] ... alive stage='Br5292b:s0:seed0:paste2' (60s)
+[2026-07-17T17:28:39Z] ... alive stage='Br5292b:s0:seed0:paste2' (80s)
+[2026-07-17T17:28:59Z] ... alive stage='Br5292b:s0:seed0:paste2' (100s)
+[2026-07-17T17:29:19Z] ... alive stage='Br5292b:s0:seed0:paste2' (120s)
+[2026-07-17T17:29:39Z] ... alive stage='Br5292b:s0:seed0:paste2' (140s)
+[2026-07-17T17:29:59Z] ... alive stage='Br5292b:s0:seed0:paste2' (160s)
+[2026-07-17T17:30:19Z] ... alive stage='Br5292b:s0:seed0:paste2' (180s)
+[2026-07-17T17:30:39Z] ... alive stage='Br5292b:s0:seed0:paste2' (200s)
+[2026-07-17T17:30:59Z] ... alive stage='Br5292b:s0:seed0:paste2' (220s)
+[2026-07-17T17:31:19Z] ... alive stage='Br5292b:s0:seed0:paste2' (240s)
+[2026-07-17T17:31:39Z] ... alive stage='Br5292b:s0:seed0:paste2' (260s)
+[2026-07-17T17:32:00Z] ... alive stage='Br5292b:s0:seed0:paste2' (280s)
+[2026-07-17T17:32:19Z] ... alive stage='Br5292b:s0:seed0:paste2' (300s)
+[2026-07-17T17:32:39Z] ... alive stage='Br5292b:s0:seed0:paste2' (320s)
+[2026-07-17T17:32:51Z] [Br5292b] s0 seed0: paste2=4.40 rigid=2.45 affine=2.37 quad=2.41 (332s)
+[2026-07-17T17:32:59Z] ... alive stage='Br5292b:s1:seed0:paste2' (340s)
+[2026-07-17T17:33:19Z] ... alive stage='Br5292b:s1:seed0:paste2' (360s)
+[2026-07-17T17:33:39Z] ... alive stage='Br5292b:s1:seed0:paste2' (380s)
+[2026-07-17T17:33:59Z] ... alive stage='Br5292b:s1:seed0:paste2' (400s)
+[2026-07-17T17:34:19Z] ... alive stage='Br5292b:s1:seed0:paste2' (420s)
+[2026-07-17T17:34:40Z] ... alive stage='Br5292b:s1:seed0:paste2' (440s)

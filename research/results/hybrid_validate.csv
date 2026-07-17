@@ -1115,3 +1115,7 @@ mousebrain,ood,8.0,2,gated_rigid_thr8,6.7176,6.1164,False,2951,137.0,,ok,2026-07
 mousebrain,ood,8.0,2,selfsup_clean,6.667,6.1164,False,2951,137.0,,ok,2026-07-17T14:55:52Z,
 mousebrain,ood,8.0,2,selfsup_leak,0.8602,6.1164,True,2951,137.0,,ok,2026-07-17T14:55:52Z,
 mousebrain,ood,8.0,2,combo_gated_selfsup,6.0729,6.1164,True,2951,137.0,,ok,2026-07-17T14:55:52Z,
+Br5292b,dlpfc_cross,0.0,0,paste2,4.4006,4.4006,True,4620,139.0,,ok,2026-07-17T17:32:51Z,
+Br5292b,dlpfc_cross,0.0,0,gated_rigid,2.4512,4.4006,True,4620,139.0,,ok,2026-07-17T17:32:51Z,
+Br5292b,dlpfc_cross,0.0,0,gated_affine,2.3654,4.4006,True,4620,139.0,,ok,2026-07-17T17:32:51Z,
+Br5292b,dlpfc_cross,0.0,0,gated_quad,2.4102,4.4006,True,4620,139.0,,ok,2026-07-17T17:32:51Z,
