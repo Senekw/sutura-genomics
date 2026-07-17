@@ -281,3 +281,10 @@ VERDICT so far: (1) last night's self-supervised OOD headline was a leakage arti
 leak-free number LOSES to PASTE2. (2) The training-free GATE is the real result and it generalizes
 off-distribution (beats PASTE2 on breast). (3) "Combine the two winners" collapses to "there is one
 real winner (the gate)". Mouse brain + seed variance pending.
+
+### SPEED: subsampling PASTE2 gives big speedups, gated win survives (Br8100 sev4)
+N=3639(full) 238s paste2 3.50 gated 3.26 | N=2500 71s (3.4x) paste2 3.60 gated 3.24 (NO accuracy loss)
+| N=1500 18s (13x) gated_affine 2.95 | N=900 6s (42x) | N=600 2s (135x). PASTE2 scales super-linearly;
+the GATE beats PASTE2 at EVERY subsample level. Recommendation: subsample to ~2500 spots = 3.4x faster,
+lossless; ~1500 = 13x, minor loss. With base-caching (already in the harness) this makes the method
+practical. (Note: n_scored shrinks with N so low-N numbers are noisier.)

@@ -1,0 +1,38 @@
+full sizes A=3639 B=3673; full-res ref (grid, 8-thread) = 190s (this probe is 2-thread so absolute times run slower; use the N=full row here as the 2-thread anchor for ratios)
+     N  time_s n_scored  paste2  g_rigid g_affine rigid_beats
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  3639     238     3469    3.50     3.26     2.59        True  (1.0x vs N=full)
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  2500      71     1619    3.60     3.24     2.71        True  (3.4x vs N=full)
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+  1500      18      580    3.60     3.50     2.95        True  (13.4x vs N=full)
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+   900       6      211    3.62     3.43     3.24        True  (42.2x vs N=full)
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+C:\Users\karti\arca\.venv\Lib\site-packages\anndata\_core\anndata.py:1882: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates("obs")
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+   600       2      102    3.00     2.15     2.35        True  (135.6x vs N=full)
+DONE
