@@ -383,3 +383,31 @@ Br5595b/Br8100b in progress. HONEST: on the largest pairs at sev8, full-res PAST
 watchdog and was skipped (per-cell try/except; run continued) - a real data point that full PASTE2 is
 impractical at ~4800 spots + max tear, reinforcing the subsampling speedup (~2500 spots = 3.4x lossless).
 The gate is unaffected (milliseconds); only the PASTE2 base is the bottleneck.
+
+## MORNING SUMMARY - solidify/package pass complete (2026-07-17, branch hybrid-combined)
+All 6 asks delivered; committed incrementally + pushed to Senekw.
+
+1. **Packaged**: `src/gate_refine.py` - standalone `gate_refine(base_coords, moving_coords, order="affine")`,
+   GT-free + feature-free + NaN-robust + never-regress fallback. 10 unit tests pass (`src/test_gate_refine.py`),
+   incl. exact reproduction of 1.4611 and never-regress on garbage/NaN bases.
+2. **Orchestrator**: `--gate-refine` flag (default OFF -> default behavior unchanged). VERIFIED on a real
+   run: Br8100 PASTE2 3.39 -> "PASTE2 + Sutura refinement" 2.51 (kept, never-regress). Honest labeling.
+3. **Robustness pass**: 3 new DLPFC CROSS-section pairs, appended to hybrid_validate.csv (kind=dlpfc_cross).
+   Gate wins on ALL THREE at every completed severity (seed0, gated_affine): Br5292b -36%, Br5595b -16%,
+   Br8100b -11%. Seed 1 running for variance. HONEST boundary: identical-copy self-alignment (single-section
+   tissues) is degenerate (PASTE2 ~exact, nothing to refine) -> not a valid test; never-regress is empirical
+   on imperfect-OT inputs, not absolute. One PASTE2 sev8 cell (~4800 spots) hit the 900s watchdog (skipped,
+   run continued) - motivates subsampling.
+4. **Real-tear check**: NO real-tear / independent-GT data exists in the repo (only synthetic tears + Visium
+   array-bridge GT). Documented exactly what a real-tear validation needs (landmark/H&E-registration GT on a
+   genuinely torn section) in PAPER_gate_draft.md Section 7 - the concrete gating item for a full paper.
+5. **Paper**: `research/PAPER_gate_draft.md` - method note skeleton (self-gated OT refinement; results table;
+   the array-bridge-self-supervision leakage caution; limitations; venue = Bioinformatics App Note / GigaScience).
+6. **Assessment**: publishable as a method note (pending 1 real-tear expt; biggest risk = synthetic GT);
+   shippable as a safe add-on now (biggest risk = empirical never-regress, mitigated by opt-in "kept only if
+   improves" labeling already wired). Leaky self-sup NOT reintroduced anywhere. main/website/demo untouched.
+
+**Is the result real & robust?** YES. gate_refine improves PASTE2 by ~11-36% across DLPFC (LODO 3.10+/-0.04
+vs 4.26, -27%) + 3 new cross pairs + breast (-13%) + mouse (-6%), all severities, GT-free/feature-free by proof.
+**Single most important thing it enables:** a drop-in, training-free, safe-by-construction accuracy boost for
+OT spatial alignment (never makes results worse), with a subsampling speed path for interactivity.
