@@ -246,3 +246,12 @@ combo_gated_selfsup. Incremental -> research/results/hybrid_validate.csv.
 ### Early single-cell numbers (Br8100 sev0 seed0, cached)
 paste2 2.99 | gated_rigid 1.461 (reproduces) | gated_affine 1.44 | gated_quad 1.45 |
 selfsup_clean 14.05 (leak-free residual does NOT transfer at sev0 - watch this). 
+
+### CRITICAL early signal (Br8100 sev0 seed0, full run) - the self-sup result was LEAKING
+paste2=2.99 | gated_rigid=1.461 (reproduces) | gated_affine=1.44 | gated_quad=1.45 |
+**selfsup_clean=12.86 (leak-free, trained only on ref-A self-warps) - does NOT beat PASTE2** |
+**selfsup_leak=1.49 (trained on the A-B array bridge = last night's breast setup) - beats PASTE2**.
+=> Last night's self-supervised breast 1.20 almost certainly LEAKED (train target == eval target,
+the array bridge). The leak-free version fails to generalize. Confirming across breast/mouse next.
+The GATE result stands (real, reproduces, leakage-audited GT-free + feature-free). Being brutally
+honest per the brief: the "biggest result" (self-sup OOD) does not survive a leakage-clean test.
