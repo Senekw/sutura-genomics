@@ -271,3 +271,13 @@ On the fuller 7-sev grid [0,1,2,3,4,6,8]: paste2=4.28 | gated_rigid=3.49 | **gat
 28% cut vs PASTE2)** | gated_quad=3.14. Wins on all 3 folds at every severity. selfsup_clean fails on
 all 3 (13-14); selfsup_leak gives the ~1.1-1.9 leak signature. Affine = the high-severity extension,
 validated across all DLPFC donors. Seeds 1,2 (variance) + breast/mouse OOD pending.
+
+### BREAST (OOD, seed 0) - DEFINITIVE: last night's 1.20 was a LEAK; but the GATE generalizes OOD
+paste2=3.65 (reproduces last night's 3.652) | gated_rigid=3.24 | gated_affine=3.22 | gated_quad=3.20
+(**gate BEATS PASTE2 on breast too, ~12% cut**) | **selfsup_clean=6.02 (leak-free) LOSES to PASTE2** |
+**selfsup_leak=1.09 == last night's "1.20"** (leaking; trains on the eval target). combo=3.84 (worse
+than gate alone - the self-sup "winner" wasn't real, so combining hurts).
+VERDICT so far: (1) last night's self-supervised OOD headline was a leakage artifact - the honest
+leak-free number LOSES to PASTE2. (2) The training-free GATE is the real result and it generalizes
+off-distribution (beats PASTE2 on breast). (3) "Combine the two winners" collapses to "there is one
+real winner (the gate)". Mouse brain + seed variance pending.
