@@ -214,6 +214,14 @@ class Session:
                 msg = f"pair {ref.name} -> {mov.name} skipped: {e}"
                 self.sink.emit(Note(text=msg, level="error"))
                 self.bundle.warnings.append(msg)
+            except Exception as e:      # noqa: BLE001 - one pathological pair
+                # (e.g. a routing/auto-adapt engine bug on an odd cross-tissue
+                # pair) must not sink the whole job. Skip it, keep the type for
+                # debuggability, and carry on with the remaining pairs.
+                msg = (f"pair {ref.name} -> {mov.name} skipped after an "
+                       f"unexpected error ({type(e).__name__}: {e})")
+                self.sink.emit(Note(text=msg, level="error"))
+                self.bundle.warnings.append(msg)
 
         if not self._results:
             self.bundle.status = "failed"

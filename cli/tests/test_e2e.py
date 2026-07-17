@@ -36,8 +36,11 @@ HAVE_DATA = bool(REPO) and all(p.is_file() for p in DLPFC)
 BR8100 = [REPO / "data" / f"DLPFC_{s}.h5ad" for s in ("151673", "151674")] if REPO else []
 CHAIN4 = [REPO / "data" / f"DLPFC_{s}.h5ad"
           for s in ("151507", "151508", "151509", "151510")] if REPO else []
+CHAIN3 = [REPO / "data" / f"DLPFC_{s}.h5ad"
+          for s in ("151507", "151508", "151509")] if REPO else []
 HAVE_BR8100 = bool(REPO) and all(p.is_file() for p in BR8100)
 HAVE_CHAIN4 = bool(REPO) and all(p.is_file() for p in CHAIN4)
+HAVE_CHAIN3 = bool(REPO) and all(p.is_file() for p in CHAIN3)
 
 pytestmark = pytest.mark.skipif(
     not HAVE_DATA, reason="DLPFC data / alignment engine not available")
@@ -147,6 +150,43 @@ def test_off_distribution_routes_and_labels_honestly(tmp_path):
     # streamed output labelled it off-distribution too
     routed = [e for e in sink.events if e.kind == "routing"][0]
     assert routed.in_distribution is False
+
+
+@pytest.mark.skipif(not HAVE_CHAIN3, reason="3-section DLPFC chain absent")
+def test_pathological_pair_is_skipped_not_fatal(tmp_path, monkeypatch):
+    """A single pair that raises an UNEXPECTED error (not Loader/AlignError) —
+    e.g. the float(None) TypeError seen on odd cross-tissue pairs in the routing
+    / auto-adapt path — must be skipped-and-continued, not sink the whole run.
+    Regression for the 35-section large-input finding."""
+    from sutura_cli.core import tools
+    # keep the run fast: cap per-pair time so no slow PASTE2 retry
+    monkeypatch.setenv("SUTURA_ALIGN_TIMEOUT", "60")
+
+    real_dc = tools.distribution_check
+    calls = {"n": 0}
+
+    def flaky_dc(ctx, sink, ref_id, mov_id):
+        calls["n"] += 1
+        if calls["n"] == 2:               # blow up on the SECOND pair only
+            raise TypeError("float() argument must be a string or a real "
+                            "number, not 'NoneType'")
+        return real_dc(ctx, sink, ref_id, mov_id)
+
+    monkeypatch.setattr("sutura_cli.core.agent.tools.distribution_check", flaky_dc)
+
+    data_dir = _stage(tmp_path, CHAIN3)
+    sink = ListSink()
+    session = Session(_config(tmp_path), sink, backend=RuleBackend())
+    bundle = session.handle(f"align the sections in {data_dir} and reconstruct in 3D")
+
+    # the run COMPLETED despite the pathological 2nd pair
+    assert bundle is not None and bundle.status == "complete"
+    assert len(bundle.pairs) == 1                    # first pair survived
+    # the failure was recorded honestly, not swallowed silently
+    assert any("skipped after an unexpected error" in w and "TypeError" in w
+               for w in bundle.warnings), bundle.warnings
+    # and a bundle was still written
+    assert sink.of_kind("bundle_written"), "no bundle written after skip"
 
 
 @pytest.mark.skipif(not HAVE_CHAIN4, reason="4-section DLPFC chain absent")
