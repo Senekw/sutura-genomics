@@ -64,8 +64,8 @@ The single regime where the *rigid* gate is neutral/negative is high-severity OO
 DLPFC/mouse high-severity cells are net positive with affine).
 
 **Robustness on 3 additional DLPFC cross-section pairs** (the 2nd adjacent pair of each donor,
-appended to the CSV as kind=`dlpfc_cross`; seed 0, gated_affine): Br5292b 4.66->3.00 (-36%),
-Br5595b 5.56->4.67 (-16%), Br8100b 5.40->4.78 (-11%). The gate wins on all three at every completed
+appended to the CSV as kind=`dlpfc_cross`; gated_affine, mean over 2 seeds): Br5292b 4.64->3.01 (-35%),
+Br5595b 5.66->4.84 (-14%), Br8100b 5.47->4.90 (-10%). The gate wins on all three at every completed
 severity - the margin scales inversely with how good PASTE2 already is (these 2nd pairs are harder for
 PASTE2). One cell (Br5292b sev8, ~4800 spots) exceeded the 900 s PASTE2 watchdog and was skipped
 (handled by per-cell try/except) - full PASTE2 is impractical at high spot-count + max tear, which the

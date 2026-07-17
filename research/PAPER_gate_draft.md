@@ -93,19 +93,19 @@ prior 3.73 (PASTE2 4.39) exactly.
 | mouse brain | 5.58 ± 0.11 | 5.26 ± 0.24 (-6%) |
 
 **Robustness (3 additional DLPFC cross-section pairs, the 2nd adjacent pair of each donor;
-sev-averaged, gated_affine vs PASTE2; seed 0):**
+sev-averaged, gated_affine vs PASTE2; mean ± std over 2 seeds):**
 
 | pair (spots) | PASTE2 | + gate (affine) | delta |
 |---|---|---|---|
-| Br5292b (~4700) | 4.66 | 3.00 | -36% |
-| Br5595b (~4000) | 5.56 | 4.67 | -16% |
-| Br8100b (~3500) | 5.40 | 4.78 | -11% |
+| Br5292b (~4700) | 4.64 ± 0.02 | 3.01 ± 0.01 | -35% |
+| Br5595b (~4000) | 5.66 ± 0.10 | 4.84 ± 0.17 | -14% |
+| Br8100b (~3500) | 5.47 ± 0.07 | 4.90 ± 0.12 | -10% |
 
-The gate wins on all three at every completed severity. Margins scale inversely with how good
-PASTE2 already is on the pair (these 2nd pairs are harder for PASTE2, 4.7-5.6 pitch, than the 1st
-pairs). One cell (Br5292b sev8, ~4800 spots) exceeded the 900 s PASTE2 watchdog and was skipped -
-a concrete illustration that full-resolution PASTE2 is impractical at high spot-count + max tear,
-which the subsampling path addresses. [Second seed running for variance.]
+The gate wins on all three at every completed severity, across both seeds. Margins scale inversely
+with how good PASTE2 already is on the pair (these 2nd pairs are harder for PASTE2, 4.6-5.7 pitch,
+than the 1st pairs). One cell (Br5292b sev8, ~4800 spots) exceeded the 900 s PASTE2 watchdog on both
+seeds and was skipped - a concrete illustration that full-resolution PASTE2 is impractical at high
+spot-count + max tear, which the subsampling path addresses.
 
 **High severity.** The rigid gate never loses more than ~0.06 pitch (it falls back); the affine gate
 actively helps at high severity (it absorbs the smooth stretch the rigid fit cannot), e.g. Br8100 s8

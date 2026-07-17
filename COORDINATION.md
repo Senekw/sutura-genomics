@@ -411,3 +411,10 @@ All 6 asks delivered; committed incrementally + pushed to Senekw.
 vs 4.26, -27%) + 3 new cross pairs + breast (-13%) + mouse (-6%), all severities, GT-free/feature-free by proof.
 **Single most important thing it enables:** a drop-in, training-free, safe-by-construction accuracy boost for
 OT spatial alignment (never makes results worse), with a subsampling speed path for interactivity.
+
+### Robustness pass COMPLETE (2 seeds) - gate confirmed on all 3 new cross pairs
+gated_affine vs paste2 (mean +/- std, 2 seeds): Br5292b 4.64+/-0.02 -> 3.01+/-0.01 (-35%);
+Br5595b 5.66+/-0.10 -> 4.84+/-0.17 (-14%); Br8100b 5.47+/-0.07 -> 4.90+/-0.12 (-10%). Wins on all 3
+at every completed severity, both seeds, small variance. Only timeouts: Br5292b sev8 (both seeds, the
+biggest pair at max tear). The validated gate holds on every real cross-section dataset tested
+(6 DLPFC pairs total + breast + mouse). DONE.
