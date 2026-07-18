@@ -76,7 +76,8 @@ from scoring import (registration_error_stats,                  # noqa: E402
                      barycentric_projection)
 from warp_slice import apply_warp                               # noqa: E402
 from train_cross import array_bridge                            # noqa: E402
-from hybrid_combined import gated_piecewise, detect_pieces      # noqa: E402
+from hybrid_validate import gated_piecewise                     # noqa: E402
+from hybrid_combined import detect_pieces                        # noqa: E402
 # PASTE2 internals we reuse verbatim (the exact FGW math, just re-driven so we
 # can instrument iterations and swap the inner oracle):
 from paste2.PASTE2 import (gwgrad_partial, gwloss_partial,      # noqa: E402

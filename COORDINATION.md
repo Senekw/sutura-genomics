@@ -430,3 +430,36 @@ Plan/progress tracked below as milestones land.
 - [start] oriented: synthetic model = single straight cut + rigid translate of 30-45% of tissue
   + Gaussian warp (src/warp_slice.py). All data is Visium (array_row/col hex lattice). Building
   detector next.
+
+---
+## [global-recon] Global multi-section 3D solve vs pairwise chaining (autonomous overnight, 2026-07-18)
+Branch `global-recon`. Scope guard: touched only research/src/global_recon*.py and
+research/results/global_recon*, plus research/FINDINGS_global_recon.md and this log. Did NOT
+touch main/website/demo/cli/app or other branches.
+Goal: replace drift-prone pairwise-chained reconstruction with a true global (bundle-adjustment
+style) solve; quantify drift honestly; test global+gate; handle missing/bad/inconsistent
+sections; characterize runtime.
+- Solver: 2D similarity transforms as complex affine maps (z'=c*z+d). Pose-graph constraint
+  P_a = P_b o T is LINEAR in complex pose params -> two-step similarity synchronisation
+  (rotation+scale averaging, then translation averaging). IRLS (Huber) + fit-residual gate for
+  robustness. `research/src/global_recon.py`. Baseline = exact reuse of the cli chain-composition.
+- Drift measured against EXACTLY-known ground truth (real DLPFC layer-centroid geometry placed
+  by known random similarities, re-estimated from noisy correspondences). 5 seeds x 3 severities.
+- KEY honest result: a global solve fed ONLY adjacent edges is IDENTICAL to the pairwise chain
+  (`global_adj`==`pairwise_chain` at every chain length). The entire benefit comes from adding
+  redundant NON-ADJACENT constraints. Given those: terminal drift on a 12-section chain drops
+  278px -> 65px (full) / 136px (band-3), and full stays FLAT vs chain length (chain grows ~linearly).
+- Real DLPFC (GT-free): global poses 28-35% more self-consistent (all-edge residual); label-
+  consistency tied within-donor (Visium sections already share the array frame -> drift only bites
+  in arbitrary-frame regimes). Reported honestly, not dressed up.
+- Robustness (biggest practical win): missing section -> pairwise chain catastrophic (4219px) vs
+  gated global (80px); one corrupted edge -> naive 3068px, IRLS 283px, GATE 74px; high noise ->
+  565 vs 297. Gate is harmless at 0% bad edges and 50-60x better at 10-20% bad -> ship gate ON.
+- Runtime: solve is negligible (0.15s for 32 sections/496 edges). Real cost = NUMBER OF ALIGNMENTS
+  to feed it: chain N-1, band-3 ~3N, full N(N-1)/2. Full is quadratic -> impractical past ~20
+  sections; band-3 is the sweet spot (near-full quality, linear cost).
+- VERDICT: adopt banded (band-3) global solve + gate + IRLS by default for chains >=~6 sections or
+  any pipeline with arbitrary frames / dropped-or-poor sections. Keep the cheap chain for short,
+  clean, array-registered stacks. Deliverables: research/results/global_recon.csv (1419 rows,
+  0 failures), global_recon_drift.png, global_recon_panels.png, research/FINDINGS_global_recon.md.
+  DONE.

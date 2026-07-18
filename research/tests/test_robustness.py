@@ -232,6 +232,28 @@ class TestNumericalStability:
         out = rg.safe_gate_refine(b, m, order="quadratic", pitch=p)
         assert np.isfinite(out).all()
 
+    @pytest.mark.parametrize("scale", [1.0, 1e3, 1e6, 1e9, 1e12])
+    @pytest.mark.parametrize("order", ["rigid", "affine", "quadratic"])
+    def test_never_regress_at_any_scale(self, torn_grid, order, scale):
+        """The 'never regress' property must hold at ANY coordinate magnitude. The raw
+        un-normalised quadratic fit BLOWS UP past ~1e6 (err 0.13 -> 2.2, worse than base);
+        the guard's pitch-normalisation keeps it stable. This is the regression test for that fix."""
+        b, m, ref, _ = torn_grid()
+        base_err = median_err(b, ref, 1.0)
+        out = rg.safe_gate_refine(b * scale, m * scale, order=order, pitch=scale, seed=0) / scale
+        assert median_err(out, ref, 1.0) <= base_err * 1.03, \
+            f"{order} regressed at scale {scale:g}"
+
+    def test_scale_stability_result_constant(self, torn_grid):
+        """Error is (near-)constant across 12 orders of magnitude of coordinate scale."""
+        b, m, ref, _ = torn_grid()
+        errs = []
+        for scale in (1.0, 1e6, 1e12):
+            out = rg.safe_gate_refine(b * scale, m * scale, order="quadratic",
+                                      pitch=scale, seed=0) / scale
+            errs.append(median_err(out, ref, 1.0))
+        assert max(errs) - min(errs) < 1e-4
+
 
 # =========================================================================== #
 # S7. Determinism / reproducibility
@@ -243,13 +265,22 @@ class TestDeterminism:
         for o in outs[1:]:
             assert np.array_equal(outs[0], o)
 
-    def test_dtype_canonicalized_for_reproducibility(self, torn_grid):
-        """float32 vs float64 input give identical output through the guard (canonicalised)."""
+    def test_identical_values_identical_output_any_dtype(self, torn_grid):
+        """Same float64 VALUES via different dtype containers give identical output (the guard
+        canonicalises to float64, so an int-valued or float64 container yields the same result)."""
         b, m, _, p = torn_grid()
-        o64 = rg.safe_gate_refine(b.astype(np.float64), m, order="affine", pitch=p)
-        o32 = rg.safe_gate_refine(b.astype(np.float32).astype(np.float64), m,
-                                  order="affine", pitch=p)
-        assert np.array_equal(o64, o32)
+        bi = np.round(b).astype(np.int64)             # integer-valued coordinates
+        o_f = rg.safe_gate_refine(bi.astype(np.float64), m, order="affine", pitch=p)
+        o_i = rg.safe_gate_refine(bi, m, order="affine", pitch=p)   # int container, same values
+        assert np.array_equal(o_f, o_i)
+
+    def test_float32_input_only_small_precision_difference(self, torn_grid):
+        """Documented caveat: lower-precision INPUT changes results only at ~1e-5 pitch, never
+        catastrophically (values already differ before the guard sees them)."""
+        b, m, _, p = torn_grid()
+        o64 = rg.safe_gate_refine(b, m, order="affine", pitch=p)
+        o32 = rg.safe_gate_refine(b.astype(np.float32), m, order="affine", pitch=p)
+        assert np.abs(o64 - o32).max() < 1e-3
 
     def test_memory_layout_invariant(self, torn_grid):
         b, m, _, p = torn_grid()
@@ -375,7 +406,7 @@ class TestScoringGuards:
 # =========================================================================== #
 # S11. Section-level (AnnData) validation
 # =========================================================================== #
-def _stub_section(n=100, spatial=True, key="spatial", genes=("g0", "g1", "g2"),
+def _stub_section(n=100, spatial=True, key="spatial", genes=tuple(f"g{i}" for i in range(20)),
                   X=None, obs_cols=("array_row", "array_col")):
     """A lightweight duck-typed AnnData stand-in exercising the getattr paths in validate_section."""
     ns = types.SimpleNamespace()
@@ -431,8 +462,8 @@ class TestSectionValidation:
             rg.validate_section_pair(A, B, check_expression=False)
 
     def test_size_imbalance_warns(self):
-        A = _stub_section(n=2000, genes=("g0", "g1", "g2"))
-        B = _stub_section(n=50, genes=("g0", "g1", "g2"))
+        A = _stub_section(n=2000)          # default 20-gene panel -> no panel warning
+        B = _stub_section(n=50)
         with pytest.warns(RuntimeWarning, match="imbalance"):
             rg.validate_section_pair(A, B, check_expression=False)
 

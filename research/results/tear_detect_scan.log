@@ -1,0 +1,7 @@
+[2026-07-18T08:39:05Z] [real] V1_Human_Lymph_Node (atlas): score=0.052 moderate voids=2 folds=0 tears=2 (4s)
+[2026-07-18T08:39:07Z] [real] V1_Mouse_Brain_Sagittal_Anterior (brain): score=0.071 moderate voids=2 folds=0 tears=3 (2s)
+[2026-07-18T08:39:09Z] ================================================================================
+[2026-07-18T08:39:09Z] tear_detect_scan START smoke=False csv=C:\Users\karti\arca\research\results\tear_detect.csv
+[2026-07-18T08:39:09Z] resuming: 2 rows already present
+[2026-07-18T08:39:09Z] scanning 40 real sections ...
+[2026-07-18T08:39:10Z] [real] V1_Mouse_Brain_Sagittal_Anterior_Section_2 (brain): score=0.020 mild voids=0 folds=0 tears=1 (3s)

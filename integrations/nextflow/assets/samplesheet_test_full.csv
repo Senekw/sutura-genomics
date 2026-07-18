@@ -1,0 +1,4 @@
+pair_id,reference,moving,method,gate_refine
+Br5292,data/DLPFC_151507.h5ad,data/DLPFC_151508.h5ad,auto,true
+Br5595,data/DLPFC_151669.h5ad,data/DLPFC_151670.h5ad,auto,true
+Br8100,data/DLPFC_151673.h5ad,data/DLPFC_151674.h5ad,auto,true

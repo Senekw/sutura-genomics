@@ -1,0 +1,13 @@
+pair_id,reference,moving,method,gate_refine
+# Example samplesheet for sutura-align.
+# Columns:
+#   pair_id      (required) unique name for the pair; names your output files
+#   reference    (required) reference section: .h5ad file OR Space Ranger output dir
+#   moving       (required) moving section to align onto the reference
+#   method       (optional) auto | sutura | paste2   (default: --method, 'auto')
+#   gate_refine  (optional) true | false             (default: --gate_refine, false)
+#
+# Comment lines starting with '#' are ignored. Paths may be absolute or relative
+# to the directory you launch `nextflow run` from. Delete these comments before use.
+sampleA,/data/spaceranger/sampleA_ref/outs,/data/spaceranger/sampleA_mov/outs,auto,false
+sampleB,/data/h5ad/sampleB_ref.h5ad,/data/h5ad/sampleB_mov.h5ad,paste2,true

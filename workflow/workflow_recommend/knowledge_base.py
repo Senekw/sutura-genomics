@@ -66,8 +66,11 @@ class KnowledgeBase:
         plats = tool.get("platforms", [])
         if platform and platform in plats and "all" not in plats:
             score += 5.0
-            if len(plats) == 1:  # a tool built for exactly this platform
-                score += 10.0
+            if len(plats) == 1:
+                # a tool built for exactly this platform (e.g. Stereopy for
+                # Stereo-seq, bin2cell for Visium HD) should win over generic
+                # backbones, since it often handles a format others cannot read.
+                score += 30.0
         return score
 
     def get_tool(self, tool_id: str) -> dict | None:

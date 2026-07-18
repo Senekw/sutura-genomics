@@ -234,6 +234,13 @@ def safe_gate_refine(base_coords, moving_coords, order="affine", *, pitch=None,
                           to max_spots (base is projected on the subsample; dropped rows are returned
                           as NaN) with a warning, rather than running for minutes.
     subsample_seed      : seed for the deterministic oversize subsample.
+    normalize           : True (default) centres and scales the coordinates by the pitch before the
+                          per-piece fit and un-normalises the result. This is mathematically
+                          equivariant for the fit (identical result to raw gate_refine at normal
+                          scale, to float precision) but dramatically better-conditioned, so it
+                          keeps the refinement numerically stable - and never-regressing - at
+                          extreme coordinate magnitudes (e.g. nanometres or 1e12 pixels) where the
+                          raw un-normalised polynomial fit degrades or blows up (see FINDINGS S4).
 
     Extra keyword args are forwarded to gate_refine.gate_refine (thr, scale, cv, seed, stretch,
     min_frac, ...).
@@ -326,35 +333,16 @@ def safe_gate_refine(base_coords, moving_coords, order="affine", *, pitch=None,
 
     pitch = resolve_pitch(mov[keep], pitch)
 
-    # Fast path: no rows to drop/subsample -> call gate_refine directly.
+    # Fast path: no rows to drop/subsample -> refine the whole array.
     if keep.all():
-        try:
-            res = _gr.gate_refine(base, mov, order=order, pitch=pitch, weights=weights,
-                                  return_info=return_info, **kw)
-        except RobustnessError:
-            raise
-        except Exception as e:  # noqa: BLE001 - translate any deep failure to a clear message
-            raise RobustnessError(
-                f"gate_refine failed unexpectedly on validated input "
-                f"({type(e).__name__}: {e}). This is a bug in the guard's validation - "
-                f"please report the input shape ({base.shape}) and order={order!r}."
-            ) from e
+        res = _run_gate(base, mov, order, pitch, weights, normalize, return_info, kw)
         out = res[0] if return_info else res
         _postcheck(out, base_finite_rows & keep)
         return res
 
     # Subset path: run on the kept spots, scatter back, NaN elsewhere.
     sub_w = None if weights is None else weights[keep]
-    try:
-        sub = _gr.gate_refine(base[keep], mov[keep], order=order, pitch=pitch,
-                              weights=sub_w, return_info=return_info, **kw)
-    except RobustnessError:
-        raise
-    except Exception as e:  # noqa: BLE001
-        raise RobustnessError(
-            f"gate_refine failed unexpectedly on validated input "
-            f"({type(e).__name__}: {e})."
-        ) from e
+    sub = _run_gate(base[keep], mov[keep], order, pitch, sub_w, normalize, return_info, kw)
     sub_out = sub[0] if return_info else sub
     out = np.full((n, 2), np.nan)
     out[keep] = sub_out
@@ -364,6 +352,43 @@ def safe_gate_refine(base_coords, moving_coords, order="affine", *, pitch=None,
         info["dropped_spots"] = int((~keep).sum())
         return out, info
     return out
+
+
+def _run_gate(base, mov, order, pitch, weights, normalize, return_info, kw):
+    """Call gate_refine, optionally with pitch-normalised coordinates for conditioning.
+
+    Normalisation centres moving on its own centroid and base on its own (finite-row) centroid,
+    scales both by `pitch`, and runs the gate at pitch=1. Because the per-piece fit is invariant
+    under an affine reparametrisation of source and target, and piece detection / the residual
+    gate work in pitch units either way, the result equals the un-normalised run at normal scale
+    (to float precision) while staying well-conditioned at any coordinate magnitude.
+    """
+    try:
+        if not normalize:
+            return _gr.gate_refine(base, mov, order=order, pitch=pitch, weights=weights,
+                                   return_info=return_info, **kw)
+        c_m = mov[np.isfinite(mov).all(axis=1)].mean(axis=0)
+        fb = np.isfinite(base).all(axis=1)
+        c_b = base[fb].mean(axis=0)
+        mov_h = (mov - c_m) / pitch
+        base_h = (base - c_b) / pitch
+        res = _gr.gate_refine(base_h, mov_h, order=order, pitch=1.0, weights=weights,
+                              return_info=return_info, **kw)
+        out_h = res[0] if return_info else res
+        out = out_h * pitch + c_b
+        if return_info:
+            info = res[1]
+            info["pitch"] = pitch          # report the real pitch, not the normalised 1.0
+            return out, info
+        return out
+    except RobustnessError:
+        raise
+    except Exception as e:  # noqa: BLE001 - translate any deep failure to a clear message
+        raise RobustnessError(
+            f"gate_refine failed unexpectedly on validated input "
+            f"({type(e).__name__}: {e}). This is a bug in the guard's validation - "
+            f"please report the input shape ({np.shape(base)}) and order={order!r}."
+        ) from e
 
 
 def _postcheck(out: np.ndarray, expect_finite_mask: np.ndarray) -> None:

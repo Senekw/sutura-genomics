@@ -386,6 +386,7 @@ class DamageReport:
     n_cut_lines: int
     max_cut_len: int
     max_cut_straightness: float
+    n_expr_boundaries: int
     # folds
     n_folds: int
     fold_area_frac: float
@@ -595,6 +596,15 @@ def characterize(adata, name: str = "section", *,
     gap_flag, gap_mids = _physical_gaps(coords, pitch)
     frac_gap_spots = float(gap_flag.mean())
 
+    # spots bordering an interior lattice void (real cut/hole edge)
+    void_border = np.zeros(n, bool)
+    if has_array and interior_empty:
+        empty_set = set(interior_empty)
+        for i, (r, c) in enumerate(zip(rows, cols)):
+            if any((r + dr, c + dc) in empty_set for dr, dc in _HEX_OFF):
+                void_border[i] = True
+    near_gap = gap_flag | void_border   # a real seam co-locates expression jump WITH a gap
+
     # ---- boundary irregularity ----
     # solidity deficit + interior-void contribution
     boundary_irreg = _boundary_irregularity(coords, pitch, fill_bbox if has_array else np.nan)
@@ -618,15 +628,23 @@ def characterize(adata, name: str = "section", *,
                                   area_frac=float(area_frac), elongation=float(v["elongation"]),
                                   straightness=float(v["straightness"]),
                                   extra=dict(centroid=v["centroid"].tolist())))
-    # cut lines that are straight and long are also tears (expression-defined, no lattice hole)
+    # Expression cut-lines become tears ONLY when they co-locate with a physical/lattice
+    # gap. A straight high-jump chain with tissue continuous across it is a BIOLOGICAL
+    # boundary (e.g. cerebellar layers), not damage -- we count those separately and do
+    # not let them drive the damage score.
+    n_expr_boundaries = 0
     for c in cut_lines:
-        if c["straightness"] >= 0.85 and c["n"] >= min_cut_len:
+        frac_ng = float(near_gap[c["spots"]].mean()) if c["spots"] else 0.0
+        is_straight = c["straightness"] >= 0.85 and c["n"] >= min_cut_len
+        if is_straight and frac_ng >= 0.30:
             n_tears += 1
             events.append(DamageEvent(kind="tear", severity=float(c["n"] * c["straightness"]),
                                       n_spots=c["n"], area_frac=c["n"] / max(n, 1),
                                       elongation=float(c["elongation"]),
                                       straightness=float(c["straightness"]),
-                                      extra=dict(source="expr_cut")))
+                                      extra=dict(source="expr_cut", frac_near_gap=frac_ng)))
+        elif is_straight:
+            n_expr_boundaries += 1   # biology, not damage
     # folds
     for c in fold_comps:
         z = float(fold_z_spot[c].max())
@@ -638,13 +656,15 @@ def characterize(adata, name: str = "section", *,
                                                                   (np.median(tot) + 1e-9)))))
 
     # ---- aggregate damage score & label ----
+    # Physically grounded: missing tissue (voids), folds, gap-coincident cuts, and outline
+    # irregularity. Expression jumps alone are NOT included (they track biology). This keeps
+    # clean-but-anatomically-sharp sections (cerebellum) from reading as damaged.
     damage_score = float(
-        2.0 * void_area_frac
-        + 1.5 * largest_void_frac
-        + 0.5 * frac_high
-        + 0.5 * fold_area_frac
+        3.0 * void_area_frac
+        + 2.0 * largest_void_frac
+        + 1.0 * fold_area_frac
         + 0.3 * min(boundary_irreg, 1.0)
-        + 0.05 * n_tears
+        + 0.02 * n_tears
     )
     if damage_score < 0.02 and (n_tears + n_folds + n_missing) == 0:
         label = "none"
@@ -663,6 +683,7 @@ def characterize(adata, name: str = "section", *,
         edge_jump_mean=edge_jump_mean, edge_jump_p95=edge_jump_p95,
         frac_high_jump_edges=frac_high, n_cut_lines=n_cut_lines,
         max_cut_len=int(max_cut_len), max_cut_straightness=float(max_cut_straight),
+        n_expr_boundaries=n_expr_boundaries,
         n_folds=n_folds, fold_area_frac=fold_area_frac, max_fold_zscore=max_fold_z,
         max_coord_resid_pitch=max_coord_resid, p95_coord_resid_pitch=p95_coord_resid,
         frac_displaced=frac_displaced, frac_gap_spots=frac_gap_spots,

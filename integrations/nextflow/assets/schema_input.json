@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/Senekw/sutura-genomics/main/integrations/nextflow/assets/schema_input.json",
+    "title": "sutura-align samplesheet schema",
+    "description": "Schema for the sutura-align input samplesheet",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "pair_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]+$",
+                "errorMessage": "pair_id must be provided and contain only letters, numbers, and _.-",
+                "meta": ["pair_id"]
+            },
+            "reference": {
+                "type": "string",
+                "errorMessage": "reference section path (.h5ad file or Space Ranger dir) is required"
+            },
+            "moving": {
+                "type": "string",
+                "errorMessage": "moving section path (.h5ad file or Space Ranger dir) is required"
+            },
+            "method": {
+                "type": "string",
+                "enum": ["auto", "sutura", "paste2"],
+                "errorMessage": "method must be one of: auto, sutura, paste2"
+            },
+            "gate_refine": {
+                "type": "string",
+                "enum": ["true", "false", "1", "0", "yes", "no", "on", "off", ""],
+                "errorMessage": "gate_refine must be a boolean-like value"
+            }
+        },
+        "required": ["pair_id", "reference", "moving"]
+    }
+}

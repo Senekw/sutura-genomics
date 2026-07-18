@@ -1,0 +1,3 @@
+[2026-07-18T08:36:59Z] === model-gen-2 START folds=['Br5292'] seeds=[0] paste2=False configs=6 ===
+[2026-07-18T08:38:00Z] ... alive stage='Br5292:basis' (60s)
+[2026-07-18T08:39:00Z] ... alive stage='Br5292:prep' (120s)

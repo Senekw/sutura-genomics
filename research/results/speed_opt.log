@@ -1,0 +1,28 @@
+[2026-07-18T08:33:58Z] ================================================================================
+[2026-07-18T08:33:58Z] speed_opt START phases=['B', 'C', 'D'] datasets=['Br8100'] seeds=[0] smoke=True threads=4
+[2026-07-18T08:33:58Z] numItermax=300 stopThr=1e-06 timeout=900s
+[2026-07-18T08:33:58Z] ================================================================================
+[2026-07-18T08:33:58Z] === PHASE B (subsampling) datasets=['Br8100'] sevs=[0.0, 4.0] seeds=[0] N=[500, 1000] methods=['random', 'spatial'] ===
+[2026-07-18T08:34:00Z] [Br8100] A=3639 B=3673 pitch=137.0 bridge=95%
+[2026-07-18T08:34:01Z] [B] Br8100 s0 seed0 N500/random/emd nA=500 nB=500 iters=4 build=0.3s solve=0.5s p2=3.62 grig=1.68 gaff=1.67
+[2026-07-18T08:34:02Z] [B] Br8100 s0 seed0 N500/spatial/emd nA=500 nB=500 iters=301 build=0.2s solve=0.5s p2=3.48 grig=1.57 gaff=1.56
+[2026-07-18T08:34:06Z] [B] Br8100 s0 seed0 N1000/random/emd nA=1000 nB=1000 iters=301 build=0.5s solve=3.4s p2=3.48 grig=2.25 gaff=2.17
+[2026-07-18T08:34:11Z] [B] Br8100 s0 seed0 N1000/spatial/emd nA=1000 nB=1000 iters=5 build=0.4s solve=3.8s p2=2.67 grig=1.79 gaff=1.75
+[2026-07-18T08:34:18Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (20s)
+[2026-07-18T08:34:38Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (40s)
+[2026-07-18T08:34:58Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (60s)
+[2026-07-18T08:35:18Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (80s)
+[2026-07-18T08:35:58Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (120s)
+[2026-07-18T08:36:18Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (140s)
+[2026-07-18T08:36:38Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (160s)
+[2026-07-18T08:36:58Z] ... alive stage='B:Br8100:s0:seed0:N100000:full:emd' (180s)
+[2026-07-18T08:37:03Z] [B] Br8100 s0 seed0 N100000/full/emd nA=3639 nB=3673 iters=5 build=1.9s solve=169.9s p2=2.99 grig=1.46 gaff=1.44
+[2026-07-18T08:37:07Z] [B] Br8100 s4 seed0 N500/random/emd nA=500 nB=500 iters=5 build=0.8s solve=1.5s p2=4.03 grig=4.02 gaff=2.93
+[2026-07-18T08:37:12Z] [B] Br8100 s4 seed0 N500/spatial/emd nA=500 nB=500 iters=301 build=0.4s solve=2.3s p2=4.39 grig=4.30 gaff=3.65
+[2026-07-18T08:37:19Z] ... alive stage='B:Br8100:s4:seed0:N1000:random:emd' (200s)
+[2026-07-18T08:37:25Z] [B] Br8100 s4 seed0 N1000/random/emd nA=1000 nB=1000 iters=6 build=1.5s solve=10.7s p2=3.64 grig=3.69 gaff=3.15
+[2026-07-18T08:37:33Z] [B] Br8100 s4 seed0 N1000/spatial/emd nA=1000 nB=1000 iters=301 build=0.7s solve=6.1s p2=3.64 grig=4.08 gaff=2.86
+[2026-07-18T08:37:39Z] ... alive stage='B:Br8100:s4:seed0:N100000:full:emd' (220s)
+[2026-07-18T08:37:59Z] ... alive stage='B:Br8100:s4:seed0:N100000:full:emd' (240s)
+[2026-07-18T08:38:19Z] ... alive stage='B:Br8100:s4:seed0:N100000:full:emd' (260s)
+[2026-07-18T08:38:58Z] ... alive stage='B:Br8100:s4:seed0:N100000:full:emd' (300s)

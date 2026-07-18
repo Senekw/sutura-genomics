@@ -120,8 +120,18 @@ def build_pipeline(spec: ExperimentSpec, kb: KnowledgeBase | None = None) -> Pip
     steps.append(st)
 
     # --- batch correction / integration ---
-    multi = (spec.n_samples or 0) > 1 or (spec.n_sections or 0) > 1
-    if "batch_correction" in goals or multi:
+    # Requires >1 thing to integrate. Include when there is positive evidence of
+    # multiple sections/samples, when the user explicitly asked, or when the design
+    # inherently spans many samples -- but suppress if we positively know it is a
+    # single section (avoids recommending integration for one slide).
+    multi = (spec.n_samples or 0) > 1 or (spec.n_sections or 0) > 1 or spec.serial_sections
+    single_known = (not spec.serial_sections and (spec.n_sections or 0) <= 1
+                    and (spec.n_samples or 0) <= 1)
+    multi_sample_design = spec.experiment_type in {
+        "atlas_building", "disease_vs_control", "developmental_timeseries"}
+    include_batch = ("batch_correction" in spec.goals) or multi or (
+        multi_sample_design and not single_known)
+    if include_batch:
         n = spec.n_samples or spec.n_sections
         reason = ("Multiple sections/samples must be integrated into a shared embedding so that "
                   "differences are biology, not batch.")
