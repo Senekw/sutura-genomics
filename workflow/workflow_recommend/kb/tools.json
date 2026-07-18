@@ -19,7 +19,7 @@
       "why": "The backbone AnnData ecosystem. Nearly every other tool reads/writes its objects. Standard for QC, normalization, PCA, neighbors, Leiden clustering, and marker DE.",
       "code": "import scanpy as sc\nadata = sc.read_h5ad('data.h5ad')\nsc.pp.calculate_qc_metrics(adata, inplace=True, percent_top=None)\nadata = adata[adata.obs.n_genes_by_counts > 200]\nsc.pp.normalize_total(adata, target_sum=1e4)\nsc.pp.log1p(adata)\nsc.pp.highly_variable_genes(adata, n_top_genes=2000)\nsc.pp.pca(adata); sc.pp.neighbors(adata); sc.tl.leiden(adata)",
       "runtime": "Seconds to a few minutes for <500k cells; minutes for millions.",
-      "limitations": "QC thresholds are judgment calls, not defaults. Leiden resolution changes cluster count arbitrarily. Marker DE (rank_genes_groups) treats cells as independent replicates — do not use it for condition-level statistics."
+      "limitations": "QC thresholds are judgment calls, not defaults. Leiden resolution changes cluster count arbitrarily. Marker DE (rank_genes_groups) treats cells as independent replicates - do not use it for condition-level statistics."
     },
     {
       "id": "squidpy",
@@ -46,7 +46,7 @@
       "install": "pip install spatialdata spatialdata-io spatialdata-plot",
       "maturity": "established",
       "priority": 85,
-      "why": "Unified reader/representation across Visium, Visium HD, Xenium, MERSCOPE, CosMx, Stereo-seq. Keeps images, transcripts, shapes, and tables in one coordinate system — the cleanest way to start a multi-platform pipeline.",
+      "why": "Unified reader/representation across Visium, Visium HD, Xenium, MERSCOPE, CosMx, Stereo-seq. Keeps images, transcripts, shapes, and tables in one coordinate system - the cleanest way to start a multi-platform pipeline.",
       "code": "import spatialdata_io\nsdata = spatialdata_io.xenium('path/to/xenium_output/')\n# sdata.tables['table'] is an AnnData; sdata.points, sdata.images, sdata.shapes\nsdata.write('experiment.zarr')",
       "runtime": "Seconds to minutes depending on image size; Zarr backing helps with large data.",
       "limitations": "Younger API than scanpy; expect occasional breaking changes. Large images need on-disk (Zarr/Dask) handling to avoid OOM."
@@ -95,7 +95,7 @@
       "why": "General-purpose deep-learning cell/nucleus segmentation from images (DAPI, membrane, H&E). The most widely used image-based segmenter; strong pretrained models plus fine-tuning.",
       "code": "from cellpose import models\nmodel = models.Cellpose(gpu=True, model_type='nuclei')\nmasks, flows, styles, diams = model.eval(image, diameter=None, channels=[0,0])",
       "runtime": "Seconds per FOV on GPU; minutes-to-hours for a whole large section. CPU is far slower.",
-      "limitations": "Image-based, so it segments morphology, not transcripts — dense/overlapping cells and weak membrane staining cause over/under-segmentation. Diameter must be roughly right. Does NOT solve segmentation; always inspect masks."
+      "limitations": "Image-based, so it segments morphology, not transcripts - dense/overlapping cells and weak membrane staining cause over/under-segmentation. Diameter must be roughly right. Does NOT solve segmentation; always inspect masks."
     },
     {
       "id": "stardist",
@@ -127,7 +127,7 @@
       "why": "Transcript-based segmentation: uses the spatial density of transcripts themselves (optionally with a nuclei prior) rather than only a stain. Frequently improves imaging-platform boundaries over vendor defaults, especially where membranes aren't stained.",
       "code": "# Command line (Julia binary):\n# baysor run -s 50 -x x -y y -g gene transcripts.csv -p --prior-segmentation-confidence 0.5\n# Or orchestrated: sopa segmentation baysor experiment.zarr --config config.toml",
       "runtime": "Minutes to hours; scales with transcript count. Parallelizable.",
-      "limitations": "Sensitive to the scale parameter (approx cell radius). Can merge/split cells in dense regions. Julia install friction; most users drive it via sopa. Not a solved solution — validate against morphology."
+      "limitations": "Sensitive to the scale parameter (approx cell radius). Can merge/split cells in dense regions. Julia install friction; most users drive it via sopa. Not a solved solution - validate against morphology."
     },
     {
       "id": "proseg",
@@ -190,7 +190,7 @@
       "why": "Fast, embedding-level batch correction integrated into scanpy (sc.external.pp.harmony_integrate). A sensible default first attempt because it's fast, corrects the PCA embedding (not counts), and is easy to compare against no-correction.",
       "code": "import scanpy as sc\nsc.pp.pca(adata)\nsc.external.pp.harmony_integrate(adata, key='batch')\nsc.pp.neighbors(adata, use_rep='X_pca_harmony'); sc.tl.leiden(adata)",
       "runtime": "Seconds to minutes for hundreds of thousands of cells.",
-      "limitations": "Corrects an embedding, not expression — you cannot get 'corrected counts' for DE. Can over-integrate and merge genuinely distinct populations; ALWAYS verify known markers/conditions survive. Batch correction is not solved."
+      "limitations": "Corrects an embedding, not expression - you cannot get 'corrected counts' for DE. Can over-integrate and merge genuinely distinct populations; ALWAYS verify known markers/conditions survive. Batch correction is not solved."
     },
     {
       "id": "scvi_tools",
@@ -205,7 +205,7 @@
       "why": "Deep generative integration (scVI) and semi-supervised label transfer (scANVI); also hosts DestVI (spatial deconvolution) and Stereoscope. Preferred when you need a probabilistic model, count-level batch correction, or reference label transfer in one framework.",
       "code": "import scvi\nscvi.model.SCVI.setup_anndata(adata, batch_key='batch')\nmodel = scvi.model.SCVI(adata); model.train()\nadata.obsm['X_scVI'] = model.get_latent_representation()\nsc.pp.neighbors(adata, use_rep='X_scVI')",
       "runtime": "Minutes to hours; GPU strongly recommended. Training time scales with cells and epochs.",
-      "limitations": "Needs enough cells per batch to train well; stochastic (set seeds). Can still over-correct. GPU effectively required for large data. Not solved — validate integration."
+      "limitations": "Needs enough cells per batch to train well; stochastic (set seeds). Can still over-correct. GPU effectively required for large data. Not solved - validate integration."
     },
     {
       "id": "scanorama",
@@ -250,7 +250,7 @@
       "why": "Optimal-transport alignment of serial sections using both spatial coordinates and expression. PASTE builds a consensus/stacked 3D reconstruction; PASTE2 handles partial overlap between adjacent sections (the common real case). The standard OT baseline for serial-section registration.",
       "code": "import paste as pst\n# pairwise alignment of adjacent slices\npi = pst.pairwise_align(sliceA, sliceB)\n# or full stack -> common coordinates\ncenter_slice, pis = pst.center_align(reference, [s1, s2, s3])",
       "runtime": "Seconds to minutes per section pair; OT scales with spot count (subsample very large sections).",
-      "limitations": "Assumes adjacent sections are similar; large biological change or big z-gaps break it. Partial-overlap fraction (PASTE2 s) must be set. Alignment can look numerically fine while anatomy is subtly wrong — inspect visually."
+      "limitations": "Assumes adjacent sections are similar; large biological change or big z-gaps break it. Partial-overlap fraction (PASTE2 s) must be set. Alignment can look numerically fine while anatomy is subtly wrong - inspect visually."
     },
     {
       "id": "sutura_align",
@@ -277,10 +277,10 @@
       "install": "pip install STalign",
       "maturity": "emerging",
       "priority": 68,
-      "why": "Diffeomorphic (LDDMM) alignment that models smooth nonlinear tissue deformation — better than affine/OT when sections are warped or distorted. Works from images or cell centroids, good for imaging platforms.",
+      "why": "Diffeomorphic (LDDMM) alignment that models smooth nonlinear tissue deformation - better than affine/OT when sections are warped or distorted. Works from images or cell centroids, good for imaging platforms.",
       "code": "from STalign import STalign\n# build velocity field mapping source -> target\nparams = {'niter': 2000, 'epV': 10}\nout = STalign.LDDMM([Y,X], I, [Y2,X2], J, **params)",
       "runtime": "Minutes per pair on GPU; slower on CPU.",
-      "limitations": "Nonlinear registration can over-warp and hallucinate correspondence if under-constrained. Needs sensible initialization. Diffeomorphic ≠ correct; validate landmarks."
+      "limitations": "Nonlinear registration can over-warp and hallucinate correspondence if under-constrained. Needs sensible initialization. Diffeomorphic != correct; validate landmarks."
     },
     {
       "id": "gpsa",
@@ -326,7 +326,7 @@
       "why": "Maps a single-cell reference onto spatial data by learning a cell-to-spot probability matrix; used for label transfer (imaging) and deconvolution (spots), and to impute genes outside a targeted panel.",
       "code": "import tangram as tg\ntg.pp_adatas(adata_sc, adata_sp, genes=markers)\ntg.map_cells_to_space(adata_sc, adata_sp, device='cuda')\ntg.project_cell_annotations(adata_map, adata_sp, annotation='cell_type')",
       "runtime": "Minutes on GPU; scales with cells x spots.",
-      "limitations": "Requires a matched single-cell reference; quality is capped by that reference. Mapping is soft — hard labels can be misleading. GPU recommended."
+      "limitations": "Requires a matched single-cell reference; quality is capped by that reference. Mapping is soft - hard labels can be misleading. GPU recommended."
     },
     {
       "id": "celltypist",
@@ -342,7 +342,7 @@
       "why": "Fast logistic-regression cell-type classifier with many prebuilt immune/tissue models; great first-pass automated annotation for single-cell-resolution spatial data. You can also train on your own reference.",
       "code": "import celltypist\npred = celltypist.annotate(adata, model='Immune_All_Low.pkl', majority_voting=True)\nadata = pred.to_adata()",
       "runtime": "Seconds to minutes.",
-      "limitations": "Prebuilt models are trained on scRNA and may not match a targeted spatial panel or your tissue/disease state. Confident labels can be wrong for novel states — confirm with markers."
+      "limitations": "Prebuilt models are trained on scRNA and may not match a targeted spatial panel or your tissue/disease state. Confident labels can be wrong for novel states - confirm with markers."
     },
     {
       "id": "azimuth",
@@ -406,7 +406,7 @@
       "why": "Robust Cell Type Decomposition; fast, well-validated, and handles platform effects between reference and spatial. 'doublet mode' is popular for near-single-cell spots. The R-side default for deconvolution.",
       "code": "# R\nreference <- Reference(sc_counts, cell_types)\npuck <- SpatialRNA(coords, counts)\nrctd <- create.RCTD(puck, reference); rctd <- run.RCTD(rctd, doublet_mode='doublet')",
       "runtime": "Minutes to tens of minutes; faster than cell2location.",
-      "limitations": "Reference-dependent like all deconvolution. R ecosystem. Doublet mode assumes few cells per spot — wrong for large multi-cell spots."
+      "limitations": "Reference-dependent like all deconvolution. R ecosystem. Doublet mode assumes few cells per spot - wrong for large multi-cell spots."
     },
     {
       "id": "destvi",
@@ -419,7 +419,7 @@
       "maturity": "established",
       "priority": 68,
       "requires_reference": true,
-      "why": "Deep-learning deconvolution that also estimates continuous within-cell-type variation per spot, inside the scvi-tools framework — convenient if you already use scVI/scANVI.",
+      "why": "Deep-learning deconvolution that also estimates continuous within-cell-type variation per spot, inside the scvi-tools framework - convenient if you already use scVI/scANVI.",
       "code": "from scvi.model import CondSCVI, DestVI\nsc_model = CondSCVI(sc_adata); sc_model.train()\nst_model = DestVI.from_rna_model(st_adata, sc_model); st_model.train()\nst_adata.obsm['proportions'] = st_model.get_proportions()",
       "runtime": "Tens of minutes on GPU (trains two models).",
       "limitations": "Two-stage training, GPU recommended; reference-dependent. Continuous sub-states can overfit with small references."
@@ -495,7 +495,7 @@
       "install": "pip install GraphST",
       "maturity": "emerging",
       "priority": 64,
-      "why": "Graph contrastive self-supervised model for spatial clustering that can also horizontally integrate multiple sections into shared domains — handy when you want domains AND cross-section integration together.",
+      "why": "Graph contrastive self-supervised model for spatial clustering that can also horizontally integrate multiple sections into shared domains - handy when you want domains AND cross-section integration together.",
       "code": "from GraphST import GraphST\nmodel = GraphST.GraphST(adata, device=device)\nadata = model.train()\n# then clustering on adata.obsm['emb']",
       "runtime": "Minutes on GPU.",
       "limitations": "Younger tool; results sensitive to graph construction. Its integration shares the general over-correction risk."
@@ -555,7 +555,7 @@
       "install": "pip install hotspotsc",
       "maturity": "emerging",
       "priority": 60,
-      "why": "Finds genes with spatial (or lineage) autocorrelation and groups them into co-varying modules — useful when you want spatial gene programs, not just a flat SVG list.",
+      "why": "Finds genes with spatial (or lineage) autocorrelation and groups them into co-varying modules - useful when you want spatial gene programs, not just a flat SVG list.",
       "code": "import hotspot\nhs = hotspot.Hotspot(adata, model='danb', latent_obsm_key='spatial')\nhs.create_knn_graph(n_neighbors=30)\nhs_results = hs.compute_autocorrelations()\nmodules = hs.create_modules()",
       "runtime": "Minutes.",
       "limitations": "Module count/thresholds are choices. Interpretation still needs biology."
@@ -573,7 +573,7 @@
       "why": "For disease-vs-control (or any condition) comparisons, the statistically correct approach is PSEUDOBULK: sum counts per sample x cell-type, then run DESeq2-style negative-binomial DE across samples. PyDESeq2 does this in Python; decoupler builds the pseudobulk matrix. This avoids the pseudo-replication that inflates per-cell DE false positives.",
       "code": "import decoupler as dc\nfrom pydeseq2.dds import DeseqDataSet\nfrom pydeseq2.ds import DeseqStats\npdata = dc.get_pseudobulk(adata, sample_col='sample', groups_col='cell_type')\ndds = DeseqDataSet(adata=pdata, design_factors='condition'); dds.deseq2()\nstat = DeseqStats(dds, contrast=['condition','disease','control']); stat.summary()",
       "runtime": "Seconds to minutes (operates on the small pseudobulk matrix).",
-      "limitations": "Needs biological replicates (multiple samples per condition) — with n=1 per group there is no valid statistic. Cell-type assignment errors propagate. Not spatial per se; pair with spatial context."
+      "limitations": "Needs biological replicates (multiple samples per condition) - with n=1 per group there is no valid statistic. Cell-type assignment errors propagate. Not spatial per se; pair with spatial context."
     },
     {
       "id": "liana",
@@ -615,7 +615,7 @@
       "install": "pip install commot",
       "maturity": "emerging",
       "priority": 62,
-      "why": "Spatially-informed cell-cell communication via collective optimal transport that respects physical distance and ligand diffusion range — a genuinely spatial LR method rather than a non-spatial one applied post-hoc.",
+      "why": "Spatially-informed cell-cell communication via collective optimal transport that respects physical distance and ligand diffusion range - a genuinely spatial LR method rather than a non-spatial one applied post-hoc.",
       "code": "import commot as ct\nct.tl.spatial_communication(adata, database_name='cellchat', df_ligrec=lr, dis_thr=200)",
       "runtime": "Minutes; OT scales with cell count.",
       "limitations": "Still requires an LR database; diffusion range is an assumption. Emerging tool. Outputs are hypotheses."
@@ -660,7 +660,7 @@
       "install": "pip install tissuumaps",
       "maturity": "emerging",
       "priority": 55,
-      "why": "Lightweight browser-based viewer built for millions of transcript points overlaid on whole-slide images — good for imaging platforms where you want to eyeball transcripts vs tissue.",
+      "why": "Lightweight browser-based viewer built for millions of transcript points overlaid on whole-slide images - good for imaging platforms where you want to eyeball transcripts vs tissue.",
       "code": "# tissuumaps  # launches the viewer; load image + marker (transcript) CSVs",
       "runtime": "Interactive.",
       "limitations": "Viewer only (no analysis). Best for QC/exploration of imaging data."

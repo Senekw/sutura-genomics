@@ -1,4 +1,4 @@
-"""workflow_recommend — honest, grounded spatial/single-cell pipeline recommendations.
+"""workflow_recommend - honest, grounded spatial/single-cell pipeline recommendations.
 
 Public API
 ----------

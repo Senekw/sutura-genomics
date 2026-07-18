@@ -25,7 +25,7 @@
       "synonyms": ["development", "developmental", "time series", "timecourse", "time course", "timepoint", "embryo", "embryonic", "gestation", "trajectory", "differentiation", "stages"],
       "implies_goals": ["cell_typing", "spatial_domains", "batch_correction", "spatial_de"],
       "emphasis": ["batch_correction", "spatial_domains", "cell_typing"],
-      "note": "Multiple timepoints must be integrated so that stage differences are biology, not batch — but over-correction can erase the developmental signal you want. Rapidly changing anatomy makes cross-timepoint alignment risky; prefer integrating in expression space over forcing spatial registration across stages.",
+      "note": "Multiple timepoints must be integrated so that stage differences are biology, not batch - but over-correction can erase the developmental signal you want. Rapidly changing anatomy makes cross-timepoint alignment risky; prefer integrating in expression space over forcing spatial registration across stages.",
       "expects_serial_sections": false
     },
     "disease_vs_control": {

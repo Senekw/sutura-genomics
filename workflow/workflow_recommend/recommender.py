@@ -170,7 +170,7 @@ def build_pipeline(spec: ExperimentSpec, kb: KnowledgeBase | None = None) -> Pip
             "anatomy. Always overlay aligned sections and inspect landmarks visually.")
         if spec.experiment_type == "developmental_timeseries":
             st.warnings.append(
-                "For a developmental time series, anatomy changes between timepoints — forcing spatial "
+                "For a developmental time series, anatomy changes between timepoints - forcing spatial "
                 "registration across stages is often wrong. Prefer integrating in expression space and "
                 "reserve spatial alignment for serial sections within a single stage.")
         steps.append(st)
@@ -246,7 +246,7 @@ def build_pipeline(spec: ExperimentSpec, kb: KnowledgeBase | None = None) -> Pip
                 alts = new_alts[:3]
             st.primary, st.alternatives = primary, alts
             st.warnings.append(
-                "HONEST LIMIT: do NOT run per-cell/per-spot DE across conditions — it pseudo-replicates "
+                "HONEST LIMIT: do NOT run per-cell/per-spot DE across conditions - it pseudo-replicates "
                 "and massively inflates false positives. Pseudobulk per biological replicate (sample x "
                 "cell type) and require multiple samples per condition.")
             if (spec.n_samples or 0) < 2:
