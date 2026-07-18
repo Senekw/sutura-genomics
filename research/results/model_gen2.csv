@@ -1,0 +1,2 @@
+kind,base,config,held_out,seed,reg_err_pitch,per_sev,base_err,gate_err,paste2_extref,beats_base,beats_gate,seconds,status,timestamp,detail
+dlpfc_lodo,ot,base_ot,Br5292,0,12.631,12.631;12.631;12.631;12.631;12.631;12.631;12.631,12.631,12.618,4.363,True,False,1.4,ok,2026-07-18T08:45:11Z,"sevs=0,1,2,3,4,6,8"

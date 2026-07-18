@@ -463,3 +463,34 @@ sections; characterize runtime.
   clean, array-registered stacks. Deliverables: research/results/global_recon.csv (1419 rows,
   0 failures), global_recon_drift.png, global_recon_panels.png, research/FINDINGS_global_recon.md.
   DONE.
+
+## model-gen-2 (branch model-gen-2) - can a LEARNED correction beat the gate? [IN PROGRESS 2026-07-18]
+Goal (overnight autonomous): the learned absolute-coordinate model still doesn't generalize
+(~9 pitch held-out vs PASTE2 ~4.4 vs the fit-residual GATE ~3.7). The gate proved corrections
+generalize far better than absolute predictions. Exploit that systematically. Scope: touch ONLY
+research/src/model_gen2*.py + research/results/model_gen2*.
+- Harness: research/src/model_gen2.py. Reuses the src/ tear benchmark READ-ONLY (generalization_max
+  DONORS/prep_pair/fit_fold_basis, hybrid_ot.ot_coordinate, train_cross, warp_slice, scoring).
+  3-donor DLPFC LODO, tear=True, >=3 seeds, median reg-err in spot-pitches. Incremental CSV after
+  every (config x fold x seed), heartbeat 60s, per-config timeout 1800s, try/except isolation,
+  real PASTE2 cached to disk (research/results/model_gen2_paste2cache/) so reruns are cheap.
+- Key design insight from the anchor numbers: the fast OT-surrogate base is warp-invariant and weak
+  (~11-12); ALL real headroom is on the REAL PASTE2 base (base ~4.4, gate ~3.7). The prior learned
+  residual used ABSOLUTE/expression features trained on one base and applied to PASTE2 -> catastrophic
+  (~13). So model-gen-2 restricts learned correctors to BASE-RELATIVE features (per-piece rigid-fit
+  residual, confidence, local base-field geometry) that transfer from a cheap training base (OT
+  surrogate, NO PASTE2 in training) to the real PASTE2 base at inference.
+- Config families (23): base/hand_gate references (both bases); learned_gate (logistic + MLP blend
+  replacing the hand gate's fixed logistic); piece_affine (piece-aware learned correction to the rigid
+  fit); resid_georel per-spot base-relative residual with L1/L2/Huber, depth 2/3/4, DR none/mod/agg,
+  +/- expression; resid_expr (prior-style expression+attention, expected to fail) +/- InfoNCE
+  correspondence-contrastive toward OT couplings; ensembles gate_then_resid / learned_gate_then_resid.
+- Probe timings: PASTE2 solve ~151s (45 eval solves ~1.9h, one-time cached), fold prep ~90s, OT ~1.6s.
+- Smoke (OT base, tiny epochs) PASSED: base_ot=12.63 reproduces prior ot_only exactly; learned_gate
+  12.30 and piece_affine 6.84 both beat the weak OT base -> training paths validated. Full run launched
+  detached (PID in model_gen2.run.pid); PASTE2 cache builds lazily on first paste2 config per fold-seed.
+- Leakage discipline: fold basis + every corrector + learned gate fit ONLY on the two TRAIN donors'
+  SYNTHETIC tears; no GT correspondence / test warp / held-out coord in training or the base; PASTE2 on
+  the test slice at inference only; eval warp seeds disjoint from training streams. Any config beating
+  the gate gets a strict leakage audit before being reported as a win.
+- Deliverables (pending run): research/results/model_gen2.csv, model_gen2.png, research/FINDINGS_model_gen2.md.

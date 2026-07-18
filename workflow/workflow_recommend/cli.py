@@ -91,6 +91,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Markdown reports contain a couple of decorative non-ASCII glyphs. On a legacy
+    # Windows console (cp1252) printing them would crash, so make stdout tolerant.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
     args = build_parser().parse_args(argv)
 
     if args.list_tools:

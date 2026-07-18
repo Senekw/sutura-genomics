@@ -1,3 +1,5 @@
-[2026-07-18T08:36:59Z] === model-gen-2 START folds=['Br5292'] seeds=[0] paste2=False configs=6 ===
-[2026-07-18T08:38:00Z] ... alive stage='Br5292:basis' (60s)
-[2026-07-18T08:39:00Z] ... alive stage='Br5292:prep' (120s)
+[2026-07-18T08:42:27Z] === model-gen-2 START folds=['Br5292', 'Br5595', 'Br8100'] seeds=[0, 1, 2] paste2=True configs=23 ===
+[2026-07-18T08:43:27Z] ... alive stage='Br5292:basis' (60s)
+[2026-07-18T08:44:27Z] ... alive stage='Br5292:prep' (120s)
+[2026-07-18T08:45:10Z] --- fold Br5292 seed 0 ---
+[2026-07-18T08:45:11Z] [Br5292/s0] base_ot [ot]: corr=12.631 base=12.631 gate=12.618 beats_gate=False (1s)

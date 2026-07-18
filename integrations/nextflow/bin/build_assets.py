@@ -105,6 +105,25 @@ def main():
             print(f"WARNING: {src_f} not found; container will need results/ mounted",
                   file=sys.stderr)
 
+    # vendor the minimal engine-code closure so the container build context
+    # (integrations/nextflow/) is fully self-contained. These are the exact modules the
+    # deploy path imports; copied verbatim so the image ships the code it was validated
+    # against. Local (non-container) runs still use the live repo src/, never this copy.
+    engine_out = here.parent.parent / "engine"
+    engine_out.mkdir(parents=True, exist_ok=True)
+    ENGINE_MODULES = ["shared_basis.py", "train_cross.py", "train.py",
+                      "scoring.py", "gate_refine.py", "warp_slice.py"]
+    (engine_out / "__init__.py").write_text(
+        "# vendored Sutura engine modules (see build_assets.py); do not edit by hand\n")
+    for name in ENGINE_MODULES:
+        s = src / name
+        if not s.exists():
+            print(f"WARNING: engine module missing, container may not import: {s}",
+                  file=sys.stderr)
+            continue
+        shutil.copy2(s, engine_out / name)
+    print(f"vendored {len(ENGINE_MODULES)} engine modules -> engine/")
+
 
 if __name__ == "__main__":
     main()

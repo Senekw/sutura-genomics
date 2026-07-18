@@ -99,8 +99,11 @@ workflow {
     // 3. align every pair (failures are isolated - see errorStrategy in the module)
     SUTURA_ALIGN(ch_pairs)
 
-    // 4. aggregate all metrics (successes and failures) into one report
-    ch_metrics = SUTURA_ALIGN.out.metrics.collect()
+    // 4. aggregate all metrics - aligned pairs (ok/failed) AND skipped pairs (missing
+    //    inputs) - into one report, so nothing silently disappears from the run.
+    ch_metrics = SUTURA_ALIGN.out.metrics
+        .mix(SAMPLESHEET_CHECK.out.skipped_metrics.flatten())
+        .collect()
     SUTURA_REPORT(ch_metrics)
 
     SUTURA_REPORT.out.report.view { "Report written: ${it}" }
