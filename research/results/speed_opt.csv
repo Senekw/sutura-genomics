@@ -4,3 +4,5 @@ D,,,,,4,,,,chain,dist_cached,,,,,,,,0.25,,ok,2026-07-18T08:47:20Z,"4 sections, 1
 D,,,,,,,,,chain,pca_cost_per_pair,,,,,,,,2.51,,ok,2026-07-18T08:47:20Z,pca_distance one pair (NOT chain-cacheable: joint HVG/PCA)
 E,,,4.0,0,4,,,,,sequential,,,,,,,,3.37,27.26,ok,2026-07-18T08:48:10Z,4 pairs serial
 E,,,4.0,0,4,,,,,parallel_w4,,,,,,,,1.11,24.6,ok,2026-07-18T08:48:35Z,"4 pairs, 4 workers, 1.11x vs serial"
+E,,,4.0,0,8,,,,,sequential,,,,,,,,3.7,45.94,ok,2026-07-18T08:49:21Z,8 pairs serial
+E,,,4.0,0,8,,,,,parallel_w8,,,,,,,,1.14,40.39,ok,2026-07-18T08:50:01Z,"8 pairs, 8 workers, 1.14x vs serial"

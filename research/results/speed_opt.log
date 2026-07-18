@@ -16,3 +16,8 @@
 [2026-07-18T08:48:23Z] ... alive stage='E:par4' (40s)
 [2026-07-18T08:48:35Z] Phase E chain=4: serial=27s parallel(4w)=25s -> 1.11x
 [2026-07-18T08:48:43Z] ... alive stage='E:seq8' (60s)
+[2026-07-18T08:49:03Z] ... alive stage='E:seq8' (80s)
+[2026-07-18T08:49:23Z] ... alive stage='E:par8' (100s)
+[2026-07-18T08:49:43Z] ... alive stage='E:par8' (120s)
+[2026-07-18T08:50:01Z] Phase E chain=8: serial=46s parallel(8w)=40s -> 1.14x
+[2026-07-18T08:50:03Z] ... alive stage='E:seq12' (140s)
