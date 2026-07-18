@@ -360,3 +360,6 @@
 [2026-07-18T08:45:16Z] [synthetic] cerebellum s6 seed1: score=0.000 fdisp=98% maxresid=14.7pitch voids=0 (3s)
 [2026-07-18T08:45:17Z] [synthetic] mouse_kidney s2 seed1: score=0.055 fdisp=85% maxresid=4.3pitch voids=2 (1s)
 [2026-07-18T08:45:20Z] [warp_only] mouse_kidney s2 seed1: score=0.055 fdisp=38% maxresid=2.5pitch voids=2 (2s)
+[2026-07-18T08:45:20Z] [warp_only] cerebellum s6 seed1: score=0.000 fdisp=93% maxresid=5.3pitch voids=0 (4s)
+[2026-07-18T08:45:21Z] [synthetic] mouse_kidney s3 seed1: score=0.055 fdisp=92% maxresid=6.6pitch voids=2 (2s)
+[2026-07-18T08:45:24Z] [warp_only] mouse_kidney s3 seed1: score=0.055 fdisp=76% maxresid=3.9pitch voids=2 (3s)
