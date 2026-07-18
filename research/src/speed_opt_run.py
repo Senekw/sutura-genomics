@@ -36,16 +36,25 @@ FULL = 100000       # n_target sentinel meaning "no subsample"
 def phase_B(names, sevs, seeds, n_levels, methods):
     log(f"=== PHASE B (subsampling) datasets={names} sevs={sevs} seeds={seeds} "
         f"N={n_levels} methods={methods} ===")
-    for name in names:
-        pair = prep_pair(name)
-        for seed in seeds:
-            for sev in sevs:
-                # cheap subsamples first, full last (most expensive)
-                for n in n_levels:
+    for name in names:                                   # warm the pair cache
+        prep_pair(name)
+    # Pass 1: all subsample cells, smallest N first, so the full accuracy-vs-N
+    # Pareto lands early even if the night is cut short.
+    for n in n_levels:
+        for name in names:
+            pair = prep_pair(name)
+            for seed in seeds:
+                for sev in sevs:
                     for method in methods:
                         run_cell("B", pair, sev, seed, n, method)
-                run_cell("B", pair, sev, seed, FULL, "full")
-        log(f"=== PHASE B {name} done ===")
+        log(f"=== PHASE B pass1 N={n} done ===")
+    # Pass 2: full-resolution anchors last (most expensive; ~5 min each).
+    # seed 0 only -- the accuracy ceiling; extra seeds add little and cost a lot.
+    for name in names:
+        pair = prep_pair(name)
+        for sev in sevs:
+            run_cell("B", pair, sev, seeds[0], FULL, "full")
+    log("=== PHASE B full anchors done ===")
 
 
 # --------------------------------------------------------------------------- #
@@ -64,16 +73,6 @@ def phase_C(names, seeds):
                 run_cell("C", pair, sev, seed, n, "random",
                          solver=f"sinkhorn{reg:g}", reg=reg)
     log("=== PHASE C done ===")
-
-
-# helper: solver dispatch by label (armijo carried in the label)
-def _run_solver_cell(pair, sev, seed, n, solver_label, reg):
-    armijo = solver_label == "armijo"
-    solver = "sinkhorn" if solver_label.startswith("sinkhorn") else \
-             ("emd" if solver_label in ("emd", "armijo") else solver_label)
-    return run_cell("C", pair, sev, seed, n, "random", solver=solver_label,
-                    armijo=armijo, reg=reg,
-                    numItermax=so.NUMITERMAX, stopThr=so.STOPTHR)
 
 
 # --------------------------------------------------------------------------- #
@@ -232,13 +231,16 @@ def _upsample(adata, target, seed):
     return a
 
 
-def phase_F(names, seed=0):
+def phase_F(names, seed=0, do_upsample=True):
     log("=== PHASE F (scale) ===")
     name = "Br5292" if "Br5292" in names else names[0]     # largest real pair
     pair = prep_pair(name)
     # fine runtime-vs-n sweep at the hardest severity
     for n in (500, 1000, 1500, 2000, 2500, 3000, FULL):
         run_cell("F", pair, 8.0, seed, n, "random")
+    if not do_upsample:
+        log("=== PHASE F done (no upsample) ===")
+        return
     # synthetic upsample tail: confirm no hang, characterize O(n^3) growth
     for target in (5000, 6500):
         key = ("F", name, "8.0", str(seed), str(target), "upsample", "emd",
@@ -354,7 +356,8 @@ def main():
             log(f"PHASE E crashed: {e!r}")
     if "F" in phases:
         try:
-            phase_F(names, seed=seeds[0] if seeds else 0)
+            phase_F(names, seed=seeds[0] if seeds else 0,
+                    do_upsample=not args.smoke)
         except Exception as e:                                   # noqa: BLE001
             log(f"PHASE F crashed: {e!r}")
     if "G" in phases:

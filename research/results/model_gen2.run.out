@@ -6,3 +6,9 @@
 [2026-07-18T08:45:13Z] [Br5292/s0] hand_gate_ot [ot]: corr=12.618 base=12.631 gate=12.618 beats_gate=True (1s)
 C:\Users\karti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\paste2\helper.py:94: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
   joint_adata = ad.concat([sliceA, sliceB])
+Filtered all slices for common genes. There are 33538 common genes.
+PASTE2 starts...
+[2026-07-18T08:45:27Z] ... alive stage='Br5292/s0:base_paste2' (180s)
+C:\Users\karti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\scanpy\preprocessing\_highly_variable_genes.py:857: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  adata._inplace_subset_var(df["highly_variable"])
+[2026-07-18T08:46:27Z] ... alive stage='Br5292/s0:base_paste2' (240s)

@@ -372,7 +372,7 @@ def solve_fgw(M, D_A, D_B, a, b, A_coords, gt, mask, pitch,
         gradF_emd[-nb_dummies:, -nb_dummies:] = np.max(gradF) * 1e2
         gradF_emd = np.asarray(gradF_emd, dtype=np.float64)
 
-        if solver == "sinkhorn":
+        if str(solver).startswith("sinkhorn"):
             Gc = _sinkhorn_oracle(p_ext, q_ext, gradF_emd, reg)
         else:
             Gc = _emd_oracle(p_ext, q_ext, gradF_emd)
