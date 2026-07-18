@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "description": "Canonical ordered pipeline steps for spatial / single-cell analysis. 'order' fixes the sequence; inclusion of each step is decided by the recommender from platform + goals + experiment type.",
+    "last_reviewed": "2026-07"
+  },
+  "steps": [
+    {
+      "id": "data_loading",
+      "order": 10,
+      "name": "Data loading & representation",
+      "purpose": "Read raw platform output into a common in-memory representation (AnnData / SpatialData) so every downstream tool interoperates.",
+      "expert_judgment": false,
+      "always": true
+    },
+    {
+      "id": "qc",
+      "order": 20,
+      "name": "Quality control & filtering",
+      "purpose": "Remove low-quality cells/spots/bins and low-count genes; for imaging, filter by transcripts-per-cell, cell area, and negative-probe rate.",
+      "expert_judgment": true,
+      "expert_note": "QC thresholds are tissue- and platform-specific. There is no universal cutoff; inspect distributions before choosing.",
+      "always": true
+    },
+    {
+      "id": "segmentation",
+      "order": 30,
+      "name": "Cell segmentation",
+      "purpose": "Assign transcripts/signal to individual cells. Required for imaging-based and high-resolution binned platforms; not applicable to multi-cell Visium spots.",
+      "expert_judgment": true,
+      "expert_note": "UNSOLVED in the general case. Segmentation is the single largest source of error in imaging-based spatial data and every downstream count depends on it. Always visually QC boundaries; no tool is reliable across all tissues.",
+      "unsolved": true
+    },
+    {
+      "id": "normalization",
+      "order": 40,
+      "name": "Normalization & feature selection",
+      "purpose": "Correct for sequencing depth / total-count differences and select informative genes.",
+      "expert_judgment": false,
+      "always": true
+    },
+    {
+      "id": "batch_correction",
+      "order": 50,
+      "name": "Batch correction / integration",
+      "purpose": "Remove technical variation between sections, samples, donors, or runs while (ideally) preserving biology, producing a shared embedding.",
+      "expert_judgment": true,
+      "expert_note": "NOT SOLVED reliably. Every method can over-correct (erase real biological differences) or under-correct. Always sanity-check with known markers and by confirming that expected biological differences survive. This is especially dangerous in disease-vs-control designs where the effect you care about can be 'corrected' away."
+    },
+    {
+      "id": "alignment_3d",
+      "order": 60,
+      "name": "Spatial alignment / 3D reconstruction",
+      "purpose": "Register serial sections into a common coordinate framework (2D pairwise alignment or full 3D stack reconstruction).",
+      "expert_judgment": true,
+      "expert_note": "Hard and imperfect. Section-to-section distortion, tears, folds, and unknown z-spacing all degrade results. Alignment quality must be inspected visually; quantitative scores can look fine while anatomy is wrong."
+    },
+    {
+      "id": "dimensionality_clustering",
+      "order": 70,
+      "name": "Dimensionality reduction & clustering",
+      "purpose": "PCA/latent embedding + neighbors graph + Leiden/Louvain clustering to define transcriptional groups prior to annotation.",
+      "expert_judgment": false,
+      "always": true
+    },
+    {
+      "id": "cell_typing",
+      "order": 80,
+      "name": "Cell type annotation",
+      "purpose": "Assign biological cell-type labels to single cells (imaging / HD) via reference mapping or marker-based manual annotation.",
+      "expert_judgment": true,
+      "expert_note": "Automated labels are a starting point, not ground truth. References rarely match your exact tissue/condition; marker-based confirmation and expert review are mandatory. Ambiguous or novel states will be mislabeled."
+    },
+    {
+      "id": "deconvolution",
+      "order": 85,
+      "name": "Spot deconvolution",
+      "purpose": "For multi-cell spots (Visium) or coarse bins: estimate cell-type proportions per spot using a matched single-cell reference.",
+      "expert_judgment": true,
+      "expert_note": "Results are only as good as the single-cell reference. A missing or mismatched cell type in the reference produces confident but wrong proportions. Validate against known anatomy."
+    },
+    {
+      "id": "spatial_domains",
+      "order": 90,
+      "name": "Spatial domain identification",
+      "purpose": "Cluster cells/spots using expression AND spatial position into coherent tissue domains / niches.",
+      "expert_judgment": true,
+      "expert_note": "The number of domains is a user choice with no objective ground truth; different tools/resolutions give different domains. Interpret anatomically."
+    },
+    {
+      "id": "spatial_de",
+      "order": 100,
+      "name": "Spatially variable genes & differential expression",
+      "purpose": "Identify genes that vary across space (SVG) and genes differentially expressed between conditions, domains, or cell types.",
+      "expert_judgment": true,
+      "expert_note": "Spot-level DE is confounded by cell-type composition. For condition comparisons, pseudobulk per sample (not per cell/spot) to avoid pseudo-replication and false positives."
+    },
+    {
+      "id": "cell_communication",
+      "order": 110,
+      "name": "Cell-cell communication / niche analysis",
+      "purpose": "Infer ligand-receptor interactions and neighborhood/niche structure from spatial proximity.",
+      "expert_judgment": true,
+      "expert_note": "Ligand-receptor inference is correlational and reference-database-dependent; spatial proximity does not prove signaling. Treat outputs as hypotheses."
+    },
+    {
+      "id": "visualization",
+      "order": 120,
+      "name": "Visualization & reporting",
+      "purpose": "Interactive and publication-quality spatial visualization, including 3D viewing of reconstructed stacks.",
+      "expert_judgment": false,
+      "always": true
+    }
+  ]
+}

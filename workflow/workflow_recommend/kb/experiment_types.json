@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "description": "Templates for common spatial experiment designs. Each names the goals that design usually implies and the steps it emphasizes. The recommender uses these as priors, then overrides from the specific description (explicit goals, platform, section count).",
+    "last_reviewed": "2026-07"
+  },
+  "experiment_types": {
+    "3d_organ_mapping": {
+      "name": "3D organ mapping (serial sections)",
+      "synonyms": ["3d", "three dimensional", "serial section", "serial sections", "organ mapping", "3d reconstruction", "z-stack", "consecutive sections", "volumetric"],
+      "implies_goals": ["cell_typing", "spatial_domains", "alignment_3d", "batch_correction"],
+      "emphasis": ["alignment_3d", "spatial_domains"],
+      "note": "The defining need is registering many serial sections into a common 3D frame. Section-to-section technical variation means you almost always also need integration. Watch for tears/folds and unknown z-spacing.",
+      "expects_serial_sections": true
+    },
+    "tumor_architecture": {
+      "name": "Tumor architecture / microenvironment",
+      "synonyms": ["tumor", "tumour", "cancer", "microenvironment", "tme", "immune infiltration", "malignant", "carcinoma", "architecture", "niche"],
+      "implies_goals": ["cell_typing", "spatial_domains", "cell_communication", "spatial_de"],
+      "emphasis": ["cell_typing", "spatial_domains", "cell_communication"],
+      "note": "Focus is spatial organization of malignant, stromal, and immune compartments and their interactions. Copy-number-driven malignant cells and continuous states make annotation hard; niches/neighborhoods matter more than global clusters.",
+      "expects_serial_sections": false
+    },
+    "developmental_timeseries": {
+      "name": "Developmental time series",
+      "synonyms": ["development", "developmental", "time series", "timecourse", "time course", "timepoint", "embryo", "embryonic", "gestation", "trajectory", "differentiation", "stages"],
+      "implies_goals": ["cell_typing", "spatial_domains", "batch_correction", "spatial_de"],
+      "emphasis": ["batch_correction", "spatial_domains", "cell_typing"],
+      "note": "Multiple timepoints must be integrated so that stage differences are biology, not batch — but over-correction can erase the developmental signal you want. Rapidly changing anatomy makes cross-timepoint alignment risky; prefer integrating in expression space over forcing spatial registration across stages.",
+      "expects_serial_sections": false
+    },
+    "disease_vs_control": {
+      "name": "Disease vs control comparison",
+      "synonyms": ["disease", "control", "case control", "case-control", "condition", "treated", "untreated", "healthy vs", "vs control", "compare", "comparison", "knockout", "wildtype", "wild-type", "responder"],
+      "implies_goals": ["cell_typing", "spatial_domains", "batch_correction", "spatial_de"],
+      "emphasis": ["spatial_de", "batch_correction"],
+      "note": "The scientific output is a statistically defensible difference between conditions. TWO honesty traps: (1) integration can 'correct away' the very disease effect you are testing; (2) per-cell/per-spot DE pseudo-replicates and inflates false positives. Use pseudobulk per biological replicate and require multiple samples per condition.",
+      "expects_serial_sections": false,
+      "requires_replicates": true
+    },
+    "atlas_building": {
+      "name": "Atlas building / reference construction",
+      "synonyms": ["atlas", "reference", "cell atlas", "compendium", "many samples", "cohort", "consortium", "reference map", "population"],
+      "implies_goals": ["cell_typing", "spatial_domains", "batch_correction"],
+      "emphasis": ["batch_correction", "cell_typing"],
+      "note": "Many donors/samples must integrate into one consistent, reusable reference. Integration across donors is the central challenge and the central risk (donor/batch effects vs real inter-individual biology). Requires careful, harmonized annotation and heavy compute.",
+      "expects_serial_sections": false
+    },
+    "single_section_survey": {
+      "name": "Single-section spatial survey",
+      "synonyms": ["single section", "one section", "pilot", "exploratory", "survey", "single slide", "one slide"],
+      "implies_goals": ["cell_typing", "spatial_domains"],
+      "emphasis": ["cell_typing", "spatial_domains"],
+      "note": "One section, exploratory. No cross-sample integration or 3D alignment needed; this is the simplest case and a good place to validate QC and annotation before scaling up.",
+      "expects_serial_sections": false
+    },
+    "general_spatial": {
+      "name": "General spatial analysis",
+      "synonyms": [],
+      "implies_goals": ["cell_typing", "spatial_domains"],
+      "emphasis": ["cell_typing", "spatial_domains"],
+      "note": "No specific design detected; defaulting to a standard survey pipeline (QC, normalization, clustering, annotation, spatial domains). Provide more detail (platform, number of sections, goal) for a sharper recommendation.",
+      "expects_serial_sections": false
+    }
+  }
+}
