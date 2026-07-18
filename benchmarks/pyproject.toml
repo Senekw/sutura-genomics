@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sutura-bench"
+version = "1.0.0"
+description = "Unified evaluation harness for spatial-transcriptomics alignment methods"
+requires-python = ">=3.10"
+# Runtime deps come from the project .venv (scanpy/anndata, torch, POT, paste2,
+# scikit-learn). Listed here for documentation; install into the existing venv.
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "anndata",
+    "scikit-learn",
+]
+
+[project.scripts]
+sutura-bench = "sutura_bench.cli:main"
+
+[tool.setuptools]
+packages = ["sutura_bench"]
