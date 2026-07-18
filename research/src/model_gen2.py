@@ -994,26 +994,32 @@ def write_findings(rows):
         L.append(f"| {c} | {m:.3f} | {sd:.3f} | {n} | {vb} | {vg} |\n")
 
     # honest verdict
+    gstr = f"{gate_m:.3f}" if gate_m is not None else "n/a"
+    bstr = f"{base_m:.3f}" if base_m is not None else "n/a"
     winners = [c for c, m, sd, n in ranked if m is not None and gate_m is not None
                and m <= gate_m and c not in ("hand_gate_paste2",)]
     L.append("\n## Verdict\n")
-    if winners:
+    if gate_m is None:
+        L.append("- PASTE2 base not yet computed; no verdict against the gate available.\n")
+    elif winners:
         L.append(f"- **{len(winners)} learned config(s) matched/beat the hand gate "
-                 f"({gate_m:.3f}) on held-out donors**: {', '.join(winners)}. "
+                 f"({gstr}) on held-out donors**: {', '.join(winners)}. "
                  "These must pass the leakage audit below before being called a win.\n")
     else:
-        L.append(f"- **No learned config beat the hand gate ({gate_m:.3f}) on held-out donors.** "
+        L.append(f"- **No learned config beat the hand gate ({gstr}) on held-out donors.** "
                  "The gate remains the strongest torn-tissue corrector.\n")
     beat_p2 = [c for c, m, sd, n in ranked if m is not None and base_m is not None
                and m <= base_m and c not in ("base_paste2", "hand_gate_paste2")]
-    L.append(f"- Configs beating the raw PASTE2 base ({base_m:.3f} ): "
-             f"{', '.join(beat_p2) if beat_p2 else 'none'}.\n" if base_m else "")
+    if base_m is not None:
+        L.append(f"- Configs beating the raw PASTE2 base ({bstr}): "
+                 f"{', '.join(beat_p2) if beat_p2 else 'none'}.\n")
     # OT-base transfer sanity
     ot_gate = _agg(rows, "ot", "hand_gate_ot")[0]
     ot_base = _agg(rows, "ot", "base_ot")[0]
-    if ot_base:
+    if ot_base is not None:
+        ogstr = f"{ot_gate:.2f}" if ot_gate is not None else "n/a"
         L.append(f"- OT-surrogate base (free, warp-invariant) is weak "
-                 f"({ot_base:.2f}); its gate={ot_gate:.2f} . Confirms all real headroom is on the "
+                 f"({ot_base:.2f}); its gate={ogstr} . Confirms all real headroom is on the "
                  "PASTE2 base, as expected.\n")
     L.append("\n## Leakage discipline\n"
              "- Fold basis, every trained corrector, the learned gate: fit ONLY on the two TRAIN "
