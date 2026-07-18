@@ -3,3 +3,4 @@
 [2026-07-18T08:44:27Z] ... alive stage='Br5292:prep' (120s)
 [2026-07-18T08:45:10Z] --- fold Br5292 seed 0 ---
 [2026-07-18T08:45:11Z] [Br5292/s0] base_ot [ot]: corr=12.631 base=12.631 gate=12.618 beats_gate=False (1s)
+[2026-07-18T08:45:13Z] [Br5292/s0] hand_gate_ot [ot]: corr=12.618 base=12.631 gate=12.618 beats_gate=True (1s)

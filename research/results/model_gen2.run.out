@@ -1,0 +1,8 @@
+[2026-07-18T08:42:27Z] === model-gen-2 START folds=['Br5292', 'Br5595', 'Br8100'] seeds=[0, 1, 2] paste2=True configs=23 ===
+[2026-07-18T08:43:27Z] ... alive stage='Br5292:basis' (60s)
+[2026-07-18T08:44:27Z] ... alive stage='Br5292:prep' (120s)
+[2026-07-18T08:45:10Z] --- fold Br5292 seed 0 ---
+[2026-07-18T08:45:11Z] [Br5292/s0] base_ot [ot]: corr=12.631 base=12.631 gate=12.618 beats_gate=False (1s)
+[2026-07-18T08:45:13Z] [Br5292/s0] hand_gate_ot [ot]: corr=12.618 base=12.631 gate=12.618 beats_gate=True (1s)
+C:\Users\karti\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\paste2\helper.py:94: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  joint_adata = ad.concat([sliceA, sliceB])

@@ -50,3 +50,4 @@
 [2026-07-18T08:44:38Z] ... alive stage='C:Br8100:s4:seed0:N1500:random:sinkhorn0.1' (640s)
 [2026-07-18T08:44:58Z] ... alive stage='C:Br8100:s4:seed0:N1500:random:sinkhorn0.1' (660s)
 [2026-07-18T08:45:09Z] [C] Br8100 s4 seed0 N1500/random/sinkhorn0.1 nA=1500 nB=1500 iters=301 build=1.5s solve=49.1s p2=3.62 grig=3.34 gaff=2.63
+[2026-07-18T08:45:18Z] ... alive stage='C:Br8100:s4:seed0:N1500:random:sinkhorn0.01' (680s)
