@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "workflow-recommend"
+version = "0.1.0"
+description = "Honest, grounded pipeline recommendations for spatial/single-cell experiments"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["spatial transcriptomics", "single-cell", "pipeline", "visium", "xenium"]
+# Core engine has ZERO runtime dependencies (stdlib only). The recommended tools
+# are installed by the user per the generated pipeline, not by this package.
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+workflow-recommend = "workflow_recommend.cli:main"
+
+[tool.setuptools]
+packages = ["workflow_recommend"]
+
+[tool.setuptools.package-data]
+workflow_recommend = ["kb/*.json"]

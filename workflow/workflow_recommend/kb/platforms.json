@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "description": "Real spatial transcriptomics platforms and their properties. Drives which pipeline steps are required (e.g. spot-based platforms need deconvolution; imaging-based platforms need cell segmentation).",
+    "last_reviewed": "2026-07"
+  },
+  "platforms": {
+    "visium": {
+      "name": "10x Visium",
+      "vendor": "10x Genomics",
+      "modality": "sequencing_spot",
+      "resolution": "55 um spots, 100 um center-to-center; each spot captures 1-10 cells",
+      "single_cell": false,
+      "needs_segmentation": false,
+      "needs_deconvolution": true,
+      "typical_units_per_sample": "~5,000 spots",
+      "gene_coverage": "whole transcriptome (~18,000+ genes detected)",
+      "readers": ["scanpy.read_visium", "squidpy.read.visium", "spatialdata_io.visium"],
+      "notes": "Spots are multi-cellular, so 'cell typing' is really deconvolution (estimating cell-type proportions per spot). Do NOT report per-cell types from raw Visium spots.",
+      "known_limits": "Not single-cell. Spot composition confounds spatial DE and cell-cell communication inference."
+    },
+    "visium_hd": {
+      "name": "10x Visium HD",
+      "vendor": "10x Genomics",
+      "modality": "sequencing_bin",
+      "resolution": "2 um bins (continuous lawn), commonly analyzed at 8 um or 16 um binning",
+      "single_cell": "near",
+      "needs_segmentation": true,
+      "needs_deconvolution": "optional",
+      "typical_units_per_sample": "millions of 2um bins; ~100k-500k cells after binning/segmentation",
+      "gene_coverage": "whole transcriptome",
+      "readers": ["spatialdata_io.visium_hd", "scanpy (bin2cell workflow)", "bin2cell"],
+      "notes": "2um bins approach single-cell but are not cells. Use bin2cell (nucleus-expansion via StarDist/Cellpose on the H&E) or bin aggregation to build cell objects. Very large: expect memory pressure.",
+      "known_limits": "Bin-to-cell assignment is an active, imperfect area. 2um bins are sparse; naive per-bin clustering is noisy."
+    },
+    "xenium": {
+      "name": "10x Xenium",
+      "vendor": "10x Genomics",
+      "modality": "imaging_smFISH",
+      "resolution": "subcellular, individual transcript locations",
+      "single_cell": true,
+      "needs_segmentation": true,
+      "needs_deconvolution": false,
+      "typical_units_per_sample": "100k-1M+ cells",
+      "gene_coverage": "targeted panel (~280-480 genes; 5K panel available)",
+      "readers": ["spatialdata_io.xenium", "squidpy.read.xenium", "sopa"],
+      "notes": "Ships with a default (nucleus-expansion / multimodal) segmentation, but re-segmentation with Baysor/Cellpose/ProSeg often improves boundaries. Panel is targeted, so untargeted cell types may be unresolvable.",
+      "known_limits": "Limited gene panel caps annotation granularity. Segmentation errors propagate into every downstream count."
+    },
+    "merscope": {
+      "name": "Vizgen MERSCOPE (MERFISH)",
+      "vendor": "Vizgen",
+      "modality": "imaging_smFISH",
+      "resolution": "subcellular, individual transcript locations",
+      "single_cell": true,
+      "needs_segmentation": true,
+      "needs_deconvolution": false,
+      "typical_units_per_sample": "100k-1M+ cells",
+      "gene_coverage": "targeted panel (~140-500 genes; custom panels)",
+      "readers": ["spatialdata_io.merscope", "squidpy.read.vizgen", "sopa"],
+      "notes": "Vizgen provides Cellpose-based cell boundaries; transcript-based re-segmentation (Baysor/ProSeg) is common. DAPI + poly-T + membrane stains available for segmentation.",
+      "known_limits": "Optical crowding in dense tissue causes transcript mis-assignment. Targeted panel limits annotation."
+    },
+    "cosmx": {
+      "name": "NanoString CosMx SMI",
+      "vendor": "NanoString / Bruker",
+      "modality": "imaging_smFISH",
+      "resolution": "subcellular, individual transcript locations",
+      "single_cell": true,
+      "needs_segmentation": true,
+      "needs_deconvolution": false,
+      "typical_units_per_sample": "100k-1M cells",
+      "gene_coverage": "1,000-plex or 6,000-plex (Whole Transcriptome panel available)",
+      "readers": ["spatialdata_io.cosmx", "squidpy.read.nanostring", "sopa", "Giotto"],
+      "notes": "Higher plex than Xenium/MERSCOPE (esp. WTx). Default segmentation via CellPose on IF morphology markers. Background/false-positive counts are non-trivial; use negative-probe QC.",
+      "known_limits": "Higher background than other imaging platforms; aggressive negative-probe filtering needed. Segmentation quality varies by tissue."
+    },
+    "stereo_seq": {
+      "name": "Stereo-seq (BGI STOMICS)",
+      "vendor": "BGI / STOMICS",
+      "modality": "sequencing_dnb",
+      "resolution": "220-500 nm DNB spots (nanoscale), analyzed at binned resolution (bin20/bin50) or cell-segmented",
+      "single_cell": "near",
+      "needs_segmentation": true,
+      "needs_deconvolution": "optional",
+      "typical_units_per_sample": "very large FOV (cm-scale); millions of DNBs; 100k-1M+ cells after segmentation",
+      "gene_coverage": "whole transcriptome",
+      "readers": ["Stereopy (st.io.read_gef)", "spatialdata_io.stereoseq", "SAW pipeline output"],
+      "notes": "Nanoscale DNBs are sub-cellular; bin into squares (bin50 ~25um) or segment cells with the ssDNA/nuclei image (Cellpose, StarDist, or Stereopy Cell Segmentation). Huge FOV enables whole-organ sections.",
+      "known_limits": "Enormous data volume (memory/compute). Cell segmentation from ssDNA is imperfect; bin-based analysis is a common compromise but is not single-cell."
+    }
+  }
+}

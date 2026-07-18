@@ -418,3 +418,15 @@ Br5595b 5.66+/-0.10 -> 4.84+/-0.17 (-14%); Br8100b 5.47+/-0.07 -> 4.90+/-0.12 (-
 at every completed severity, both seeds, small variance. Only timeouts: Br5292b sev8 (both seeds, the
 biggest pair at max tear). The validated gate holds on every real cross-section dataset tested
 (6 DLPFC pairs total + breast + mouse). DONE.
+
+---
+## [tear-detect] Real-tissue-damage detector (autonomous overnight, 2026-07-18)
+Branch `tear-detect`. Goal: move beyond synthetic-only tear testing. Build a GT-free detector
+for REAL tears/folds/discontinuities, characterize real damage across all datasets, compare to
+our synthetic `apply_warp(tear=True)` generator, improve the generator to match real stats, and
+re-test the gate on realistic tears.
+Scope guard: touch only research/src/tear_detect*.py and research/results/tear_detect*.
+Plan/progress tracked below as milestones land.
+- [start] oriented: synthetic model = single straight cut + rigid translate of 30-45% of tissue
+  + Gaussian warp (src/warp_slice.py). All data is Visium (array_row/col hex lattice). Building
+  detector next.

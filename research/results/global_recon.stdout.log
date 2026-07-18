@@ -1,0 +1,20 @@
+[2026-07-18 03:31:26] ################ global_recon run start ################
+[2026-07-18 03:31:26] === Experiment A: controlled drift vs chain length ===
+[2026-07-18 03:31:27] Experiment A done.
+[2026-07-18 03:31:27] === Experiment B: real DLPFC chains ===
+C:\Users\karti\arca\.venv\Lib\site-packages\numpy\core\fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+C:\Users\karti\arca\.venv\Lib\site-packages\numpy\core\_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+C:\Users\karti\arca\.venv\Lib\site-packages\numpy\core\fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+C:\Users\karti\arca\.venv\Lib\site-packages\numpy\core\_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[2026-07-18 03:31:30] Experiment B done.
+[2026-07-18 03:31:30] === Experiment C: robustness ===
+[2026-07-18 03:31:30] Experiment C done.
+[2026-07-18 03:31:30] === Experiment E: gate within the global solve ===
+[2026-07-18 03:31:30] Experiment E done.
+[2026-07-18 03:31:30] === Experiment D: runtime scaling ===
+[2026-07-18 03:31:30] Experiment D done.
+[2026-07-18 03:31:30] ################ global_recon run end ################

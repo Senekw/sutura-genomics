@@ -1,6 +1,2 @@
 dataset,tissue,truth,qc_ok,chosen_method,in_dist_confidence,gene_overlap,maha,error,retry,retry_error,footprint_coverage,severity,seed
 Br5292,human DLPFC,in-distribution,True,sutura,0.922,1.0,0.85,1.409,False,,1.041,4.0,0
-Br5595,human DLPFC,in-distribution,True,sutura,0.902,1.0,1.02,1.19,False,,0.988,4.0,0
-Br8100,human DLPFC,off-distribution,True,paste2,0.032,1.0,4.77,3.394,False,,,4.0,0
-mouse,mouse brain,off-distribution,True,paste2,0.02,0.001,,5.421,False,,,4.0,0
-breast,human breast cancer,off-distribution,True,paste2,0.0,0.952,20.4,3.609,False,,,4.0,0

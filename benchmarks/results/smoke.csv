@@ -1,0 +1,9 @@
+run_tag,timestamp,dataset,group,regime,degenerate,tissue,method,kind,severity,seed,median_pitch,mean_pitch,p90_pitch,p95_pitch,median_px,n,pitch_px,bridge_coverage,base_err_pitch,beats_base,seconds,status,detail
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,identity,aligner,0.0,0,0.9728,2.1291,3.9762,3.9794,133.28,3502,137.0,0.9534,2.9866,True,0.0,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,paste2,aligner,0.0,0,2.9866,3.5326,6.8892,8.0355,409.17,3502,137.0,0.9534,2.9866,True,0.0,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,gate_rigid,refiner,0.0,0,1.4611,1.6709,3.05,3.4045,200.18,3502,137.0,0.9534,2.9866,True,0.04,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,gate_affine,refiner,0.0,0,1.4376,1.5892,2.7649,3.1133,196.95,3502,137.0,0.9534,2.9866,True,0.03,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,identity,aligner,4.0,0,4.1022,7.9439,16.3807,16.5149,562.02,3502,137.0,0.9534,3.4261,False,0.0,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,paste2,aligner,4.0,0,3.4261,4.0149,7.9755,9.6228,469.39,3502,137.0,0.9534,3.4261,True,0.0,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,gate_rigid,refiner,4.0,0,3.2289,3.741,6.9788,8.4941,442.37,3502,137.0,0.9534,3.4261,True,0.03,ok,
+smoke,2026-07-18T08:31:14Z,Br8100,dlpfc,real_serial,False,human DLPFC,gate_affine,refiner,4.0,0,2.5642,3.012,5.6703,6.8079,351.31,3502,137.0,0.9534,3.4261,True,0.03,ok,

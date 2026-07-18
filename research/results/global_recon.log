@@ -1,0 +1,24 @@
+[2026-07-18 03:31:26] ################ global_recon run start ################
+[2026-07-18 03:31:26] === Experiment A: controlled drift vs chain length ===
+[2026-07-18 03:31:27] Experiment A done.
+[2026-07-18 03:31:27] === Experiment B: real DLPFC chains ===
+[2026-07-18 03:31:30] Experiment B done.
+[2026-07-18 03:31:30] === Experiment C: robustness ===
+[2026-07-18 03:31:30] Experiment C done.
+[2026-07-18 03:31:30] === Experiment E: gate within the global solve ===
+[2026-07-18 03:31:30] Experiment E done.
+[2026-07-18 03:31:30] === Experiment D: runtime scaling ===
+[2026-07-18 03:31:30] Experiment D done.
+[2026-07-18 03:31:30] ################ global_recon run end ################
+[2026-07-18 03:32:22] ################ global_recon run start ################
+[2026-07-18 03:32:22] === Experiment A: controlled drift vs chain length ===
+[2026-07-18 03:32:26] Experiment A done.
+[2026-07-18 03:32:26] === Experiment B: real DLPFC chains ===
+[2026-07-18 03:32:30] Experiment B done.
+[2026-07-18 03:32:30] === Experiment C: robustness ===
+[2026-07-18 03:32:30] Experiment C done.
+[2026-07-18 03:32:30] === Experiment E: gate within the global solve ===
+[2026-07-18 03:32:30] Experiment E done.
+[2026-07-18 03:32:30] === Experiment D: runtime scaling ===
+[2026-07-18 03:32:31] Experiment D done.
+[2026-07-18 03:32:31] ################ global_recon run end ################
