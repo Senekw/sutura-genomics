@@ -22,3 +22,10 @@
 [2026-07-18T08:50:01Z] Phase E chain=8: serial=46s parallel(8w)=40s -> 1.14x
 [2026-07-18T08:50:03Z] ... alive stage='E:seq12' (140s)
 [2026-07-18T08:50:23Z] ... alive stage='E:seq12' (160s)
+[2026-07-18T08:50:43Z] ... alive stage='E:par12' (180s)
+[2026-07-18T08:51:04Z] ... alive stage='E:par12' (200s)
+[2026-07-18T08:51:23Z] ... alive stage='E:par12' (220s)
+[2026-07-18T08:51:24Z] Phase E chain=12: serial=41s parallel(8w)=42s -> 0.98x
+[2026-07-18T08:51:24Z] === PHASE E done ===
+[2026-07-18T08:51:24Z] speed_opt DONE total=221s -> C:\Users\karti\arca\research\results\speed_opt.csv
+[2026-07-18T08:51:24Z] DONE

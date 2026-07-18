@@ -6,3 +6,5 @@ E,,,4.0,0,4,,,,,sequential,,,,,,,,3.37,27.26,ok,2026-07-18T08:48:10Z,4 pairs ser
 E,,,4.0,0,4,,,,,parallel_w4,,,,,,,,1.11,24.6,ok,2026-07-18T08:48:35Z,"4 pairs, 4 workers, 1.11x vs serial"
 E,,,4.0,0,8,,,,,sequential,,,,,,,,3.7,45.94,ok,2026-07-18T08:49:21Z,8 pairs serial
 E,,,4.0,0,8,,,,,parallel_w8,,,,,,,,1.14,40.39,ok,2026-07-18T08:50:01Z,"8 pairs, 8 workers, 1.14x vs serial"
+E,,,4.0,0,12,,,,,sequential,,,,,,,,2.3,41.23,ok,2026-07-18T08:50:42Z,12 pairs serial
+E,,,4.0,0,12,,,,,parallel_w8,,,,,,,,0.98,42.03,ok,2026-07-18T08:51:24Z,"12 pairs, 8 workers, 0.98x vs serial"

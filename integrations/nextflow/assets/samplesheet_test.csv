@@ -1,3 +1,0 @@
-pair_id,reference,moving,method,gate_refine
-Br5292,demo_data/DLPFC_151507.h5ad,demo_data/DLPFC_151508.h5ad,auto,false
-Br5292_p2,demo_data/DLPFC_151507.h5ad,demo_data/DLPFC_151508.h5ad,paste2,true
