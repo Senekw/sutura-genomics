@@ -66,3 +66,5 @@
 [2026-07-18T08:48:50Z] [warp_only] DLPFC_151507 s2 seed1: score=0.000 fdisp=48% maxresid=1.6pitch voids=0 (3s)
 [2026-07-18T08:48:52Z] [synthetic] DLPFC_151507 s3 seed1: score=0.000 fdisp=92% maxresid=7.5pitch voids=0 (2s)
 [2026-07-18T08:48:54Z] [warp_only] DLPFC_151507 s3 seed1: score=0.000 fdisp=70% maxresid=2.5pitch voids=0 (2s)
+[2026-07-18T08:48:58Z] [synthetic] DLPFC_151507 s4 seed1: score=0.000 fdisp=96% maxresid=10.2pitch voids=0 (3s)
+[2026-07-18T08:49:01Z] [warp_only] DLPFC_151507 s4 seed1: score=0.000 fdisp=85% maxresid=3.4pitch voids=0 (3s)
