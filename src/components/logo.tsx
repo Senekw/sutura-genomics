@@ -5,10 +5,13 @@ export function Logo({
   size = 44,
   withWordmark = true,
   className,
+  wordmarkClassName,
 }: {
   size?: number;
   withWordmark?: boolean;
   className?: string;
+  /** Overrides the default 2xl wordmark — for smaller lockups (e.g. corner marks). */
+  wordmarkClassName?: string;
 }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
@@ -22,7 +25,12 @@ export function Logo({
         style={{ width: size, height: size }}
       />
       {withWordmark && (
-        <span className="text-2xl font-light tracking-tight text-foreground">
+        <span
+          className={cn(
+            "text-2xl font-light tracking-tight text-foreground",
+            wordmarkClassName,
+          )}
+        >
           Sutura Genomics
         </span>
       )}
