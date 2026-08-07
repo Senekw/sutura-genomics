@@ -43,9 +43,15 @@ export default function DemoLoginPage() {
         <ArrowLeft className="h-4 w-4" /> Back
       </Link>
 
+      <Logo
+        size={26}
+        withWordmark
+        className="absolute right-6 top-6"
+        wordmarkClassName="text-base"
+      />
+
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
-          <Logo size={44} withWordmark className="mb-6" />
           <h1 className="text-xl font-light tracking-tight text-foreground">
             Sign in to your workspace
           </h1>

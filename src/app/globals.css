@@ -132,29 +132,41 @@ body {
 .landing .brand {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: clamp(9px, 2.4vw, 14px);
+  max-width: 100%;
 }
+/* Mark and wordmark scale together so the lockup always fits one line — at a
+   fixed 47px the wordmark wrapped on phones, which vertically re-centered the
+   emblem against a two-line block and left it stranded to the left. */
 .landing .brand .mark {
-  width: 46px;
-  height: 46px;
+  width: clamp(34px, 8.6vw, 46px);
+  height: clamp(34px, 8.6vw, 46px);
+  flex: none;
   object-fit: contain;
   display: block;
 }
 .landing .brand .word {
-  font-size: 47px;
+  font-size: clamp(29px, 8vw, 47px);
   font-weight: 300;
   letter-spacing: 0.015em;
+  line-height: 1.1;
+  white-space: nowrap;
   color: var(--cb-ink);
 }
 
 .landing .tagline {
   margin: 24px 0 0;
   max-width: 32rem;
-  min-height: 1.7em; /* one line — matches cuebench's tight tagline→button rhythm */
+  /* Two lines are always reserved so the button below never shifts as the
+     typewriter types, deletes, and cycles. */
+  min-height: 3.2em;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  white-space: pre-line; /* renders the explicit \n break in each tagline */
   font-size: 17px;
+  line-height: 1.6;
   font-weight: 300;
   letter-spacing: 0.01em;
   color: var(--cb-muted);

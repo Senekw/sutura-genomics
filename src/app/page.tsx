@@ -37,7 +37,6 @@ export default function Home() {
           height={46}
           priority
           className="mark"
-          style={{ width: 46, height: 46 }}
         />
         <span className="word">Sutura Genomics</span>
       </div>
@@ -45,10 +44,13 @@ export default function Home() {
       {/* Tagline — typewriter (honest, no benchmark claim) */}
       <p className="tagline fade d1">
         <Typewriter
+          // Break points are explicit (\n, rendered via white-space: pre-line)
+          // so each line breaks where it reads best instead of wherever the
+          // viewport happens to reflow it.
           text={[
-            "The alignment layer for spatial transcriptomics",
-            "Graph deep learning for tissue registration",
-            "Built for the tears optimal transport can't represent",
+            "The alignment layer for\nspatial transcriptomics",
+            "Graph deep learning for\ntissue registration",
+            "Built for the tears\noptimal transport can't represent",
           ]}
           speed={55}
           deleteSpeed={28}
