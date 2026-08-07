@@ -1,6 +1,6 @@
 // Client side of the analysis assistant: a grounded metrics context, a
 // rule-based "full analysis" (no API key needed), and a chat call to /api/chat
-// (xAI Grok, key from the server environment) with a graceful fallback.
+// (Google Gemini, key held server-side) with a graceful fallback.
 
 import type { DemoDataset } from "./demoDatasets";
 import type { Run } from "./demoRuns";
@@ -20,10 +20,18 @@ export function buildContext(ds: DemoDataset, run: Run) {
     tissue: ds.tissue,
     sections: run.sections,
     classLabel: ds.classLabel,
+    // Breast/kidney are illustrative demo data (demoDatasets.ts). Pass the flag
+    // so the assistant discloses that instead of presenting them as findings.
+    dataIsSynthetic: !ds.real,
+    runStatus: run.status,
     medianErrorPx: run.medianErrorPx,
+    // Only PASTE2 is carried as a comparison: it is the one baseline actually
+    // run end-to-end on this benchmark. The other rows in ds.benchmark are not
+    // grounded the same way, so they are deliberately not given to the model.
     paste2Px: ds.paste2Px,
     spotsRegistered: run.spots,
     coverage: run.coverage,
+    parameters: run.params,
     layers: ds.regions.map((r) => ({
       label: r.label,
       spots: r.count,
@@ -51,6 +59,20 @@ export function fullAnalysis(ds: DemoDataset, run: Run): string {
   ].join("\n\n");
 }
 
+// Starter questions that name what actually happened in this run, so the
+// prompts read as being about the result on screen rather than as generic
+// chatbot filler.
+export function suggestedQuestions(ds: DemoDataset, run: Run): string[] {
+  const worst = [...ds.regions].sort((a, b) => residNum(b.resid) - residNum(a.resid))[0];
+  const label = ds.classLabel.toLowerCase();
+  return [
+    worst ? `Why did ${worst.label} carry the largest residual?` : `Which ${label} aligned worst?`,
+    run.medianErrorPx < PITCH ? "Is this accurate enough to trust?" : "Why is the error above one spot pitch?",
+    "How does this compare to PASTE2?",
+    `What did tear sensitivity ${run.params.tearSensitivity} change?`,
+  ];
+}
+
 function rateOk(): boolean {
   try {
     const now = Date.now();
@@ -66,34 +88,59 @@ function rateOk(): boolean {
   }
 }
 
-export type ChatReply = { answer: string; source: "gemini" | "fallback" };
+export type ChatTurn = { role: "user" | "assistant"; text: string };
+export type ChatReply = { answer: string; source: "gemini" | "fallback" | "notice" };
 
-export async function askChat(question: string, ds: DemoDataset, run: Run): Promise<ChatReply> {
-  const fallback = (): ChatReply => ({
-    answer:
-      "Live chat isn't available right now (Gemini isn't configured for this deployment). Here's the grounded summary instead:\n\n" +
-      fullAnalysis(ds, run),
+// A failure should never expose deployment state to a visitor. Each case gets
+// copy that says what happened and what to do, and anything that leaves the
+// assistant unable to answer still hands back the grounded summary.
+function unavailable(ds: DemoDataset, run: Run, lead: string): ChatReply {
+  return {
+    answer: `${lead}\n\nHere's the grounded summary of this run in the meantime:\n\n${fullAnalysis(ds, run)}`,
     source: "fallback",
-  });
+  };
+}
 
+export async function askChat(
+  question: string,
+  ds: DemoDataset,
+  run: Run,
+  history: ChatTurn[] = [],
+): Promise<ChatReply> {
   if (!rateOk()) {
     return {
-      answer: "You're sending messages quickly — please wait a moment before asking again.",
-      source: "fallback",
+      answer: "You're sending questions faster than the assistant can take them. Give it a few seconds and try again.",
+      source: "notice",
     };
   }
 
+  let res: Response;
   try {
-    const res = await fetch("/api/chat", {
+    res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, context: buildContext(ds, run) }),
+      body: JSON.stringify({ question, context: buildContext(ds, run), history }),
     });
-    if (!res.ok) return fallback();
+  } catch {
+    return unavailable(ds, run, "The assistant couldn't be reached — that's usually a network drop on this end.");
+  }
+
+  if (res.status === 429) {
+    return {
+      answer: "The assistant is handling a lot of questions right now. Try again in a moment.",
+      source: "notice",
+    };
+  }
+  if (!res.ok) {
+    return unavailable(ds, run, "The assistant isn't available right now.");
+  }
+
+  try {
     const data = await res.json();
     const answer = typeof data.answer === "string" ? data.answer.trim() : "";
-    return answer ? { answer, source: "gemini" } : fallback();
+    if (answer) return { answer, source: "gemini" };
   } catch {
-    return fallback();
+    /* fall through to the grounded summary */
   }
+  return unavailable(ds, run, "The assistant didn't return an answer to that one.");
 }
