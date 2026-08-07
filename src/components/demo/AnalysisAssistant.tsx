@@ -1,19 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Sparkles, Send, ChevronDown } from "lucide-react";
+import { Sparkles, Send, ChevronDown, RotateCcw } from "lucide-react";
 
 import type { DemoDataset } from "@/lib/demoDatasets";
 import { analyzeRun, type Run } from "@/lib/demoRuns";
-import { askChat, fullAnalysis, type ChatReply } from "@/lib/analysisChat";
+import {
+  askChat,
+  fullAnalysis,
+  suggestedQuestions,
+  type ChatReply,
+  type ChatTurn,
+} from "@/lib/analysisChat";
 
 type Msg = { role: "user" | "assistant"; text: string; source?: ChatReply["source"] };
-
-const SUGGESTIONS = [
-  "Which region aligned worst?",
-  "Was the tear resolved?",
-  "How does this compare to PASTE2?",
-];
 
 export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: Run }) {
   const [expanded, setExpanded] = useState(false);
@@ -22,13 +22,23 @@ export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: R
   const [busy, setBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const suggestions = suggestedQuestions(ds, run);
+
   const send = async (q: string) => {
     const question = q.trim();
     if (!question || busy) return;
     setInput("");
+
+    // The turns that existed before this question are the conversation the
+    // model needs in order to resolve follow-ups like "why?". Notices (rate
+    // limits, outages) aren't part of the discussion, so they're left out.
+    const history: ChatTurn[] = messages
+      .filter((m) => m.source !== "notice")
+      .map((m) => ({ role: m.role, text: m.text }));
+
     setMessages((m) => [...m, { role: "user", text: question }]);
     setBusy(true);
-    const reply = await askChat(question, ds, run);
+    const reply = await askChat(question, ds, run, history);
     setMessages((m) => [...m, { role: "assistant", text: reply.answer, source: reply.source }]);
     setBusy(false);
     requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: 1e6, behavior: "smooth" }));
@@ -41,11 +51,30 @@ export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: R
           <Sparkles className="h-3.5 w-3.5 text-[#6633ee]" strokeWidth={2} />
         </span>
         <h2 className="text-[15px] font-normal text-foreground">Analysis assistant</h2>
+        {messages.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setMessages([])}
+            className="ml-auto inline-flex items-center gap-1 text-[12px] font-light text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <RotateCcw className="h-3 w-3" strokeWidth={2} />
+            Clear
+          </button>
+        )}
       </div>
 
       <div className="px-6 py-5">
         {/* Grounded one-line read */}
         <p className="text-[14px] font-light leading-relaxed text-foreground">{analyzeRun(run)}</p>
+
+        {/* Illustrative datasets are labelled here as well as in the model's
+            context, so the caveat is visible without having to ask for it. */}
+        {!ds.real && (
+          <p className="mt-2 text-[12px] font-light leading-relaxed text-muted-foreground">
+            {ds.name} is illustrative demo data — these figures show how a result reads, not a
+            measured outcome.
+          </p>
+        )}
 
         {/* See full analysis */}
         <button
@@ -64,7 +93,13 @@ export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: R
 
         {/* Chat */}
         {messages.length > 0 && (
-          <div ref={scrollRef} className="mt-4 max-h-72 space-y-3 overflow-y-auto pr-1">
+          <div
+            ref={scrollRef}
+            className="mt-4 max-h-72 space-y-3 overflow-y-auto pr-1"
+            role="log"
+            aria-live="polite"
+            aria-label="Analysis assistant conversation"
+          >
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                 <div
@@ -76,7 +111,9 @@ export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: R
                   }
                 >
                   <p className="whitespace-pre-line">{m.text}</p>
-                  {m.role === "assistant" && (
+                  {/* Notices (rate limits, outages) aren't answers, so they
+                      carry no provenance line. */}
+                  {m.role === "assistant" && m.source !== "notice" && (
                     <p className="mt-1.5 flex items-center gap-1 text-[10.5px] font-light text-muted-foreground">
                       <Sparkles className="h-2.5 w-2.5 text-[#6633ee]/70" strokeWidth={1.8} />
                       {m.source === "gemini" ? "Gemini · grounded in run metrics" : "Rule-based summary"}
@@ -98,7 +135,7 @@ export default function AnalysisAssistant({ ds, run }: { ds: DemoDataset; run: R
 
         {messages.length === 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {SUGGESTIONS.map((q) => (
+            {suggestions.map((q) => (
               <button
                 key={q}
                 type="button"
